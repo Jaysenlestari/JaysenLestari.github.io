@@ -336,7 +336,7 @@ html[data-theme='light'] .site-header {
   font-size: 0.9rem;
 }
 
-/* Reusable bits */
+
 .eyebrow {
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -436,7 +436,7 @@ html[data-theme='light'] .site-header {
   border-color: rgba(255, 255, 255, 0.15);
 }
 
-/* Hero */
+
 .hero {
   padding: 3rem 0 2rem;
 }
@@ -490,7 +490,7 @@ html[data-theme='light'] .site-header {
   object-fit: cover;
 }
 
-/* Highlights */
+
 .highlights {
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr);
@@ -521,7 +521,7 @@ html[data-theme='light'] .site-header {
   color: var(--text);
 }
 
-/* Top viewed */
+
 .top-posts {
   margin: 2.5rem 0;
 }
@@ -578,7 +578,7 @@ html[data-theme='light'] .site-header {
   font-size: 0.92rem;
 }
 
-/* Latest posts */
+
 .latest {
   margin: 2rem 0;
 }
@@ -647,7 +647,7 @@ html[data-theme='light'] .site-header {
   color: var(--accent);
 }
 
-/* Post layout */
+
 .post {
   background: transparent;
   border: none;
@@ -819,7 +819,7 @@ html[data-theme='light'] .site-header {
   padding: 0.5rem 0.6rem;
 }
 
-/* Tags page */
+
 .tags-page {
   display: flex;
   flex-direction: column;
@@ -896,7 +896,7 @@ hr {
   margin: 2rem 0;
 }
 
-/* ===== VS Code / Ray.so style code blocks ===== */
+
 :root {
   --code-bg: #111a2d;
   --code-text: #e8edf7;
@@ -1068,7 +1068,7 @@ figure.highlight > figcaption,
   display: none;
 }
 
-/* TOC toggle (mobile) */
+
 .toc-toggle {
   display: none;
   position: fixed;
@@ -1100,7 +1100,7 @@ figure.highlight > figcaption,
   fill: currentColor;
 }
 
-/* Syntax colors (Rouge) */
+
 :root {
   --code-comment: #6b7487;
   --code-keyword: #c792ea;
@@ -1183,7 +1183,7 @@ html[data-theme="light"] {
 }
 
 @media (max-width: 900px) {
-  /* --- 1. HEADER FIX --- */
+  
   .site-header {
     position: sticky;
     top: 0;
@@ -1198,16 +1198,16 @@ html[data-theme="light"] {
     color: var(--text) !important;
   }
 
-  /* --- 2. HAMBURGER MENU (GLASSMORPHISM) --- */
+  
   .nav-links {
     display: flex !important;
     position: absolute;
     top: 100%;
     left: 0;
     width: 100vw;
-    /* Background semi-transparan biar blur kelihatan */
+    
     background: rgba(31, 36, 48, 0.99) !important; 
-    /* EFEK KACA BURAM */
+    
     backdrop-filter: blur(15px) !important;
     -webkit-backdrop-filter: blur(15px);
     
@@ -1216,7 +1216,7 @@ html[data-theme="light"] {
     z-index: 10000;
     border-bottom: 1px solid var(--border);
     
-    /* Animation */
+    
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);
@@ -1231,7 +1231,7 @@ html[data-theme="light"] {
     pointer-events: auto !important;
   }
 
-  /* --- 3. TOC BOTTOM SHEET (GLASSMORPHISM) --- */
+  
   .toc-toggle {
     display: inline-flex !important;
     position: fixed;
@@ -1241,7 +1241,7 @@ html[data-theme="light"] {
     transition: opacity 0.3s ease, transform 0.3s ease;
   }
 
-  /* KUNCI: Tombol TOC ilang pas menu kebuka */
+  
   body.toc-open .toc-toggle {
     opacity: 0 !important;
     pointer-events: none;
@@ -1259,7 +1259,7 @@ html[data-theme="light"] {
     border-radius: 24px 24px 0 0;
     z-index: 10000;
     
-    /* Background semi-transparan & Blur */
+    
     background: rgba(31, 36, 48, 0.99) !important;
     backdrop-filter: blur(15px) !important;
     -webkit-backdrop-filter: blur(15px);
@@ -1274,7 +1274,7 @@ html[data-theme="light"] {
     transform: translateY(0) !important;
   }
 
-  /* Light Mode Adjustment */
+  
   html[data-theme='light'] .nav-links,
   html[data-theme='light'] .toc-card {
     background: rgba(255, 255, 255, 0.7) !important;
@@ -1310,68 +1310,66 @@ html[data-theme="light"] {
 }
 
 @media (max-width: 900px) {
-  /* --- 1. HERO SECTION RESPONSIVE --- */
+  
   .hero {
-    padding: 2rem 0 3rem; /* Kurangi padding atas biar ga terlalu jauh */
+    padding: 2rem 0 3rem; 
   }
 
   .hero-grid {
-    grid-template-columns: 1fr; /* Paksa jadi satu kolom tunggal */
-    gap: 2.5rem; /* Kasih jarak antara teks dan foto profile */
-    text-align: center; /* Center teks biar rapi di HP */
+    grid-template-columns: 1fr; 
+    gap: 2.5rem; 
+    text-align: center; 
   }
 
   .hero-copy {
-    order: 1; /* Teks di atas */
-    align-items: center; /* Center teks lede dan actions */
+    order: 1; 
+    align-items: center; 
   }
 
   .hero h1 {
-    font-size: 2.2rem; /* Kecilin dikit ukuran font buat layar kecil */
+    font-size: 2.2rem; 
     line-height: 1.2;
   }
 
   .lede {
-    margin: 0 auto; /* Biar paragrafnya rata tengah */
+    margin: 0 auto; 
   }
 
   .hero-actions {
-    justify-content: center; /* Center tombol View Posts & About */
+    justify-content: center; 
     width: 100%;
   }
 
   .hero-avatar {
-    order: 2; /* Foto di bawah teks (atau 1 kalau mau di atas) */
+    order: 2; 
     width: 100%;
-    max-width: 280px; /* Batasi lebar container avatar di mobile */
-    margin: 0 auto; /* Center container foto */
+    max-width: 280px; 
+    margin: 0 auto; 
   }
 
   .avatar-frame {
-    width: 160px; /* Kecilin dikit ukuran lingkarannya */
+    width: 160px;
     height: 160px;
   }
 
-  /* --- 2. POST GRID RESPONSIVE --- */
   .post-grid {
-    grid-template-columns: 1fr; /* Stacking kartu blog ke bawah */
+    grid-template-columns: 1fr;
     gap: 1.5rem;
   }
 }
 
-/* Fix tambahan untuk layar sangat kecil (HP jadul/kecil) */
 @media (max-width: 480px) {
   .hero h1 {
     font-size: 1.8rem;
   }
   
   .hero-actions {
-    flex-direction: column; /* Tombol jadi tumpuk vertikal */
+    flex-direction: column;
     gap: 1rem;
   }
   
   .hero-actions .btn {
-    width: 100%; /* Tombol full width biar gampang diklik jari */
+    width: 100%;
     justify-content: center;
   }
 }
