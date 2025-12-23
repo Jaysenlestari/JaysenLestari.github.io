@@ -30,6 +30,11 @@ layout: default
 
     <aside id="post-toc" class="toc-card" aria-label="Table of contents"></aside>
   </div>
+  <button id="toc-toggle" class="toc-toggle" type="button" aria-expanded="false" aria-controls="post-toc" aria-label="Toggle table of contents">
+    <svg viewBox="0 0 24 24" role="presentation">
+      <path d="M4 5.5c0-.55.45-1 1-1h14a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1Zm0 6c0-.55.45-1 1-1h8a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1Zm0 6c0-.55.45-1 1-1h14a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1Z"/>
+    </svg>
+  </button>
 </article>
 
 <script>
@@ -96,6 +101,23 @@ layout: default
 
   tocRoot.appendChild(title);
   tocRoot.appendChild(rootList);
+
+  // Toggle for mobile
+  const tocToggle = document.getElementById('toc-toggle');
+  if (tocToggle) {
+    const toggleState = (open) => {
+      tocToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      tocRoot.classList.toggle('open', open);
+    };
+    tocToggle.addEventListener('click', () => {
+      const willOpen = !tocRoot.classList.contains('open');
+      toggleState(willOpen);
+    });
+    // Close when clicking a TOC link (mobile)
+    tocRoot.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => toggleState(false));
+    });
+  }
 
   const observer = new IntersectionObserver(
     (entries) => {

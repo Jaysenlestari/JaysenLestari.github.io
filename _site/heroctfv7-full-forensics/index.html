@@ -87,9 +87,11 @@
       
 
       <div class="post-body">
-        <p>About a month ago, I participated in heroCTF v7 with my team, CSUI, where we finished 9th overall and successfully solved all forensic challenges. I personally handled most of the forensic tracks, which turned out to be among the most enjoyable and realistic CTF challenges I have experienced so far.</p>
+        <p>About a month ago, I participated in heroCTF v7 with my team, CSUI, where we finished 9th overall and successfully solved all forensic challenges. I personally worked on most of the forensic challanges throughout the competition.</p>
 
-<p>This challenge series is based on real-world engagements, including both penetration testing and red team operations, as stated by the challenge author. This realism is clearly reflected in the attack flow, which closely resembles an actual enterprise intrusion and requires a DFIR-style investigation rather than isolated exploitation steps. In this post, I will share the full forensic write-up of <em>Operation Pensieve Breach</em>, covering the complete attack timeline from the initial access and lateral movement to privilege escalation, credential theft, and domain compromise based entirely on evidence extracted from logs, disk artifacts, network traffic, and memory analysis.</p>
+<p>This challenge series is based on real-world engagements, including both penetration testing and red team operations, as stated by the challenge author. This realism is clearly reflected in the attack flow, which closely resembles an actual enterprise intrusion and requires a DFIR-style investigation rather than isolated exploitation steps.</p>
+
+<p>In this post, I will share the full forensic write-up of <em>Operation Pensieve Breach</em>, covering the complete attack timeline from the initial access and lateral movement to privilege escalation, credential theft, and domain compromise based entirely on evidence extracted from logs, disk artifacts, network traffic, and memory analysis.</p>
 
 <p>You can access the challange attachments and the official writeup <a href="https://github.com//assets/heroCTF//assets/heroCTF_v7/tree/master/Forensics">here</a></p>
 
@@ -756,6 +758,8 @@ This conclusion is drawn from the fact that:</p>
 
 <p>FLAG: <code class="language-plaintext highlighter-rouge">Hero{sa;GRINGOTTS02;http://192.168.56.200:8000/update.exe;445;192.168.56.200}</code></p>
 
+<hr />
+
 <h2 id="operation-pensieve-breach---6">Operation Pensieve Breach - 6</h2>
 
 <h3 id="attachment-5">Attachment</h3>
@@ -816,6 +820,8 @@ The frame contained multiple cookies, but one cookie stood out due to its unusua
 <code class="language-plaintext highlighter-rouge">/dev/shm/kinit</code></p>
 
 <p>FLAG = <code class="language-plaintext highlighter-rouge">Hero{base64:zHJvDAIBtVN83kzkjqUZNv42w9gjd8FZZllqdqn0EBQ=;/dev/shm/kinit}</code></p>
+
+<hr />
 
 <h2 id="operation-pensieve-breach---7">Operation Pensieve Breach - 7</h2>
 
@@ -961,6 +967,11 @@ This strongly indicates that:</p>
 
     <aside id="post-toc" class="toc-card" aria-label="Table of contents"></aside>
   </div>
+  <button id="toc-toggle" class="toc-toggle" type="button" aria-expanded="false" aria-controls="post-toc" aria-label="Toggle table of contents">
+    <svg viewBox="0 0 24 24" role="presentation">
+      <path d="M4 5.5c0-.55.45-1 1-1h14a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1Zm0 6c0-.55.45-1 1-1h8a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1Zm0 6c0-.55.45-1 1-1h14a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1Z"/>
+    </svg>
+  </button>
 </article>
 
 <script>
@@ -1027,6 +1038,23 @@ This strongly indicates that:</p>
 
   tocRoot.appendChild(title);
   tocRoot.appendChild(rootList);
+
+  // Toggle for mobile
+  const tocToggle = document.getElementById('toc-toggle');
+  if (tocToggle) {
+    const toggleState = (open) => {
+      tocToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      tocRoot.classList.toggle('open', open);
+    };
+    tocToggle.addEventListener('click', () => {
+      const willOpen = !tocRoot.classList.contains('open');
+      toggleState(willOpen);
+    });
+    // Close when clicking a TOC link (mobile)
+    tocRoot.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => toggleState(false));
+    });
+  }
 
   const observer = new IntersectionObserver(
     (entries) => {

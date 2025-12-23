@@ -1,7 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2025-12-23T19:15:28+07:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Jay’s Cybersecurity Notes</title><subtitle>A personal technical blog documenting my journey as a Computer Science student, covering cybersecurity, CTF write-ups, digital forensics, reverse engineering, and hands-on security research.
-</subtitle><author><name>Jaysen</name></author><entry><title type="html">Operation Pensieve Breach - heroCTF v7</title><link href="http://localhost:4000/heroctfv9-full-forensics/" rel="alternate" type="text/html" title="Operation Pensieve Breach - heroCTF v7" /><published>2025-12-23T00:00:00+07:00</published><updated>2025-12-23T00:00:00+07:00</updated><id>http://localhost:4000/heroctfv9-full-forensics</id><content type="html" xml:base="http://localhost:4000/heroctfv9-full-forensics/"><![CDATA[<p>About a month ago, I participated in heroCTF v7 with my team, CSUI, where we finished 9th overall and successfully solved all forensic challenges. I personally handled most of the forensic tracks, which turned out to be among the most enjoyable and realistic CTF challenges I have experienced so far.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2025-12-23T20:27:53+07:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Jay’s Cybersecurity Notes</title><subtitle>A personal technical blog documenting my journey as a Computer Science student, covering cybersecurity, CTF write-ups, digital forensics, reverse engineering, and hands-on security research.
+</subtitle><author><name>Jaysen</name></author><entry><title type="html">Operation Pensieve Breach - heroCTF v7</title><link href="http://localhost:4000/heroctfv7-full-forensics/" rel="alternate" type="text/html" title="Operation Pensieve Breach - heroCTF v7" /><published>2025-12-23T00:00:00+07:00</published><updated>2025-12-23T00:00:00+07:00</updated><id>http://localhost:4000/heroctfv7-full-forensics</id><content type="html" xml:base="http://localhost:4000/heroctfv7-full-forensics/"><![CDATA[<p>About a month ago, I participated in heroCTF v7 with my team, CSUI, where we finished 9th overall and successfully solved all forensic challenges. I personally worked on most of the forensic challanges throughout the competition.</p>
 
-<p>This challenge series is based on real-world engagements, including both penetration testing and red team operations, as stated by the challenge author. This realism is clearly reflected in the attack flow, which closely resembles an actual enterprise intrusion and requires a DFIR-style investigation rather than isolated exploitation steps. In this post, I will share the full forensic write-up of <em>Operation Pensieve Breach</em>, covering the complete attack timeline from the initial access and lateral movement to privilege escalation, credential theft, and domain compromise based entirely on evidence extracted from logs, disk artifacts, network traffic, and memory analysis.</p>
+<p>This challenge series is based on real-world engagements, including both penetration testing and red team operations, as stated by the challenge author. This realism is clearly reflected in the attack flow, which closely resembles an actual enterprise intrusion and requires a DFIR-style investigation rather than isolated exploitation steps.</p>
+
+<p>In this post, I will share the full forensic write-up of <em>Operation Pensieve Breach</em>, covering the complete attack timeline from the initial access and lateral movement to privilege escalation, credential theft, and domain compromise based entirely on evidence extracted from logs, disk artifacts, network traffic, and memory analysis.</p>
 
 <p>You can access the challange attachments and the official writeup <a href="https://github.com//assets/heroCTF//assets/heroCTF_v7/tree/master/Forensics">here</a></p>
 
@@ -668,6 +670,8 @@ This conclusion is drawn from the fact that:</p>
 
 <p>FLAG: <code class="language-plaintext highlighter-rouge">Hero{sa;GRINGOTTS02;http://192.168.56.200:8000/update.exe;445;192.168.56.200}</code></p>
 
+<hr />
+
 <h2 id="operation-pensieve-breach---6">Operation Pensieve Breach - 6</h2>
 
 <h3 id="attachment-5">Attachment</h3>
@@ -728,6 +732,8 @@ The frame contained multiple cookies, but one cookie stood out due to its unusua
 <code class="language-plaintext highlighter-rouge">/dev/shm/kinit</code></p>
 
 <p>FLAG = <code class="language-plaintext highlighter-rouge">Hero{base64:zHJvDAIBtVN83kzkjqUZNv42w9gjd8FZZllqdqn0EBQ=;/dev/shm/kinit}</code></p>
+
+<hr />
 
 <h2 id="operation-pensieve-breach---7">Operation Pensieve Breach - 7</h2>
 
@@ -866,4 +872,4 @@ This strongly indicates that:</p>
 
 <p>This challenge was especially enjoyable due to how closely it mirrors a real-world DFIR investigation. Each stage required correlating evidence across multiple data sources, reinforcing the importance of methodical analysis over isolated exploitation techniques.</p>
 
-<p>Huge credit to the challenge author and the heroCTF team for designing this scenario.</p>]]></content><author><name>Jaysen</name></author><category term="CTF |" /><category term="Forensics |" /><category term="DFIR" /><category term="DigitalForensics" /><category term="ActiveDirectory" /><category term="DCsync" /><category term="GLPI" /><category term="BYOVD" /><summary type="html"><![CDATA[About a month ago, I participated in heroCTF v7 with my team, CSUI, where we finished 9th overall and successfully solved all forensic challenges. I personally handled most of the forensic tracks, which turned out to be among the most enjoyable and realistic CTF challenges I have experienced so far.]]></summary></entry></feed>
+<p>Huge credit to the challenge author and the heroCTF team for designing this scenario.</p>]]></content><author><name>Jaysen</name></author><category term="CTF |" /><category term="Forensics |" /><category term="DFIR" /><category term="DigitalForensics" /><category term="ActiveDirectory" /><category term="DCsync" /><category term="GLPI" /><category term="BYOVD" /><summary type="html"><![CDATA[About a month ago, I participated in heroCTF v7 with my team, CSUI, where we finished 9th overall and successfully solved all forensic challenges. I personally worked on most of the forensic challanges throughout the competition.]]></summary></entry></feed>
