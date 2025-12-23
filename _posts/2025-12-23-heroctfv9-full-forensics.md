@@ -1,12 +1,13 @@
 ---
 layout: post
-title: "Operation Pensieve Breach (heroCTF v7)"
+title: "Operation Pensieve Breach - heroCTF v7"
 date: 2025-12-23
-categories: [CTF, Forensics, DFIR]
+categories: [CTF |, Forensics |, DFIR]
 tags: [heroCTF, ActiveDirectory, DCsync, GLPI, BYOVD]
 ---
 
-About a month ago, I participated in heroCTF v7 with my team, **CSUI**, where we finished 9th at the end and successfully solved all forensic challenges. I personally handled most of the forensic tracks, which turned out to be some of the most enjoyable and realistic forensic challenges I have experienced in a CTF so far.
+
+About a month ago, I participated in heroCTF v7 with my team, CSUI, where we finished 9th overall and successfully solved all forensic challenges. I personally handled most of the forensic tracks, which turned out to be among the most enjoyable and realistic CTF challenges I have experienced so far.
 
 This challenge series is based on real-world engagements, including both penetration testing and red team operations, as stated by the challenge author. This realism is clearly reflected in the attack flow, which closely resembles an actual enterprise intrusion and requires a DFIR-style investigation rather than isolated exploitation steps. In this post, I will share the full forensic write-up of *Operation Pensieve Breach*, covering the complete attack timeline from the initial access and lateral movement to privilege escalation, credential theft, and domain compromise based entirely on evidence extracted from logs, disk artifacts, network traffic, and memory analysis.
 
@@ -70,8 +71,7 @@ The final successful logon before the DCsync activity originated from the follow
 ![alt text](/assets/heroCTF/1d.png)
 IP : `192.168.56.230`
 
-FLAG: `Hero{albus.dumbledore;22/11/2025-23:13:41;192.168.56.200;192.168.56.230}
-`
+FLAG: `Hero{albus.dumbledore;22/11/2025-23:13:41;192.168.56.200;192.168.56.230}`
 
 ---
 
@@ -102,7 +102,7 @@ To identify potentially malicious modifications, recently modified files within 
 find /var/www/glpi -type f -mtime -30 -ls | sort -k11
 ```
 This revealed a suspicious file:
-```
+```bash
 281474977455951     72 -rwxrwxrwx   1 jay      jay         73231 Nov 23 06:10 ./var/www/glpi/src/Auth.php
 ```
 The file permissions and recent modification timestamp strongly suggest unauthorized tampering.

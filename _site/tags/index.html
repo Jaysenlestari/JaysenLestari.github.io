@@ -3,21 +3,21 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{% if page.title %}{{ page.title }} | {% endif %}{{ site.title }}</title>
-    <link rel="stylesheet" href="{{ '/assets/main.css' | relative_url }}">
-    <link rel="stylesheet" href="{{ '/assets/css/custom.css' | relative_url }}">
+    <title>Tags | Jaysen's Cybersecurity Notes</title>
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="stylesheet" href="/assets/css/custom.css">
   </head>
   <body>
     <header class="site-header">
       <div class="wrapper header-inner">
-        <a class="brand" href="{{ '/' | relative_url }}">
+        <a class="brand" href="/">
           <span class="brand-dot"></span>
-          {{ site.title }}
+          Jaysen's Cybersecurity Notes
         </a>
         <nav class="nav-links" aria-label="Primary">
-          <a href="{{ '/' | relative_url }}">Home</a>
-          <a href="{{ '/tags/' | relative_url }}">Tags</a>
-          <a href="{{ '/about/' | relative_url }}">About</a>
+          <a href="/">Home</a>
+          <a href="/tags/">Tags</a>
+          <a href="/about/">About</a>
           <div class="nav-icons">
             <a class="icon-btn" href="https://github.com/Jaysenlestari" target="_blank" rel="noopener" aria-label="GitHub: Jaysenlestari">
               <span aria-hidden="true" class="icon github-icon">
@@ -52,13 +52,133 @@
 
     <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        {{ content }}
+        <section class="tags-page">
+  <div class="section-header">
+    <h1>Tags</h1>
+    <p class="muted">Browse posts by tag</p>
+  </div>
+
+  
+  <div class="tag-grid">
+    
+      
+      
+      <a class="tag-tile" href="#activedirectory">
+        <span class="tag-name">ActiveDirectory</span>
+        <span class="tag-count">| 1</span>
+      </a>
+    
+      
+      
+      <a class="tag-tile" href="#byovd">
+        <span class="tag-name">BYOVD</span>
+        <span class="tag-count">| 1</span>
+      </a>
+    
+      
+      
+      <a class="tag-tile" href="#dcsync">
+        <span class="tag-name">DCsync</span>
+        <span class="tag-count">| 1</span>
+      </a>
+    
+      
+      
+      <a class="tag-tile" href="#glpi">
+        <span class="tag-name">GLPI</span>
+        <span class="tag-count">| 1</span>
+      </a>
+    
+      
+      
+      <a class="tag-tile" href="#heroctf">
+        <span class="tag-name">heroCTF</span>
+        <span class="tag-count">| 1</span>
+      </a>
+    
+  </div>
+
+  <div class="tag-sections">
+    
+      
+      
+      <section id="activedirectory" class="tag-section">
+        <h2>ActiveDirectory <span class="tag-count">| 1</span></h2>
+        <ul class="tag-post-list">
+          
+            <li>
+              <a href="/heroctfv9-full-forensics/">Operation Pensieve Breach - heroCTF v7</a>
+              <span class="muted">Dec 23, 2025</span>
+            </li>
+          
+        </ul>
+      </section>
+    
+      
+      
+      <section id="byovd" class="tag-section">
+        <h2>BYOVD <span class="tag-count">| 1</span></h2>
+        <ul class="tag-post-list">
+          
+            <li>
+              <a href="/heroctfv9-full-forensics/">Operation Pensieve Breach - heroCTF v7</a>
+              <span class="muted">Dec 23, 2025</span>
+            </li>
+          
+        </ul>
+      </section>
+    
+      
+      
+      <section id="dcsync" class="tag-section">
+        <h2>DCsync <span class="tag-count">| 1</span></h2>
+        <ul class="tag-post-list">
+          
+            <li>
+              <a href="/heroctfv9-full-forensics/">Operation Pensieve Breach - heroCTF v7</a>
+              <span class="muted">Dec 23, 2025</span>
+            </li>
+          
+        </ul>
+      </section>
+    
+      
+      
+      <section id="glpi" class="tag-section">
+        <h2>GLPI <span class="tag-count">| 1</span></h2>
+        <ul class="tag-post-list">
+          
+            <li>
+              <a href="/heroctfv9-full-forensics/">Operation Pensieve Breach - heroCTF v7</a>
+              <span class="muted">Dec 23, 2025</span>
+            </li>
+          
+        </ul>
+      </section>
+    
+      
+      
+      <section id="heroctf" class="tag-section">
+        <h2>heroCTF <span class="tag-count">| 1</span></h2>
+        <ul class="tag-post-list">
+          
+            <li>
+              <a href="/heroctfv9-full-forensics/">Operation Pensieve Breach - heroCTF v7</a>
+              <span class="muted">Dec 23, 2025</span>
+            </li>
+          
+        </ul>
+      </section>
+    
+  </div>
+</section>
+
       </div>
     </main>
 
     <footer class="site-footer">
       <div class="wrapper footer-inner">
-        <div class="footer-note-left">&copy; {{ site.time | date: "%Y" }} {{ site.title }}. Some rights reserved.</div>
+        <div class="footer-note-left">&copy; 2025 Jaysen's Cybersecurity Notes. Some rights reserved.</div>
         <div class="footer-note-right">Using a custom theme for Jekyll.</div>
       </div>
     </footer>

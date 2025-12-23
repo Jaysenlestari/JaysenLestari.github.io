@@ -1,4 +1,4 @@
-title: Jaysen's Cybersecurity Notes
+title: Jay's Cybersecurity Notes
 description: >
   A personal technical blog documenting my journey as a Computer Science student,
   covering cybersecurity, CTF write-ups, digital forensics, reverse engineering,
@@ -6,12 +6,13 @@ description: >
 theme: minima
 
 author: Jaysen
-email: ""
+email: "lestarijaysen@gmail.com"
 
 show_excerpts: true
 paginate: 5
 paginate_path: "/page:num/"
 future: true
+permalink: /:title/
 
 plugins:
   - jekyll-paginate

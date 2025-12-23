@@ -3,21 +3,21 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{% if page.title %}{{ page.title }} | {% endif %}{{ site.title }}</title>
-    <link rel="stylesheet" href="{{ '/assets/main.css' | relative_url }}">
-    <link rel="stylesheet" href="{{ '/assets/css/custom.css' | relative_url }}">
+    <title>Home | Jaysen's Cybersecurity Notes</title>
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="stylesheet" href="/assets/css/custom.css">
   </head>
   <body>
     <header class="site-header">
       <div class="wrapper header-inner">
-        <a class="brand" href="{{ '/' | relative_url }}">
+        <a class="brand" href="/">
           <span class="brand-dot"></span>
-          {{ site.title }}
+          Jaysen's Cybersecurity Notes
         </a>
         <nav class="nav-links" aria-label="Primary">
-          <a href="{{ '/' | relative_url }}">Home</a>
-          <a href="{{ '/tags/' | relative_url }}">Tags</a>
-          <a href="{{ '/about/' | relative_url }}">About</a>
+          <a href="/">Home</a>
+          <a href="/tags/">Tags</a>
+          <a href="/about/">About</a>
           <div class="nav-icons">
             <a class="icon-btn" href="https://github.com/Jaysenlestari" target="_blank" rel="noopener" aria-label="GitHub: Jaysenlestari">
               <span aria-hidden="true" class="icon github-icon">
@@ -52,13 +52,79 @@
 
     <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        {{ content }}
+        <section class="hero">
+  <div class="hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow">Cybersecurity / DFIR / CTFs</p>
+      <h1>Hi, I'm Jaysen</h1>
+      <p class="lede">
+        I'm a Computer Science student who enjoys participating in Capture The Flag (CTF) competitions.
+        This blog is where I share CTF write-ups and what I learn along the way.
+      </p>
+      <div class="hero-actions">
+        <a class="btn primary" href="#posts">View posts</a>
+        <a class="btn ghost" href="/about/">About</a>
+      </div>
+    </div>
+
+    <div class="hero-avatar card">
+      <div class="avatar-frame">
+        <img src="/assets/img/avatar.png"
+             alt="Jaysen profile picture">
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="posts" id="posts">
+  <div class="section-header">
+    <h2>All Posts</h2>
+  </div>
+
+  
+    <div class="post-grid">
+      
+        <article class="post-card">
+          <div class="post-meta">
+            Dec 23, 2025
+          </div>
+
+          <h3 class="post-title">
+            <a class="post-link" href="/heroctfv9-full-forensics/">
+              Operation Pensieve Breach - heroCTF v7
+            </a>
+          </h3>
+
+          
+            <p class="post-excerpt">
+              <p>About a month ago, I participated in heroCTF v7 with my team, CSUI, where we finished 9th overall and successfully solved all forensic challenges. I personally handled most of the forensic tracks, which turned out to be among the most enjoyable and realistic CTF challenges I have experienced so far.</p>
+
+            </p>
+          
+
+          
+            <div class="post-tags">
+              
+                <span class="tag">CTF |</span>
+              
+                <span class="tag">Forensics |</span>
+              
+                <span class="tag">DFIR</span>
+              
+            </div>
+          
+        </article>
+      
+    </div>
+  
+</section>
+
       </div>
     </main>
 
     <footer class="site-footer">
       <div class="wrapper footer-inner">
-        <div class="footer-note-left">&copy; {{ site.time | date: "%Y" }} {{ site.title }}. Some rights reserved.</div>
+        <div class="footer-note-left">&copy; 2025 Jaysen's Cybersecurity Notes. Some rights reserved.</div>
         <div class="footer-note-right">Using a custom theme for Jekyll.</div>
       </div>
     </footer>

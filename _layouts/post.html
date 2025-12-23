@@ -1,3 +1,4 @@
+---
 layout: default
 ---
 
@@ -34,7 +35,7 @@ layout: default
 <script>
   (function () {
     const tocRoot = document.getElementById('post-toc');
-    const headings = Array.from(document.querySelectorAll('.post-body h2, .post-body h3'));
+    const headings = Array.from(document.querySelectorAll('.post-body h2'));
     if (!tocRoot || headings.length === 0) {
       if (tocRoot) tocRoot.style.display = 'none';
       return;
@@ -42,36 +43,23 @@ layout: default
 
     const list = document.createElement('ul');
     list.className = 'toc-list';
-    let currentList = list;
-    let lastLevel = 2;
     const headingMap = new Map();
 
     headings.forEach((h, idx) => {
-      const level = h.tagName === 'H3' ? 3 : 2;
       if (!h.id) h.id = 'section-' + (idx + 1);
 
-      if (level > lastLevel) {
-        const nested = document.createElement('ul');
-        nested.className = 'toc-list depth-2';
-        const parentLi = currentList.lastElementChild;
-        if (parentLi) {
-          parentLi.appendChild(nested);
-          currentList = nested;
-        }
-      } else if (level < lastLevel && currentList.parentElement?.classList.contains('toc-list')) {
-        currentList = currentList.parentElement;
-      }
-      lastLevel = level;
-
       const li = document.createElement('li');
-      li.className = level === 3 ? 'toc-item depth-2' : 'toc-item';
+      li.className = 'toc-item';
+
       const link = document.createElement('a');
       link.href = '#' + h.id;
       link.textContent = h.textContent;
+
       li.appendChild(link);
-      currentList.appendChild(li);
+      list.appendChild(li);
       headingMap.set(h.id, li);
     });
+
 
     const title = document.createElement('div');
     title.className = 'toc-title';
@@ -80,20 +68,27 @@ layout: default
     tocRoot.appendChild(title);
     tocRoot.appendChild(list);
 
+    const setActive = (id) => {
+      document.querySelectorAll('.toc-item.active').forEach((el) => el.classList.remove('active'));
+      const li = headingMap.get(id);
+      if (li) li.classList.add('active');
+    };
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          const li = headingMap.get(entry.target.id);
-          if (!li) return;
-          if (entry.isIntersecting) {
-            document.querySelectorAll('.toc-item.active').forEach((el) => el.classList.remove('active'));
-            li.classList.add('active');
-          }
+          if (entry.isIntersecting) setActive(entry.target.id);
         });
       },
-      { rootMargin: '-40% 0px -50% 0px', threshold: [0, 1] }
+      { rootMargin: '-25% 0px -60% 0px', threshold: [0, 1] }
     );
 
     headings.forEach((h) => observer.observe(h));
+    const firstId = headings[0]?.id;
+    if (firstId) setActive(firstId);
+
+    list.querySelectorAll('a').forEach((a) => {
+      a.addEventListener('click', () => setActive(a.getAttribute('href').replace('#', '')));
+    });
   })();
 </script>

