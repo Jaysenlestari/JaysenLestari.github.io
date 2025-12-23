@@ -1181,80 +1181,75 @@ html[data-theme="light"] {
 .highlight .mo {
   color: var(--code-number) !important;
 }
-@media (max-width: 900px) {
 
+@media (max-width: 900px) {
+  /* --- 1. HEADER FIX --- */
   .site-header {
     position: sticky;
     top: 0;
-    z-index: 9999 !important; /* WAJIB: Biar ga ketutup konten blog */
+    z-index: 9999 !important;
     overflow: visible !important;
-  }
-  /* --- HEADER & HAMBURGER (KIRI) --- */
-  .header-inner {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
   }
 
   .nav-toggle {
     display: inline-flex !important;
     order: -1; 
-    margin-right: 1rem;
-    z-index: 2000;
+    z-index: 10001 !important;
     color: var(--text) !important;
   }
 
-  .nav-toggle-bars span {
-    background-color: var(--text) !important; /* Biar kelihatan garisnya */
-  }
-
-  /* --- MENU DROPDOWN --- */
+  /* --- 2. HAMBURGER MENU (GLASSMORPHISM) --- */
   .nav-links {
-    display: none; /* Sembunyi default */
+    display: flex !important;
     position: absolute;
     top: 100%;
     left: 0;
     width: 100vw;
-    background: var(--card) !important;
-    padding: 2rem 1.5rem;
-    flex-direction: column;
-    z-index: 1900;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    /* Background semi-transparan biar blur kelihatan */
+    background: rgba(31, 36, 48, 0.99) !important; 
+    /* EFEK KACA BURAM */
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px);
     
-    /* Reset state agar muncul */
+    padding: 2.5rem 1.5rem;
+    flex-direction: column;
+    z-index: 10000;
+    border-bottom: 1px solid var(--border);
+    
+    /* Animation */
     opacity: 0;
+    visibility: hidden;
     transform: translateY(-10px);
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     pointer-events: none;
   }
 
-  /* KUNCI: Biar menu kelihatan pas diklik */
   .nav-links.open {
-    display: flex !important;
     opacity: 1 !important;
+    visibility: visible !important;
     transform: translateY(0) !important;
     pointer-events: auto !important;
-    visibility: visible !important;
   }
 
-  .nav-links a {
-    width: 100%;
-    padding: 1rem 0;
-    text-align: center;
-    border-bottom: 1px solid var(--border);
-  }
-
-  /* --- TOC MOBILE (BOTTOM SHEET) --- */
+  /* --- 3. TOC BOTTOM SHEET (GLASSMORPHISM) --- */
   .toc-toggle {
     display: inline-flex !important;
     position: fixed;
     bottom: 2rem;
     right: 1.5rem;
     z-index: 2000;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  /* KUNCI: Tombol TOC ilang pas menu kebuka */
+  body.toc-open .toc-toggle {
+    opacity: 0 !important;
+    pointer-events: none;
+    transform: scale(0.8);
   }
 
   .toc-card {
-    display: none;
+    display: block !important;
     position: fixed;
     bottom: 0 !important;
     top: auto !important;
@@ -1262,17 +1257,27 @@ html[data-theme="light"] {
     width: 100%;
     max-height: 70vh;
     border-radius: 24px 24px 0 0;
-    z-index: 1950;
-    background: var(--card) !important;
-    padding: 2rem 1.5rem;
+    z-index: 10000;
+    
+    /* Background semi-transparan & Blur */
+    background: rgba(31, 36, 48, 0.99) !important;
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px);
+    
+    padding: 2.2rem 1.5rem;
     box-shadow: 0 -10px 40px rgba(0,0,0,0.4);
-    transform: translateY(100%);
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(105%);
+    transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
   }
 
   .toc-card.open {
-    display: block !important;
     transform: translateY(0) !important;
+  }
+
+  /* Light Mode Adjustment */
+  html[data-theme='light'] .nav-links,
+  html[data-theme='light'] .toc-card {
+    background: rgba(255, 255, 255, 0.7) !important;
   }
 }
 
@@ -1301,5 +1306,72 @@ html[data-theme="light"] {
 
 .nav-links {
     justify-content: flex-start;
+  }
+}
+
+@media (max-width: 900px) {
+  /* --- 1. HERO SECTION RESPONSIVE --- */
+  .hero {
+    padding: 2rem 0 3rem; /* Kurangi padding atas biar ga terlalu jauh */
+  }
+
+  .hero-grid {
+    grid-template-columns: 1fr; /* Paksa jadi satu kolom tunggal */
+    gap: 2.5rem; /* Kasih jarak antara teks dan foto profile */
+    text-align: center; /* Center teks biar rapi di HP */
+  }
+
+  .hero-copy {
+    order: 1; /* Teks di atas */
+    align-items: center; /* Center teks lede dan actions */
+  }
+
+  .hero h1 {
+    font-size: 2.2rem; /* Kecilin dikit ukuran font buat layar kecil */
+    line-height: 1.2;
+  }
+
+  .lede {
+    margin: 0 auto; /* Biar paragrafnya rata tengah */
+  }
+
+  .hero-actions {
+    justify-content: center; /* Center tombol View Posts & About */
+    width: 100%;
+  }
+
+  .hero-avatar {
+    order: 2; /* Foto di bawah teks (atau 1 kalau mau di atas) */
+    width: 100%;
+    max-width: 280px; /* Batasi lebar container avatar di mobile */
+    margin: 0 auto; /* Center container foto */
+  }
+
+  .avatar-frame {
+    width: 160px; /* Kecilin dikit ukuran lingkarannya */
+    height: 160px;
+  }
+
+  /* --- 2. POST GRID RESPONSIVE --- */
+  .post-grid {
+    grid-template-columns: 1fr; /* Stacking kartu blog ke bawah */
+    gap: 1.5rem;
+  }
+}
+
+/* Fix tambahan untuk layar sangat kecil (HP jadul/kecil) */
+@media (max-width: 480px) {
+  .hero h1 {
+    font-size: 1.8rem;
+  }
+  
+  .hero-actions {
+    flex-direction: column; /* Tombol jadi tumpuk vertikal */
+    gap: 1rem;
+  }
+  
+  .hero-actions .btn {
+    width: 100%; /* Tombol full width biar gampang diklik jari */
+    justify-content: center;
   }
 }

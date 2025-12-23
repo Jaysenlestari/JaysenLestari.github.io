@@ -1055,7 +1055,20 @@ document.addEventListener('DOMContentLoaded', () => {
   // 1. Theme Logic
   const root = document.documentElement;
   const themeBtn = document.getElementById('theme-toggle');
-  const setTheme = (t) => { root.dataset.theme = t; localStorage.setItem('theme', t); };
+  const sunIcon = '<svg viewBox="0 0 24 24" role="presentation"><path d="M12 4.5a1 1 0 0 1-1-1V2a1 1 0 1 1 2 0v1.5a1 1 0 0 1-1 1Zm0 17a1 1 0 0 1-1-1V19a1 1 0 1 1 2 0v1.5a1 1 0 0 1-1 1ZM4.5 12a1 1 0 0 1-1-1H2a1 1 0 1 1 0-2h1.5a1 1 0 0 1 0 2Zm17 0a1 1 0 0 1-1-1H21a1 1 0 1 1 0-2h-1.5a1 1 0 0 1 0 2ZM6.343 6.343a1 1 0 0 1-.707-1.707l1.06-1.06a1 1 0 0 1 1.414 1.414l-1.06 1.06a1 1 0 0 1-.707.293Zm10.606 10.607a1 1 0 0 1-.707-1.707l1.06-1.06a1 1 0 0 1 1.415 1.414l-1.061 1.06a1 1 0 0 1-.707.293Zm1.768-10.607a1 1 0 0 1-.707-.293l-1.06-1.06A1 1 0 0 1 18.364 3.576l1.06 1.06a1 1 0 0 1-.707 1.415ZM6.343 17.657a1 1 0 0 1-.707-.293l-1.06-1.06a1 1 0 0 1 1.414-1.415l1.06 1.06a1 1 0 0 1-.707 1.708ZM12 7.25A4.75 4.75 0 1 0 12 16.75 4.75 4.75 0 0 0 12 7.25Z"/></svg>';
+  const moonIcon = '<svg viewBox="0 0 24 24" role="presentation"><path d="M20.752 14.318a8.5 8.5 0 0 1-11.07-11.07 1 1 0 0 0-1.32-1.32A10.5 10.5 0 1 0 21.89 15.64a1 1 0 0 0-1.138-1.322Z"/></svg>';
+  const setTheme = (t) => {
+    root.dataset.theme = t;
+    localStorage.setItem('theme', t);
+    if (themeBtn) {
+      themeBtn.innerHTML = t === 'dark' ? sunIcon : moonIcon;
+      themeBtn.setAttribute('aria-label', t === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+      themeBtn.setAttribute('title', t === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+    }
+  };
+  const stored = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  setTheme(stored || (prefersDark ? 'dark' : 'light'));
   if (themeBtn) themeBtn.addEventListener('click', () => setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark'));
 
   // 2. Hamburger Logic (FIXED)
