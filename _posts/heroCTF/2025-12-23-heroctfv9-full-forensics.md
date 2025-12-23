@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Operation Pensieve Breach (HeroCTF v7)"
+date: 2025-12-23
 categories: [CTF, Forensics, DFIR]
 tags: [HeroCTF, ActiveDirectory, DCsync, GLPI, BYOVD]
 ---
