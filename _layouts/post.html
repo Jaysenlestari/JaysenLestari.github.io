@@ -36,101 +36,72 @@ layout: default
     </svg>
   </button>
 </article>
-
 <script>
 (function () {
   const tocRoot = document.getElementById('post-toc');
-  const headings = Array.from(
-    document.querySelectorAll('.post-body h2, .post-body h3')
-  );
+  const postBody = document.querySelector('.post-body');
+  if (!tocRoot || !postBody) return;
 
-  if (!tocRoot || headings.length === 0) {
-    tocRoot?.remove();
-    return;
-  }
+  const headings = Array.from(postBody.querySelectorAll('h2, h3'));
+  if (headings.length === 0) { tocRoot.remove(); document.getElementById('toc-toggle')?.remove(); return; }
 
   const rootList = document.createElement('ul');
   rootList.className = 'toc-list';
-
-  let currentH2Li = null;
-  let currentSubList = null;
   const headingMap = new Map();
+  let currentH2Li = null;
 
   headings.forEach((h, i) => {
     if (!h.id) h.id = `section-${i + 1}`;
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = `#${h.id}`; a.textContent = h.textContent;
 
     if (h.tagName === 'H2') {
-      const li = document.createElement('li');
       li.className = 'toc-item';
-
-      const a = document.createElement('a');
-      a.href = `#${h.id}`;
-      a.textContent = h.textContent;
-
       li.appendChild(a);
       rootList.appendChild(li);
-
       currentH2Li = li;
-      currentSubList = null;
-      headingMap.set(h.id, li);
+    } else if (h.tagName === 'H3' && currentH2Li) {
+      let sub = currentH2Li.querySelector('ul') || document.createElement('ul');
+      sub.className = 'toc-list depth-2';
+      const subLi = document.createElement('li');
+      subLi.className = 'toc-item depth-2';
+      subLi.appendChild(a);
+      sub.appendChild(subLi);
+      if (!currentH2Li.contains(sub)) currentH2Li.appendChild(sub);
     }
-
-    if (h.tagName === 'H3' && currentH2Li) {
-      if (!currentSubList) {
-        currentSubList = document.createElement('ul');
-        currentSubList.className = 'toc-list depth-2';
-        currentH2Li.appendChild(currentSubList);
-      }
-
-      const li = document.createElement('li');
-      li.className = 'toc-item depth-2';
-
-      const a = document.createElement('a');
-      a.href = `#${h.id}`;
-      a.textContent = h.textContent;
-
-      li.appendChild(a);
-      currentSubList.appendChild(li);
-      headingMap.set(h.id, li);
-    }
+    headingMap.set(h.id, li);
   });
 
-  const title = document.createElement('div');
-  title.className = 'toc-title';
-  title.textContent = 'Contents';
-
-  tocRoot.appendChild(title);
+  tocRoot.innerHTML = '<div class="toc-title">Contents</div>';
   tocRoot.appendChild(rootList);
 
-  // Toggle for mobile
   const tocToggle = document.getElementById('toc-toggle');
   if (tocToggle) {
-    const toggleState = (open) => {
-      tocToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-      tocRoot.classList.toggle('open', open);
-    };
-    tocToggle.addEventListener('click', () => {
-      const willOpen = !tocRoot.classList.contains('open');
-      toggleState(willOpen);
-    });
-    // Close when clicking a TOC link (mobile)
-    tocRoot.querySelectorAll('a').forEach(a => {
-      a.addEventListener('click', () => toggleState(false));
+    tocToggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      const isOpened = tocRoot.classList.toggle('open');
+      document.body.classList.toggle('toc-open', isOpened);
     });
   }
 
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        document.querySelectorAll('.toc-item.active')
-          .forEach(el => el.classList.remove('active'));
+  // Scroll Spy
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        document.querySelectorAll('.toc-item.active').forEach(el => el.classList.remove('active'));
         headingMap.get(entry.target.id)?.classList.add('active');
-      });
-    },
-    { rootMargin: '-30% 0px -60% 0px' }
-  );
-
+      }
+    });
+  }, { rootMargin: '-10% 0px -70% 0px' });
   headings.forEach(h => observer.observe(h));
+
+  document.addEventListener('click', (e) => {
+    if (tocRoot.classList.contains('open') && !tocRoot.contains(e.target) && !tocToggle?.contains(e.target)) {
+      tocRoot.classList.remove('open');
+      document.body.classList.remove('toc-open');
+    }
+  });
 })();
 </script>
