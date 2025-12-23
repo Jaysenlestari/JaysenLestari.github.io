@@ -3,18 +3,23 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Operation Pensieve Breach - heroCTF v7 | Jaysen's Cybersecurity Notes</title>
+    <title>Operation Pensieve Breach - heroCTF v7 | Jay's Cybersecurity Notes</title>
     <link rel="stylesheet" href="/assets/main.css">
     <link rel="stylesheet" href="/assets/css/custom.css">
   </head>
   <body>
     <header class="site-header">
       <div class="wrapper header-inner">
+        <button class="nav-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="primary-nav">
+          <span class="nav-toggle-bars">
+            <span></span><span></span><span></span>
+          </span>
+        </button>
         <a class="brand" href="/">
           <span class="brand-dot"></span>
-          Jaysen's Cybersecurity Notes
+          Jay's Cybersecurity Notes
         </a>
-        <nav class="nav-links" aria-label="Primary">
+        <nav id="primary-nav" class="nav-links" aria-label="Primary">
           <a href="/">Home</a>
           <a href="/tags/">Tags</a>
           <a href="/about/">About</a>
@@ -68,7 +73,7 @@
       
         <div class="tag-row">
           
-            <span class="tag-chip">heroCTF</span>
+            <span class="tag-chip">DigitalForensics</span>
           
             <span class="tag-chip">ActiveDirectory</span>
           
@@ -915,7 +920,7 @@ The connection is established over port 53, which is commonly abused by implants
 <h3 id="secret-used-by-the-attacker-to-connect-to-the-implant">Secret used by the attacker to connect to the implant</h3>
 <p>To identify the authentication secret, the kinit binary was reversed. Initial inspection revealed that kinit was packed using UPX. The binary was first unpacked before reversing. After unpacking, the binary was analyzed using IDA.</p>
 
-<p>Inside the main_main function, a call chain related to session initialization was observed, including a function named <code class="language-plaintext highlighter-rouge">main_createSSHSessionHandler</code>. During analysis of this logic, a hardcoded credential was passed into a password handler routine.
+<p>Inside the <code class="language-plaintext highlighter-rouge">main</code> function, a call chain related to session initialization was observed, including a function named <code class="language-plaintext highlighter-rouge">createSSHSessionHandler</code>. During analysis of this logic, a hardcoded credential was passed into a password handler routine.
 <img src="/assets/heroCTF/7c.png" alt="alt text" />
 Navigating to the referenced <code class="language-plaintext highlighter-rouge">.rodata</code> section revealed the following string:
 <img src="/assets/heroCTF/7d.png" alt="alt text" />
@@ -959,64 +964,84 @@ This strongly indicates that:</p>
 </article>
 
 <script>
-  (function () {
-    const tocRoot = document.getElementById('post-toc');
-    const headings = Array.from(document.querySelectorAll('.post-body h2'));
-    if (!tocRoot || headings.length === 0) {
-      if (tocRoot) tocRoot.style.display = 'none';
-      return;
-    }
+(function () {
+  const tocRoot = document.getElementById('post-toc');
+  const headings = Array.from(
+    document.querySelectorAll('.post-body h2, .post-body h3')
+  );
 
-    const list = document.createElement('ul');
-    list.className = 'toc-list';
-    const headingMap = new Map();
+  if (!tocRoot || headings.length === 0) {
+    tocRoot?.remove();
+    return;
+  }
 
-    headings.forEach((h, idx) => {
-      if (!h.id) h.id = 'section-' + (idx + 1);
+  const rootList = document.createElement('ul');
+  rootList.className = 'toc-list';
 
+  let currentH2Li = null;
+  let currentSubList = null;
+  const headingMap = new Map();
+
+  headings.forEach((h, i) => {
+    if (!h.id) h.id = `section-${i + 1}`;
+
+    if (h.tagName === 'H2') {
       const li = document.createElement('li');
       li.className = 'toc-item';
 
-      const link = document.createElement('a');
-      link.href = '#' + h.id;
-      link.textContent = h.textContent;
+      const a = document.createElement('a');
+      a.href = `#${h.id}`;
+      a.textContent = h.textContent;
 
-      li.appendChild(link);
-      list.appendChild(li);
+      li.appendChild(a);
+      rootList.appendChild(li);
+
+      currentH2Li = li;
+      currentSubList = null;
       headingMap.set(h.id, li);
-    });
+    }
 
+    if (h.tagName === 'H3' && currentH2Li) {
+      if (!currentSubList) {
+        currentSubList = document.createElement('ul');
+        currentSubList.className = 'toc-list depth-2';
+        currentH2Li.appendChild(currentSubList);
+      }
 
-    const title = document.createElement('div');
-    title.className = 'toc-title';
-    title.textContent = 'Contents';
+      const li = document.createElement('li');
+      li.className = 'toc-item depth-2';
 
-    tocRoot.appendChild(title);
-    tocRoot.appendChild(list);
+      const a = document.createElement('a');
+      a.href = `#${h.id}`;
+      a.textContent = h.textContent;
 
-    const setActive = (id) => {
-      document.querySelectorAll('.toc-item.active').forEach((el) => el.classList.remove('active'));
-      const li = headingMap.get(id);
-      if (li) li.classList.add('active');
-    };
+      li.appendChild(a);
+      currentSubList.appendChild(li);
+      headingMap.set(h.id, li);
+    }
+  });
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) setActive(entry.target.id);
-        });
-      },
-      { rootMargin: '-25% 0px -60% 0px', threshold: [0, 1] }
-    );
+  const title = document.createElement('div');
+  title.className = 'toc-title';
+  title.textContent = 'Contents';
 
-    headings.forEach((h) => observer.observe(h));
-    const firstId = headings[0]?.id;
-    if (firstId) setActive(firstId);
+  tocRoot.appendChild(title);
+  tocRoot.appendChild(rootList);
 
-    list.querySelectorAll('a').forEach((a) => {
-      a.addEventListener('click', () => setActive(a.getAttribute('href').replace('#', '')));
-    });
-  })();
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        document.querySelectorAll('.toc-item.active')
+          .forEach(el => el.classList.remove('active'));
+        headingMap.get(entry.target.id)?.classList.add('active');
+      });
+    },
+    { rootMargin: '-30% 0px -60% 0px' }
+  );
+
+  headings.forEach(h => observer.observe(h));
+})();
 </script>
 
       </div>
@@ -1024,8 +1049,7 @@ This strongly indicates that:</p>
 
     <footer class="site-footer">
       <div class="wrapper footer-inner">
-        <div class="footer-note-left">&copy; 2025 Jaysen's Cybersecurity Notes. Some rights reserved.</div>
-        <div class="footer-note-right">Using a custom theme for Jekyll.</div>
+        <div class="footer-note-left">&copy; 2025 Jay's Cybersecurity Notes.</div>
       </div>
     </footer>
 
@@ -1115,6 +1139,33 @@ This strongly indicates that:</p>
             updateButton(next);
           });
         }
+      })();
+    </script>
+    <script>
+      (function () {
+        const toggle = document.querySelector('.nav-toggle');
+        const nav = document.getElementById('primary-nav');
+        if (!toggle || !nav) return;
+        const close = () => {
+          nav.classList.remove('open');
+          toggle.classList.remove('is-open');
+          toggle.setAttribute('aria-expanded', 'false');
+        };
+        toggle.addEventListener('click', () => {
+          const isOpen = nav.classList.toggle('open');
+          toggle.classList.toggle('is-open', isOpen);
+          toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+        nav.querySelectorAll('a').forEach(link => {
+          link.addEventListener('click', () => {
+            nav.classList.remove('open');
+            toggle.classList.remove('is-open');
+            toggle.setAttribute('aria-expanded', 'false');
+          });
+        });
+        window.addEventListener('resize', () => {
+          if (window.innerWidth > 900) close();
+        });
       })();
     </script>
   </body>

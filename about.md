@@ -4,7 +4,7 @@ title: About
 permalink: /about/
 ---
 
-Hi, I'm Jaysen.
+Hi, I'm Jaysen an undergraduate Computer Science student at the University of Indonesia.
 
 This is a personal blog where I share CTF write-ups and what I learn along the way
 as a Computer Science student.

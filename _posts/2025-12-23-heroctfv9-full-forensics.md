@@ -3,7 +3,7 @@ layout: post
 title: "Operation Pensieve Breach - heroCTF v7"
 date: 2025-12-23
 categories: [CTF |, Forensics |, DFIR]
-tags: [heroCTF, ActiveDirectory, DCsync, GLPI, BYOVD]
+tags: [DigitalForensics, ActiveDirectory, DCsync, GLPI, BYOVD]
 ---
 
 
@@ -796,7 +796,7 @@ The connection is established over port 53, which is commonly abused by implants
 ### Secret used by the attacker to connect to the implant
 To identify the authentication secret, the kinit binary was reversed. Initial inspection revealed that kinit was packed using UPX. The binary was first unpacked before reversing. After unpacking, the binary was analyzed using IDA.
 
-Inside the main_main function, a call chain related to session initialization was observed, including a function named `main_createSSHSessionHandler`. During analysis of this logic, a hardcoded credential was passed into a password handler routine.
+Inside the `main` function, a call chain related to session initialization was observed, including a function named `createSSHSessionHandler`. During analysis of this logic, a hardcoded credential was passed into a password handler routine.
 ![alt text](/assets/heroCTF/7c.png)
 Navigating to the referenced `.rodata` section revealed the following string:
 ![alt text](/assets/heroCTF/7d.png)

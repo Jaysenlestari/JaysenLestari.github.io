@@ -33,62 +33,82 @@ layout: default
 </article>
 
 <script>
-  (function () {
-    const tocRoot = document.getElementById('post-toc');
-    const headings = Array.from(document.querySelectorAll('.post-body h2'));
-    if (!tocRoot || headings.length === 0) {
-      if (tocRoot) tocRoot.style.display = 'none';
-      return;
-    }
+(function () {
+  const tocRoot = document.getElementById('post-toc');
+  const headings = Array.from(
+    document.querySelectorAll('.post-body h2, .post-body h3')
+  );
 
-    const list = document.createElement('ul');
-    list.className = 'toc-list';
-    const headingMap = new Map();
+  if (!tocRoot || headings.length === 0) {
+    tocRoot?.remove();
+    return;
+  }
 
-    headings.forEach((h, idx) => {
-      if (!h.id) h.id = 'section-' + (idx + 1);
+  const rootList = document.createElement('ul');
+  rootList.className = 'toc-list';
 
+  let currentH2Li = null;
+  let currentSubList = null;
+  const headingMap = new Map();
+
+  headings.forEach((h, i) => {
+    if (!h.id) h.id = `section-${i + 1}`;
+
+    if (h.tagName === 'H2') {
       const li = document.createElement('li');
       li.className = 'toc-item';
 
-      const link = document.createElement('a');
-      link.href = '#' + h.id;
-      link.textContent = h.textContent;
+      const a = document.createElement('a');
+      a.href = `#${h.id}`;
+      a.textContent = h.textContent;
 
-      li.appendChild(link);
-      list.appendChild(li);
+      li.appendChild(a);
+      rootList.appendChild(li);
+
+      currentH2Li = li;
+      currentSubList = null;
       headingMap.set(h.id, li);
-    });
+    }
 
+    if (h.tagName === 'H3' && currentH2Li) {
+      if (!currentSubList) {
+        currentSubList = document.createElement('ul');
+        currentSubList.className = 'toc-list depth-2';
+        currentH2Li.appendChild(currentSubList);
+      }
 
-    const title = document.createElement('div');
-    title.className = 'toc-title';
-    title.textContent = 'Contents';
+      const li = document.createElement('li');
+      li.className = 'toc-item depth-2';
 
-    tocRoot.appendChild(title);
-    tocRoot.appendChild(list);
+      const a = document.createElement('a');
+      a.href = `#${h.id}`;
+      a.textContent = h.textContent;
 
-    const setActive = (id) => {
-      document.querySelectorAll('.toc-item.active').forEach((el) => el.classList.remove('active'));
-      const li = headingMap.get(id);
-      if (li) li.classList.add('active');
-    };
+      li.appendChild(a);
+      currentSubList.appendChild(li);
+      headingMap.set(h.id, li);
+    }
+  });
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) setActive(entry.target.id);
-        });
-      },
-      { rootMargin: '-25% 0px -60% 0px', threshold: [0, 1] }
-    );
+  const title = document.createElement('div');
+  title.className = 'toc-title';
+  title.textContent = 'Contents';
 
-    headings.forEach((h) => observer.observe(h));
-    const firstId = headings[0]?.id;
-    if (firstId) setActive(firstId);
+  tocRoot.appendChild(title);
+  tocRoot.appendChild(rootList);
 
-    list.querySelectorAll('a').forEach((a) => {
-      a.addEventListener('click', () => setActive(a.getAttribute('href').replace('#', '')));
-    });
-  })();
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        document.querySelectorAll('.toc-item.active')
+          .forEach(el => el.classList.remove('active'));
+        headingMap.get(entry.target.id)?.classList.add('active');
+      });
+    },
+    { rootMargin: '-30% 0px -60% 0px' }
+  );
+
+  headings.forEach(h => observer.observe(h));
+})();
 </script>

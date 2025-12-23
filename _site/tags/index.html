@@ -3,18 +3,23 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Tags | Jaysen's Cybersecurity Notes</title>
+    <title>Tags | Jay's Cybersecurity Notes</title>
     <link rel="stylesheet" href="/assets/main.css">
     <link rel="stylesheet" href="/assets/css/custom.css">
   </head>
   <body>
     <header class="site-header">
       <div class="wrapper header-inner">
+        <button class="nav-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="primary-nav">
+          <span class="nav-toggle-bars">
+            <span></span><span></span><span></span>
+          </span>
+        </button>
         <a class="brand" href="/">
           <span class="brand-dot"></span>
-          Jaysen's Cybersecurity Notes
+          Jay's Cybersecurity Notes
         </a>
-        <nav class="nav-links" aria-label="Primary">
+        <nav id="primary-nav" class="nav-links" aria-label="Primary">
           <a href="/">Home</a>
           <a href="/tags/">Tags</a>
           <a href="/about/">About</a>
@@ -84,15 +89,15 @@
     
       
       
-      <a class="tag-tile" href="#glpi">
-        <span class="tag-name">GLPI</span>
+      <a class="tag-tile" href="#digitalforensics">
+        <span class="tag-name">DigitalForensics</span>
         <span class="tag-count">| 1</span>
       </a>
     
       
       
-      <a class="tag-tile" href="#heroctf">
-        <span class="tag-name">heroCTF</span>
+      <a class="tag-tile" href="#glpi">
+        <span class="tag-name">GLPI</span>
         <span class="tag-count">| 1</span>
       </a>
     
@@ -144,8 +149,8 @@
     
       
       
-      <section id="glpi" class="tag-section">
-        <h2>GLPI <span class="tag-count">| 1</span></h2>
+      <section id="digitalforensics" class="tag-section">
+        <h2>DigitalForensics <span class="tag-count">| 1</span></h2>
         <ul class="tag-post-list">
           
             <li>
@@ -158,8 +163,8 @@
     
       
       
-      <section id="heroctf" class="tag-section">
-        <h2>heroCTF <span class="tag-count">| 1</span></h2>
+      <section id="glpi" class="tag-section">
+        <h2>GLPI <span class="tag-count">| 1</span></h2>
         <ul class="tag-post-list">
           
             <li>
@@ -178,8 +183,7 @@
 
     <footer class="site-footer">
       <div class="wrapper footer-inner">
-        <div class="footer-note-left">&copy; 2025 Jaysen's Cybersecurity Notes. Some rights reserved.</div>
-        <div class="footer-note-right">Using a custom theme for Jekyll.</div>
+        <div class="footer-note-left">&copy; 2025 Jay's Cybersecurity Notes.</div>
       </div>
     </footer>
 
@@ -269,6 +273,33 @@
             updateButton(next);
           });
         }
+      })();
+    </script>
+    <script>
+      (function () {
+        const toggle = document.querySelector('.nav-toggle');
+        const nav = document.getElementById('primary-nav');
+        if (!toggle || !nav) return;
+        const close = () => {
+          nav.classList.remove('open');
+          toggle.classList.remove('is-open');
+          toggle.setAttribute('aria-expanded', 'false');
+        };
+        toggle.addEventListener('click', () => {
+          const isOpen = nav.classList.toggle('open');
+          toggle.classList.toggle('is-open', isOpen);
+          toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+        nav.querySelectorAll('a').forEach(link => {
+          link.addEventListener('click', () => {
+            nav.classList.remove('open');
+            toggle.classList.remove('is-open');
+            toggle.setAttribute('aria-expanded', 'false');
+          });
+        });
+        window.addEventListener('resize', () => {
+          if (window.innerWidth > 900) close();
+        });
       })();
     </script>
   </body>
