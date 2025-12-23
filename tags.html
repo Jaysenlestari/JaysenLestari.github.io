@@ -17,7 +17,7 @@ permalink: /tags/
       {% assign posts = tag[1] %}
       <a class="tag-tile" href="#{{ tag_name | slugify }}">
         <span class="tag-name">{{ tag_name }}</span>
-        <span class="tag-count">{{ posts | size }}</span>
+        <span class="tag-count">| {{ posts | size }}</span>
       </a>
     {% endfor %}
   </div>
@@ -27,7 +27,7 @@ permalink: /tags/
       {% assign tag_name = tag[0] %}
       {% assign posts = tag[1] %}
       <section id="{{ tag_name | slugify }}" class="tag-section">
-        <h2>{{ tag_name }} <span class="tag-count">{{ posts | size }}</span></h2>
+        <h2>{{ tag_name }} <span class="tag-count">| {{ posts | size }}</span></h2>
         <ul class="tag-post-list">
           {% for post in posts %}
             <li>

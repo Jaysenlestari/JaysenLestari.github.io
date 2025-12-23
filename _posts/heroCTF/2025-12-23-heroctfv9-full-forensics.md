@@ -6,7 +6,6 @@ categories: [CTF, Forensics, DFIR]
 tags: [HeroCTF, ActiveDirectory, DCsync, GLPI, BYOVD]
 ---
 
-# Operation Pensieve Breach (HeroCTF v7)
 About a month ago, I participated in HeroCTF v7 with my team, **CSUI**, where we finished 9th at the end and successfully solved all forensic challenges. I personally handled most of the forensic tracks, which turned out to be some of the most enjoyable and realistic forensic challenges I have experienced in a CTF so far.
 
 This challenge series is based on real-world engagements, including both penetration testing and red team operations, as stated by the challenge author. This realism is clearly reflected in the attack flow, which closely resembles an actual enterprise intrusion and requires a DFIR-style investigation rather than isolated exploitation steps. In this post, I will share the full forensic write-up of *Operation Pensieve Breach*, covering the complete attack timeline from the initial access and lateral movement to privilege escalation, credential theft, and domain compromise based entirely on evidence extracted from logs, disk artifacts, network traffic, and memory analysis.

@@ -6,7 +6,7 @@ layout: default
   <p class="post-meta-line">
     <span>{{ page.date | date: "%b %-d, %Y" }}</span>
     {% if page.categories and page.categories.size > 0 %}
-      <span class="dot">•</span>
+      <span class="dot" aria-hidden="true">&bull;</span>
       <span class="caps">{{ page.categories | join: ", " }}</span>
     {% endif %}
   </p>
@@ -21,7 +21,38 @@ layout: default
     </div>
   {% endif %}
 
+  <nav id="post-toc" class="toc-card" aria-label="Table of contents"></nav>
+
   <div class="post-body">
     {{ content }}
   </div>
 </article>
+
+<script>
+  (function () {
+    const tocRoot = document.getElementById('post-toc');
+    const headings = document.querySelectorAll('.post-body h2, .post-body h3');
+    if (!tocRoot || headings.length === 0) return;
+
+    const list = document.createElement('ol');
+    list.className = 'toc-list';
+
+    headings.forEach((h, idx) => {
+      if (!h.id) h.id = 'section-' + (idx + 1);
+      const li = document.createElement('li');
+      li.className = h.tagName.toLowerCase() === 'h3' ? 'toc-item depth-2' : 'toc-item';
+      const link = document.createElement('a');
+      link.href = '#' + h.id;
+      link.textContent = h.textContent;
+      li.appendChild(link);
+      list.appendChild(li);
+    });
+
+    const title = document.createElement('div');
+    title.className = 'toc-title';
+    title.textContent = 'Table of Contents';
+
+    tocRoot.appendChild(title);
+    tocRoot.appendChild(list);
+  })();
+</script>

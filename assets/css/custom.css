@@ -673,6 +673,7 @@ html[data-theme='light'] .site-header {
 .tag-count {
   color: var(--muted);
   font-weight: 700;
+  margin-left: 0.35rem;
 }
 
 .tag-section {
