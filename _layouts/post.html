@@ -34,7 +34,7 @@ layout: default
 <script>
   (function () {
     const tocRoot = document.getElementById('post-toc');
-    const headings = document.querySelectorAll('.post-body h2, .post-body h3');
+    const headings = Array.from(document.querySelectorAll('.post-body h2, .post-body h3'));
     if (!tocRoot || headings.length === 0) {
       if (tocRoot) tocRoot.style.display = 'none';
       return;
@@ -44,6 +44,7 @@ layout: default
     list.className = 'toc-list';
     let currentList = list;
     let lastLevel = 2;
+    const headingMap = new Map();
 
     headings.forEach((h, idx) => {
       const level = h.tagName === 'H3' ? 3 : 2;
@@ -52,8 +53,11 @@ layout: default
       if (level > lastLevel) {
         const nested = document.createElement('ul');
         nested.className = 'toc-list depth-2';
-        currentList.lastElementChild?.appendChild(nested);
-        currentList = nested;
+        const parentLi = currentList.lastElementChild;
+        if (parentLi) {
+          parentLi.appendChild(nested);
+          currentList = nested;
+        }
       } else if (level < lastLevel && currentList.parentElement?.classList.contains('toc-list')) {
         currentList = currentList.parentElement;
       }
@@ -66,13 +70,30 @@ layout: default
       link.textContent = h.textContent;
       li.appendChild(link);
       currentList.appendChild(li);
+      headingMap.set(h.id, li);
     });
 
     const title = document.createElement('div');
     title.className = 'toc-title';
-    title.textContent = 'Table of Contents';
+    title.textContent = 'Contents';
 
     tocRoot.appendChild(title);
     tocRoot.appendChild(list);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const li = headingMap.get(entry.target.id);
+          if (!li) return;
+          if (entry.isIntersecting) {
+            document.querySelectorAll('.toc-item.active').forEach((el) => el.classList.remove('active'));
+            li.classList.add('active');
+          }
+        });
+      },
+      { rootMargin: '-40% 0px -50% 0px', threshold: [0, 1] }
+    );
+
+    headings.forEach((h) => observer.observe(h));
   })();
 </script>
