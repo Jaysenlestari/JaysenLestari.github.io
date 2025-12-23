@@ -4,53 +4,66 @@ title: Home
 ---
 
 <section class="hero">
-  <p class="eyebrow">Cybersecurity · DFIR · CTFs</p>
-  <h1>Hi, I'm Jaysen</h1>
-  <p class="lede">
-    I’m a Computer Science student focusing on cybersecurity and like to participate in Capture The Flag (CTF) competitions.
-    This blog is where I break down investigations, share write-ups, and keep track of what I’m learning.
-  </p>
-  <div class="hero-actions">
-    <a class="btn primary" href="#latest">Latest posts</a>
-    <a class="btn ghost" href="{{ '/about/' | relative_url }}">About</a>
+  <div class="hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow">Cybersecurity / DFIR / CTFs</p>
+      <h1>Hi, I'm Jaysen</h1>
+      <p class="lede">
+        I'm a Computer Science student who enjoys participating in Capture The Flag (CTF) competitions.
+        This blog is where I share CTF write-ups and what I learn along the way.
+      </p>
+      <div class="hero-actions">
+        <a class="btn primary" href="#posts">View posts</a>
+        <a class="btn ghost" href="{{ '/about/' | relative_url }}">About</a>
+      </div>
+    </div>
+
+    <div class="hero-avatar card">
+      <div class="avatar-frame">
+        <img src="{{ site.avatar | default: '/assets/img/avatar.png' | relative_url }}"
+             alt="Jaysen profile picture">
+      </div>
+    </div>
   </div>
 </section>
 
-<section class="highlights">
-  <div>
-    <h2>What You'll Find Here</h2>
-    <ul>
-      <li>Digital forensics & DFIR case studies</li>
-      <li>Web exploitation & vulnerability analysis</li>
-      <li>Cryptography & protocol analysis</li>
-      <li>Reverse engineering & malware analysis</li>
-      <li>General CS & security notes</li>
-    </ul>
-  </div>
-  <div class="card note">
-    <p class="eyebrow">Approach</p>
-    <p>Methodical breakdowns, reproducible steps, and evidence-driven write-ups—more than just the final flag.</p>
-  </div>
-</section>
-
-<section class="latest" id="latest">
+<section class="posts" id="posts">
   <div class="section-header">
-    <h2>Latest Posts</h2>
-    <a class="see-all" href="{{ '/archive/' | relative_url }}">See all</a>
+    <h2>All Posts</h2>
+    <p class="muted">Sorted by newest first</p>
   </div>
-  <div class="post-grid">
-    {% for post in site.posts limit:5 %}
-      <article class="post-card">
-        <div class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</div>
-        <h3 class="post-title">
-          <a class="post-link" href="{{ post.url | relative_url }}">
-            {{ post.title }}
-          </a>
-        </h3>
-        {% if post.excerpt %}
-          <p class="post-excerpt">{{ post.excerpt }}</p>
-        {% endif %}
-      </article>
-    {% endfor %}
-  </div>
+
+  {% if site.posts and site.posts.size > 0 %}
+    <div class="post-grid">
+      {% for post in site.posts %}
+        <article class="post-card">
+          <div class="post-meta">
+            {{ post.date | date: "%b %-d, %Y" }}
+          </div>
+
+          <h3 class="post-title">
+            <a class="post-link" href="{{ post.url | relative_url }}">
+              {{ post.title }}
+            </a>
+          </h3>
+
+          {% if post.excerpt %}
+            <p class="post-excerpt">
+              {{ post.excerpt }}
+            </p>
+          {% endif %}
+
+          {% if post.categories %}
+            <div class="post-tags">
+              {% for cat in post.categories %}
+                <span class="tag">{{ cat }}</span>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="muted">No posts yet.</p>
+  {% endif %}
 </section>

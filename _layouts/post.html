@@ -1,0 +1,27 @@
+---
+layout: default
+---
+
+<article class="post">
+  <p class="post-meta-line">
+    <span>{{ page.date | date: "%b %-d, %Y" }}</span>
+    {% if page.categories and page.categories.size > 0 %}
+      <span class="dot">•</span>
+      <span class="caps">{{ page.categories | join: ", " }}</span>
+    {% endif %}
+  </p>
+
+  <h1 class="post-title">{{ page.title }}</h1>
+
+  {% if page.tags %}
+    <div class="tag-row">
+      {% for tag in page.tags %}
+        <span class="tag-chip">{{ tag }}</span>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="post-body">
+    {{ content }}
+  </div>
+</article>
