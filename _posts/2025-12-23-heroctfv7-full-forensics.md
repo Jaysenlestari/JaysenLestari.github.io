@@ -645,6 +645,8 @@ This conclusion is drawn from the fact that:
 
 FLAG: `Hero{sa;GRINGOTTS02;http://192.168.56.200:8000/update.exe;445;192.168.56.200}`
 
+---
+
 ## Operation Pensieve Breach - 6
 
 ### Attachment
@@ -700,6 +702,8 @@ The binary was downloaded and executed by the malicious cookie payload after suc
 `/dev/shm/kinit`
 
 FLAG = `Hero{base64:zHJvDAIBtVN83kzkjqUZNv42w9gjd8FZZllqdqn0EBQ=;/dev/shm/kinit}`
+
+---
 
 ## Operation Pensieve Breach - 7
 
