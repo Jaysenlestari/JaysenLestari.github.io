@@ -1,30 +1,33 @@
----
 layout: default
 ---
 
 <article class="post">
-  <p class="post-meta-line">
-    <span>{{ page.date | date: "%b %-d, %Y" }}</span>
-    {% if page.categories and page.categories.size > 0 %}
-      <span class="dot" aria-hidden="true">&bull;</span>
-      <span class="caps">{{ page.categories | join: ", " }}</span>
-    {% endif %}
-  </p>
+  <div class="post-shell">
+    <div class="post-main">
+      <p class="post-meta-line">
+        <span>{{ page.date | date: "%b %-d, %Y" }}</span>
+        {% if page.categories and page.categories.size > 0 %}
+          <span class="dot" aria-hidden="true">&bull;</span>
+          <span class="caps">{{ page.categories | join: " | " }}</span>
+        {% endif %}
+      </p>
 
-  <h1 class="post-title">{{ page.title }}</h1>
+      <h1 class="post-title">{{ page.title }}</h1>
 
-  {% if page.tags %}
-    <div class="tag-row">
-      {% for tag in page.tags %}
-        <span class="tag-chip">{{ tag }}</span>
-      {% endfor %}
+      {% if page.tags %}
+        <div class="tag-row">
+          {% for tag in page.tags %}
+            <span class="tag-chip">{{ tag }}</span>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="post-body">
+        {{ content }}
+      </div>
     </div>
-  {% endif %}
 
-  <nav id="post-toc" class="toc-card" aria-label="Table of contents"></nav>
-
-  <div class="post-body">
-    {{ content }}
+    <aside id="post-toc" class="toc-card" aria-label="Table of contents"></aside>
   </div>
 </article>
 
@@ -32,20 +35,37 @@ layout: default
   (function () {
     const tocRoot = document.getElementById('post-toc');
     const headings = document.querySelectorAll('.post-body h2, .post-body h3');
-    if (!tocRoot || headings.length === 0) return;
+    if (!tocRoot || headings.length === 0) {
+      if (tocRoot) tocRoot.style.display = 'none';
+      return;
+    }
 
-    const list = document.createElement('ol');
+    const list = document.createElement('ul');
     list.className = 'toc-list';
+    let currentList = list;
+    let lastLevel = 2;
 
     headings.forEach((h, idx) => {
+      const level = h.tagName === 'H3' ? 3 : 2;
       if (!h.id) h.id = 'section-' + (idx + 1);
+
+      if (level > lastLevel) {
+        const nested = document.createElement('ul');
+        nested.className = 'toc-list depth-2';
+        currentList.lastElementChild?.appendChild(nested);
+        currentList = nested;
+      } else if (level < lastLevel && currentList.parentElement?.classList.contains('toc-list')) {
+        currentList = currentList.parentElement;
+      }
+      lastLevel = level;
+
       const li = document.createElement('li');
-      li.className = h.tagName.toLowerCase() === 'h3' ? 'toc-item depth-2' : 'toc-item';
+      li.className = level === 3 ? 'toc-item depth-2' : 'toc-item';
       const link = document.createElement('a');
       link.href = '#' + h.id;
       link.textContent = h.textContent;
       li.appendChild(link);
-      list.appendChild(li);
+      currentList.appendChild(li);
     });
 
     const title = document.createElement('div');
