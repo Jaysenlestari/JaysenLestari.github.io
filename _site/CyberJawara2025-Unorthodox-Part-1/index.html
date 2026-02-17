@@ -266,16 +266,16 @@ First, we extracting the exfiltrated encrypted payload and decrypting using the 
     <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">tar</span> <span class="nt">-czf</span> - <span class="nt">-C</span> /home/cj/core_app <span class="nb">.</span>
 | openssl enc <span class="nt">-aes-256-cbc</span> <span class="nt">-salt</span> <span class="nt">-pbkdf2</span> <span class="nt">-k</span> <span class="s1">'Ch4LLG48uT_h3h3!'</span>
 </code></pre></div>    </div>
-    <p>Inside /home/cj/core_app/company_secret/app/layout.tsx. We localted the metadata : 
+    <p>Inside /home/cj/core_app/company_secret/app/layout.tsx. We localted the metadata : <br />
 <img src="/assets/CJ-Qual/9.png" alt="alt text" />
-Counting Stock Sectors inside : lib/stock-data.ts
-<img src="/assets/CJ-Qual/10.png" alt="alt text" />
+Counting Stock Sectors inside : lib/stock-data.ts<br />
+<img src="/assets/CJ-Qual/10.png" alt="alt text" /><br />
 total : 8</p>
   </li>
 </ol>
 
-<p>Counting Company List inside the same file : 
-<img src="/assets/CJ-Qual/11.png" alt="alt text" />
+<p>Counting Company List inside the same file : <br />
+<img src="/assets/CJ-Qual/11.png" alt="alt text" /><br />
 Total companies = 40</p>
 
 <p>Answer : <code class="language-plaintext highlighter-rouge">Saham Bos 2025 - Stock Market Dashboard_8_40</code></p>
@@ -284,8 +284,8 @@ Total companies = 40</p>
   <li>
     <p>Please provide the original state of all the stock codes for Technology Sector-based Stock Code!
 Format: STCK,STCK,STCK,STCK (e.g., NUMA,POCK,RAVA,LEMA)
-From the same file lib/stock-data.ts, we filtered companies where sector==”Technology” and resulted :
-<img src="/assets/CJ-Qual/11.png" alt="alt text" />
+From the same file lib/stock-data.ts, we filtered companies where sector==”Technology” and resulted :<br />
+<img src="/assets/CJ-Qual/11.png" alt="alt text" /> <br />
 Answer : TECH,DIGI,CHIP,CLOUD,ELECT,DATA</p>
   </li>
   <li>

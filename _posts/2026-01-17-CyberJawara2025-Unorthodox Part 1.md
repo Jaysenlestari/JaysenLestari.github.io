@@ -141,22 +141,22 @@ First, we extracting the exfiltrated encrypted payload and decrypting using the 
 tar -czf - -C /home/cj/core_app .
 | openssl enc -aes-256-cbc -salt -pbkdf2 -k 'Ch4LLG48uT_h3h3!'
 ```
-Inside /home/cj/core_app/company_secret/app/layout.tsx. We localted the metadata : 
+Inside /home/cj/core_app/company_secret/app/layout.tsx. We localted the metadata :   
 ![alt text](/assets/CJ-Qual/9.png)
-Counting Stock Sectors inside : lib/stock-data.ts
-![alt text](/assets/CJ-Qual/10.png)
-total : 8
+Counting Stock Sectors inside : lib/stock-data.ts  
+![alt text](/assets/CJ-Qual/10.png)  
+total : 8  
 
-Counting Company List inside the same file : 
-![alt text](/assets/CJ-Qual/11.png)
-Total companies = 40
+Counting Company List inside the same file :   
+![alt text](/assets/CJ-Qual/11.png)  
+Total companies = 40  
 
 Answer : `Saham Bos 2025 - Stock Market Dashboard_8_40`
 
 7. Please provide the original state of all the stock codes for Technology Sector-based Stock Code!
 Format: STCK,STCK,STCK,STCK (e.g., NUMA,POCK,RAVA,LEMA)
-From the same file lib/stock-data.ts, we filtered companies where sector==”Technology” and resulted :
-![alt text](/assets/CJ-Qual/11.png)
+From the same file lib/stock-data.ts, we filtered companies where sector==”Technology” and resulted :  
+![alt text](/assets/CJ-Qual/11.png)   
 Answer : TECH,DIGI,CHIP,CLOUD,ELECT,DATA
 
 8. Upon the investigation, we sought another potential threat actor compromising the machine from the different IP but we didn't see any plain IOC in the server. It looks like this threat actor was first seen in November before the exfiltration event occurs whereas there has been an unauthorized dependency/package installation in the server which we haven't validated yet. Are you able to find another IP of the attacker and its payload in base64 form?
