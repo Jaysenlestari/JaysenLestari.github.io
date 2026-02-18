@@ -1,137 +1,399 @@
 <!doctype html>
-<html lang="en" data-theme="light">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{% if page.title %}{{ page.title }} | {% endif %}{{ site.title }}</title>
-    <link rel="stylesheet" href="{{ '/assets/main.css' | relative_url }}">
-    <link rel="stylesheet" href="{{ '/assets/css/custom.css' | relative_url }}">
-  </head>
-  <body>
-    <header class="site-header">
-      <div class="wrapper header-inner">
-        <button class="nav-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="primary-nav">
-          <span class="nav-toggle-bars">
-            <span></span><span></span><span></span>
-          </span>
-        </button>
-        <a class="brand" href="{{ '/' | relative_url }}">
-          <span class="brand-dot"></span>
-          {{ site.title }}
-        </a>
-        <nav id="primary-nav" class="nav-links" aria-label="Primary">
-          <a href="{{ '/' | relative_url }}">Home</a>
-          <a href="{{ '/tags/' | relative_url }}">Tags</a>
-          <a href="{{ '/about/' | relative_url }}">About</a>
-          <div class="nav-icons">
-            <a class="icon-btn" href="https://github.com/Jaysenlestari" target="_blank" rel="noopener" aria-label="GitHub: Jaysenlestari">
-              <span aria-hidden="true" class="icon github-icon">
-                <svg viewBox="0 0 24 24" role="presentation">
-                  <path d="M12 .5C5.648.5.5 5.74.5 12.207c0 5.181 3.438 9.576 8.207 11.125.6.116.82-.27.82-.6 0-.297-.011-1.082-.017-2.124-3.338.744-4.042-1.645-4.042-1.645-.546-1.402-1.333-1.775-1.333-1.775-1.089-.767.083-.751.083-.751 1.205.087 1.838 1.27 1.838 1.27 1.07 1.866 2.809 1.327 3.494 1.015.108-.787.419-1.327.762-1.632-2.665-.313-5.466-1.378-5.466-6.135 0-1.356.465-2.463 1.235-3.33-.124-.314-.535-1.574.117-3.281 0 0 1.008-.329 3.302 1.27a11.29 11.29 0 0 1 3.008-.415c1.02.005 2.047.142 3.007.415 2.294-1.599 3.3-1.27 3.3-1.27.653 1.707.242 2.967.118 3.28.77.868 1.233 1.975 1.233 3.331 0 4.77-2.806 5.818-5.48 6.125.43.382.814 1.136.814 2.29 0 1.654-.015 2.986-.015 3.392 0 .333.217.72.826.597 4.766-1.55 8.201-5.944 8.201-11.123C23.5 5.74 18.353.5 12 .5Z"/>
-                </svg>
-              </span>
-            </a>
-            <a class="icon-btn" href="https://discord.com/users/655627264180092948" target="_blank" rel="noopener" aria-label="Discord: jaysen_lestari">
-              <span aria-hidden="true" class="icon discord-icon">
-                <svg viewBox="0 0 24 24" role="presentation">
-                  <path d="M20.317 4.369a19.78 19.78 0 0 0-4.885-1.515.07.07 0 0 0-.075.035c-.211.375-.444.864-.608 1.249a18.27 18.27 0 0 0-5.448 0 12.64 12.64 0 0 0-.617-1.25.07.07 0 0 0-.075-.035 19.736 19.736 0 0 0-4.885 1.516.064.064 0 0 0-.03.025C2.175 9.033 1.64 13.6 2.066 18.111a.077.077 0 0 0 .031.054c2.052 1.505 4.038 2.422 5.993 3.029a.07.07 0 0 0 .076-.027c.461-.632.873-1.3 1.226-2.006a.07.07 0 0 0-.041-.097 13.1 13.1 0 0 1-1.872-.898.07.07 0 0 1-.007-.117c.126-.094.252-.192.372-.29a.07.07 0 0 1 .073-.01c3.928 1.793 8.18 1.793 12.062 0a.07.07 0 0 1 .074.01c.12.098.246.196.373.29a.07.07 0 0 1-.006.118 12.3 12.3 0 0 1-1.873.897.07.07 0 0 0-.04.098 14.3 14.3 0 0 0 1.225 2.005.07.07 0 0 0 .077.028c1.957-.607 3.943-1.524 5.994-3.029a.07.07 0 0 0 .03-.053c.5-5.177-.838-9.713-3.548-13.718a.061.061 0 0 0-.03-.025ZM8.68 15.331c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.175 1.096 2.157 2.419 0 1.334-.956 2.419-2.157 2.419Zm6.64 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.175 1.096 2.157 2.419 0 1.334-.947 2.419-2.157 2.419Z"/>
-                </svg>
-              </span>
-            </a>
-            <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">
-              <span aria-hidden="true" class="icon icon-sun">
-                <svg viewBox="0 0 24 24" role="presentation">
-                  <path d="M12 4.5a1 1 0 0 1-1-1V2a1 1 0 1 1 2 0v1.5a1 1 0 0 1-1 1Zm0 17a1 1 0 0 1-1-1V19a1 1 0 1 1 2 0v1.5a1 1 0 0 1-1 1ZM4.5 12a1 1 0 0 1-1-1H2a1 1 0 1 1 0-2h1.5a1 1 0 0 1 0 2Zm17 0a1 1 0 0 1-1-1H21a1 1 0 1 1 0-2h-1.5a1 1 0 0 1 0 2ZM6.343 6.343a1 1 0 0 1-.707-1.707l1.06-1.06a1 1 0 0 1 1.414 1.414l-1.06 1.06a1 1 0 0 1-.707.293Zm10.606 10.607a1 1 0 0 1-.707-1.707l1.06-1.06a1 1 0 0 1 1.415 1.414l-1.061 1.06a1 1 0 0 1-.707.293Zm1.768-10.607a1 1 0 0 1-.707-.293l-1.06-1.06A1 1 0 0 1 18.364 3.576l1.06 1.06a1 1 0 0 1-.707 1.415ZM6.343 17.657a1 1 0 0 1-.707-.293l-1.06-1.06a1 1 0 0 1 1.414-1.415l1.06 1.06a1 1 0 0 1-.707 1.708ZM12 7.25A4.75 4.75 0 1 0 12 16.75 4.75 4.75 0 0 0 12 7.25Z"/>
-                </svg>
-              </span>
-              <span aria-hidden="true" class="icon icon-moon" hidden>
-                <svg viewBox="0 0 24 24" role="presentation">
-                  <path d="M20.752 14.318a8.5 8.5 0 0 1-11.07-11.07 1 1 0 0 0-1.32-1.32A10.5 10.5 0 1 0 21.89 15.64a1 1 0 0 0-1.138-1.322Z"/>
-                </svg>
-              </span>
-            </button>
-          </div>
-        </nav>
-      </div>
-    </header>
+<html lang="en" data-theme="dark">
 
-    <main class="page-content" aria-label="Content">
-      <div class="wrapper">
-        {{ content }}
-      </div>
-    </main>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% if page.title %}{{ page.title }} | {% endif %}{{ site.title }}</title>
+  <link rel="icon" type="image/png" href="{{ site.avatar | default: '/assets/img/avatar.png' | relative_url }}">
+  <link rel="stylesheet" href="{{ '/assets/main.css' | relative_url }}">
+  <link rel="stylesheet" href="{{ '/assets/css/custom.css' | relative_url }}">
+</head>
 
-    <footer class="site-footer">
-      <div class="wrapper footer-inner">
-        <div class="footer-note-left">&copy; {{ site.time | date: "%Y" }} {{ site.title }}.</div>
-      </div>
-    </footer>
-    <script>
-document.addEventListener('DOMContentLoaded', () => {
-  // 1. Theme Logic
-  const root = document.documentElement;
-  const themeBtn = document.getElementById('theme-toggle');
-  const sunIcon = '<svg viewBox="0 0 24 24" role="presentation"><path d="M12 4.5a1 1 0 0 1-1-1V2a1 1 0 1 1 2 0v1.5a1 1 0 0 1-1 1Zm0 17a1 1 0 0 1-1-1V19a1 1 0 1 1 2 0v1.5a1 1 0 0 1-1 1ZM4.5 12a1 1 0 0 1-1-1H2a1 1 0 1 1 0-2h1.5a1 1 0 0 1 0 2Zm17 0a1 1 0 0 1-1-1H21a1 1 0 1 1 0-2h-1.5a1 1 0 0 1 0 2ZM6.343 6.343a1 1 0 0 1-.707-1.707l1.06-1.06a1 1 0 0 1 1.414 1.414l-1.06 1.06a1 1 0 0 1-.707.293Zm10.606 10.607a1 1 0 0 1-.707-1.707l1.06-1.06a1 1 0 0 1 1.415 1.414l-1.061 1.06a1 1 0 0 1-.707.293Zm1.768-10.607a1 1 0 0 1-.707-.293l-1.06-1.06A1 1 0 0 1 18.364 3.576l1.06 1.06a1 1 0 0 1-.707 1.415ZM6.343 17.657a1 1 0 0 1-.707-.293l-1.06-1.06a1 1 0 0 1 1.414-1.415l1.06 1.06a1 1 0 0 1-.707 1.708ZM12 7.25A4.75 4.75 0 1 0 12 16.75 4.75 4.75 0 0 0 12 7.25Z"/></svg>';
-  const moonIcon = '<svg viewBox="0 0 24 24" role="presentation"><path d="M20.752 14.318a8.5 8.5 0 0 1-11.07-11.07 1 1 0 0 0-1.32-1.32A10.5 10.5 0 1 0 21.89 15.64a1 1 0 0 0-1.138-1.322Z"/></svg>';
-  const setTheme = (t) => {
-    root.dataset.theme = t;
-    localStorage.setItem('theme', t);
-    if (themeBtn) {
-      themeBtn.innerHTML = t === 'dark' ? sunIcon : moonIcon;
-      themeBtn.setAttribute('aria-label', t === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-      themeBtn.setAttribute('title', t === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+<body>
+  <canvas id="global-particles" class="global-particles" aria-hidden="true"></canvas>
+  <header class="site-header">
+    <div class="wrapper header-inner">
+      <button class="nav-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false"
+        aria-controls="primary-nav">
+        <span class="nav-toggle-bars">
+          <span></span><span></span><span></span>
+        </span>
+      </button>
+      <a class="brand" href="{{ '/' | relative_url }}">
+        <span class="brand-dot"></span>
+        {{ site.title }}
+      </a>
+      <nav id="primary-nav" class="nav-links" aria-label="Primary">
+        <a href="{{ '/' | relative_url }}">Home</a>
+        <a href="{{ '/tags/' | relative_url }}">Tags</a>
+        <a href="{{ '/about/' | relative_url }}">About</a>
+        <div class="nav-icons">
+          <a class="icon-btn" href="https://github.com/Jaysenlestari" target="_blank" rel="noopener"
+            aria-label="GitHub: Jaysenlestari">
+            <span aria-hidden="true" class="icon github-icon">
+              <svg viewBox="0 0 24 24" role="presentation">
+                <path
+                  d="M12 .5C5.648.5.5 5.74.5 12.207c0 5.181 3.438 9.576 8.207 11.125.6.116.82-.27.82-.6 0-.297-.011-1.082-.017-2.124-3.338.744-4.042-1.645-4.042-1.645-.546-1.402-1.333-1.775-1.333-1.775-1.089-.767.083-.751.083-.751 1.205.087 1.838 1.27 1.838 1.27 1.07 1.866 2.809 1.327 3.494 1.015.108-.787.419-1.327.762-1.632-2.665-.313-5.466-1.378-5.466-6.135 0-1.356.465-2.463 1.235-3.33-.124-.314-.535-1.574.117-3.281 0 0 1.008-.329 3.302 1.27a11.29 11.29 0 0 1 3.008-.415c1.02.005 2.047.142 3.007.415 2.294-1.599 3.3-1.27 3.3-1.27.653 1.707.242 2.967.118 3.28.77.868 1.233 1.975 1.233 3.331 0 4.77-2.806 5.818-5.48 6.125.43.382.814 1.136.814 2.29 0 1.654-.015 2.986-.015 3.392 0 .333.217.72.826.597 4.766-1.55 8.201-5.944 8.201-11.123C23.5 5.74 18.353.5 12 .5Z" />
+              </svg>
+            </span>
+          </a>
+          <a class="icon-btn" href="https://discord.com/users/655627264180092948" target="_blank" rel="noopener"
+            aria-label="Discord: jaysen_lestari">
+            <span aria-hidden="true" class="icon discord-icon">
+              <svg viewBox="0 0 24 24" role="presentation">
+                <path
+                  d="M20.317 4.369a19.78 19.78 0 0 0-4.885-1.515.07.07 0 0 0-.075.035c-.211.375-.444.864-.608 1.249a18.27 18.27 0 0 0-5.448 0 12.64 12.64 0 0 0-.617-1.25.07.07 0 0 0-.075-.035 19.736 19.736 0 0 0-4.885 1.516.064.064 0 0 0-.03.025C2.175 9.033 1.64 13.6 2.066 18.111a.077.077 0 0 0 .031.054c2.052 1.505 4.038 2.422 5.993 3.029a.07.07 0 0 0 .076-.027c.461-.632.873-1.3 1.226-2.006a.07.07 0 0 0-.041-.097 13.1 13.1 0 0 1-1.872-.898.07.07 0 0 1-.007-.117c.126-.094.252-.192.372-.29a.07.07 0 0 1 .073-.01c3.928 1.793 8.18 1.793 12.062 0a.07.07 0 0 1 .074.01c.12.098.246.196.373.29a.07.07 0 0 1-.006.118 12.3 12.3 0 0 1-1.873.897.07.07 0 0 0-.04.098 14.3 14.3 0 0 0 1.225 2.005.07.07 0 0 0 .077.028c1.957-.607 3.943-1.524 5.994-3.029a.07.07 0 0 0 .03-.053c.5-5.177-.838-9.713-3.548-13.718a.061.061 0 0 0-.03-.025ZM8.68 15.331c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.175 1.096 2.157 2.419 0 1.334-.956 2.419-2.157 2.419Zm6.64 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.175 1.096 2.157 2.419 0 1.334-.947 2.419-2.157 2.419Z" />
+              </svg>
+            </span>
+          </a>
+          <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">
+            <span aria-hidden="true" class="icon icon-sun">
+              <svg viewBox="0 0 24 24" role="presentation">
+                <path
+                  d="M12 4.5a1 1 0 0 1-1-1V2a1 1 0 1 1 2 0v1.5a1 1 0 0 1-1 1Zm0 17a1 1 0 0 1-1-1V19a1 1 0 1 1 2 0v1.5a1 1 0 0 1-1 1ZM4.5 12a1 1 0 0 1-1-1H2a1 1 0 1 1 0-2h1.5a1 1 0 0 1 0 2Zm17 0a1 1 0 0 1-1-1H21a1 1 0 1 1 0-2h-1.5a1 1 0 0 1 0 2ZM6.343 6.343a1 1 0 0 1-.707-1.707l1.06-1.06a1 1 0 0 1 1.414 1.414l-1.06 1.06a1 1 0 0 1-.707.293Zm10.606 10.607a1 1 0 0 1-.707-1.707l1.06-1.06a1 1 0 0 1 1.415 1.414l-1.061 1.06a1 1 0 0 1-.707.293Zm1.768-10.607a1 1 0 0 1-.707-.293l-1.06-1.06A1 1 0 0 1 18.364 3.576l1.06 1.06a1 1 0 0 1-.707 1.415ZM6.343 17.657a1 1 0 0 1-.707-.293l-1.06-1.06a1 1 0 0 1 1.414-1.415l1.06 1.06a1 1 0 0 1-.707 1.708ZM12 7.25A4.75 4.75 0 1 0 12 16.75 4.75 4.75 0 0 0 12 7.25Z" />
+              </svg>
+            </span>
+            <span aria-hidden="true" class="icon icon-moon" hidden>
+              <svg viewBox="0 0 24 24" role="presentation">
+                <path
+                  d="M20.752 14.318a8.5 8.5 0 0 1-11.07-11.07 1 1 0 0 0-1.32-1.32A10.5 10.5 0 1 0 21.89 15.64a1 1 0 0 0-1.138-1.322Z" />
+              </svg>
+            </span>
+          </button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-content" aria-label="Content">
+    <div class="wrapper">
+      {{ content }}
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrapper footer-inner">
+      <div class="footer-note-left">&copy; {{ site.time | date: "%Y" }} {{ site.title }}.</div>
+    </div>
+  </footer>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Theme Logic
+      const root = document.documentElement;
+      const themeBtn = document.getElementById('theme-toggle');
+      const sunIcon = '<svg viewBox="0 0 24 24" role="presentation"><path d="M12 4.5a1 1 0 0 1-1-1V2a1 1 0 1 1 2 0v1.5a1 1 0 0 1-1 1Zm0 17a1 1 0 0 1-1-1V19a1 1 0 1 1 2 0v1.5a1 1 0 0 1-1 1ZM4.5 12a1 1 0 0 1-1-1H2a1 1 0 1 1 0-2h1.5a1 1 0 0 1 0 2Zm17 0a1 1 0 0 1-1-1H21a1 1 0 1 1 0-2h-1.5a1 1 0 0 1 0 2ZM6.343 6.343a1 1 0 0 1-.707-1.707l1.06-1.06a1 1 0 0 1 1.414 1.414l-1.06 1.06a1 1 0 0 1-.707.293Zm10.606 10.607a1 1 0 0 1-.707-1.707l1.06-1.06a1 1 0 0 1 1.415 1.414l-1.061 1.06a1 1 0 0 1-.707.293Zm1.768-10.607a1 1 0 0 1-.707-.293l-1.06-1.06A1 1 0 0 1 18.364 3.576l1.06 1.06a1 1 0 0 1-.707 1.415ZM6.343 17.657a1 1 0 0 1-.707-.293l-1.06-1.06a1 1 0 0 1 1.414-1.415l1.06 1.06a1 1 0 0 1-.707 1.708ZM12 7.25A4.75 4.75 0 1 0 12 16.75 4.75 4.75 0 0 0 12 7.25Z"/></svg>';
+      const moonIcon = '<svg viewBox="0 0 24 24" role="presentation"><path d="M20.752 14.318a8.5 8.5 0 0 1-11.07-11.07 1 1 0 0 0-1.32-1.32A10.5 10.5 0 1 0 21.89 15.64a1 1 0 0 0-1.138-1.322Z"/></svg>';
+      const setTheme = (t) => {
+        root.dataset.theme = t;
+        localStorage.setItem('theme', t);
+        if (themeBtn) {
+          themeBtn.innerHTML = t === 'dark' ? sunIcon : moonIcon;
+          themeBtn.setAttribute('aria-label', t === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+          themeBtn.setAttribute('title', t === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+        }
+      };
+      const stored = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setTheme(stored || (prefersDark ? 'dark' : 'light'));
+      if (themeBtn) themeBtn.addEventListener('click', () => setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark'));
+
+      // 2. Hamburger Logic (FIXED)
+      const toggle = document.querySelector('.nav-toggle');
+      const nav = document.getElementById('primary-nav');
+
+      if (toggle && nav) {
+        toggle.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopImmediatePropagation(); // MATIKAN bubble biar ga lari ke document.click
+
+          const isOpen = nav.classList.toggle('open');
+          toggle.classList.toggle('is-open', isOpen);
+          document.body.classList.toggle('nav-open', isOpen);
+
+        });
+      }
+
+      // 3. Global Click to Close
+      document.addEventListener('click', (e) => {
+        if (nav && nav.classList.contains('open') && !nav.contains(e.target) && !toggle.contains(e.target)) {
+          nav.classList.remove('open');
+          toggle.classList.remove('is-open');
+          document.body.classList.remove('nav-open');
+        }
+      });
+
+      // 4. Code Copy Button
+      const copyIcon = '<svg viewBox="0 0 24 24" role="presentation"><path d="M8 4a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3h-1v3a3 3 0 0 1-3 3H4a3 3 0 0 1-3-3v-8a3 3 0 0 1 3-3h1V4Zm2 0v3h5a3 3 0 0 1 3 3v5h1a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1h-8a1 1 0 0 0-1 1Zm-6 8v8a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1Z"/></svg>';
+      document.querySelectorAll('figure.highlight, div.highlight').forEach(block => {
+        const code = block.querySelector('pre code');
+        if (!code) return;
+        const btn = document.createElement('button');
+        btn.className = 'copy-btn'; btn.innerHTML = copyIcon;
+        btn.onclick = async () => {
+          await navigator.clipboard.writeText(code.innerText);
+          btn.classList.add('copied');
+          setTimeout(() => btn.classList.remove('copied'), 1500);
+        };
+        const actions = block.querySelector('.code-actions') || document.createElement('div');
+        actions.className = 'code-actions';
+        actions.appendChild(btn);
+        if (!block.querySelector('.code-actions')) block.appendChild(actions);
+      });
+
+      // 5. Hero terminal typewriter loop (colored HTML output)
+      const terminalEl = document.getElementById('terminal-body');
+      if (terminalEl) {
+        const postCount = '{{ site.posts.size }}';
+        const recentTitles = [{% for p in site.posts limit: 3 %} '{{ p.title | escape }}'{% unless forloop.last %}, {% endunless %} {% endfor %}];
+
+      // Each line: { kind, text, html }
+      // 'html' is what gets rendered (with color spans); 'text' is what gets typed char-by-char
+      const prompt = '<span class="t-prompt">jaysen@blog</span><span class="t-prompt-muted">:~$</span> ';
+      const script = [
+        { kind: 'cmd', text: 'whoami', html: prompt + '<span class="t-cmd">whoami</span>' },
+        { kind: 'out', text: 'Jaysen Lestari - CS @ Universitas Indonesia | NetSOS @ Ristek CSUI', html: '<span class="t-val">Jaysen Lestari</span> <span class="t-muted">-</span> <span class="t-out">CS @ Universitas Indonesia</span> <span class="t-muted">|</span> <span class="t-hi">NetSOS @ Ristek CSUI</span>' },
+        { kind: 'cmd', text: 'cat /etc/motd', html: prompt + '<span class="t-cmd">cat /etc/motd</span>' },
+        { kind: 'out', text: 'CTF player & challenge creator.', html: '<span class="t-out">CTF player & challenge creator.</span>' },
+        { kind: 'out', text: 'I break things, build challenges, and write about it.', html: '<span class="t-out">I break things, build challenges, and write about it.</span>' },
+        { kind: 'cmd', text: 'cat stats.json | jq', html: prompt + '<span class="t-cmd">cat stats.json</span> <span class="t-muted">|</span> <span class="t-cmd">jq</span>' },
+        { kind: 'out', text: '  writeups : ' + postCount, html: '  <span class="t-label">writeups</span> <span class="t-muted">:</span> <span class="t-val">' + postCount + '</span>' },
+        { kind: 'out', text: '  focus    : Forensics . DFIR . CyberSecurity', html: '  <span class="t-label">focus</span>    <span class="t-muted">:</span> <span class="t-hi">Forensics</span> <span class="t-muted">.</span> <span class="t-hi">DFIR</span> <span class="t-muted">.</span> <span class="t-hi">CyberSecurity</span>' },
+        { kind: 'out', text: '  role     : CTF Player & Challenge Author', html: '  <span class="t-label">role</span>     <span class="t-muted">:</span> <span class="t-val">CTF Player & Challenge Author</span>' },
+        { kind: 'out', text: '  tools    : Volatility . Wireshark . Eric Zimmerman Tools . Autopsy . FTK Imager', html: '  <span class="t-label">tools</span>    <span class="t-muted">:</span> <span class="t-val">Volatility</span> <span class="t-muted">.</span> <span class="t-val">Wireshark</span> <span class="t-muted">.</span> <span class="t-val">Eric Zimmerman Tools</span> <span class="t-muted">.</span> <span class="t-val">Autopsy</span> <span class="t-muted">.</span> <span class="t-val">FTK Imager</span>' },
+        { kind: 'cmd', text: 'tail -1 ctf.log', html: prompt + '<span class="t-cmd">tail -1 ctf.log</span>' },
+        { kind: 'out', text: '[+] latest: ' + (recentTitles[0] || 'coming soon...'), html: '<span class="t-marker">[+]</span> <span class="t-label">latest:</span> <span class="t-hi">' + (recentTitles[0] || 'coming soon...') + '</span>' },
+      ];
+
+      let lineIndex = 0;
+      let charIndex = 0;
+      let currentText = '';
+      let renderedHtml = [];
+      const baseSpeed = 22;
+
+      const render = (showCursor) => {
+        if (showCursor === undefined) showCursor = true;
+        const cursor = showCursor ? '<span class="t-cursor">\u258c</span>' : '';
+        const currentLine = lineIndex < script.length ? buildPartialHtml(script[lineIndex], charIndex) + cursor : cursor;
+        terminalEl.innerHTML = renderedHtml.join('') + currentLine;
+      };
+
+      // Build partial colored HTML as we type char by char
+      const buildPartialHtml = (item, chars) => {
+        const plainPrefix = item.kind === 'cmd' ? 'jaysen@blog:~$ ' : '';
+        const plainFull = plainPrefix + item.text;
+        const typed = plainFull.substring(0, chars);
+        // For partial typing, we show plain text; once complete, swap to colored HTML
+        if (chars >= plainFull.length) return '';
+        return '<span class="t-typing">' + escapeHtml(typed) + '</span>';
+      };
+
+      const escapeHtml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+      const nextScript = () => {
+        lineIndex = 0;
+        charIndex = 0;
+        currentText = '';
+        renderedHtml = [];
+        type();
+      };
+
+      const type = () => {
+        const item = script[lineIndex];
+        const plainPrefix = item.kind === 'cmd' ? 'jaysen@blog:~$ ' : '';
+        const plainFull = plainPrefix + item.text;
+
+        if (charIndex < plainFull.length) {
+          charIndex += 1;
+          render();
+          setTimeout(type, baseSpeed + Math.random() * 35);
+        } else {
+          // Line done - push the colored HTML version
+          renderedHtml.push('<div class="t-line">' + item.html + '</div>');
+          charIndex = 0;
+          lineIndex += 1;
+          if (lineIndex >= script.length) {
+            render(true);
+            setTimeout(nextScript, 2500);
+          } else {
+            render();
+            const pause = item.kind === 'cmd' ? 400 : 80;
+            setTimeout(type, pause);
+          }
+        }
+      };
+
+      render();
+      type();
     }
-  };
-  const stored = localStorage.getItem('theme');
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  setTheme(stored || (prefersDark ? 'dark' : 'light'));
-  if (themeBtn) themeBtn.addEventListener('click', () => setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark'));
 
-  // 2. Hamburger Logic (FIXED)
-  const toggle = document.querySelector('.nav-toggle');
-  const nav = document.getElementById('primary-nav');
+    // 6. Hacker background animation (hero section)
+    const hackerCanvas = document.getElementById('hacker-canvas');
+    if (hackerCanvas) {
+      const hCtx = hackerCanvas.getContext('2d');
+      const heroSection = hackerCanvas.parentElement;
+      let hW, hH;
 
-  if (toggle && nav) {
-    toggle.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopImmediatePropagation(); // MATIKAN bubble biar ga lari ke document.click
-      
-      const isOpen = nav.classList.toggle('open');
-      toggle.classList.toggle('is-open', isOpen);
-      document.body.classList.toggle('nav-open', isOpen);
+      const resizeHacker = () => {
+        hW = hackerCanvas.width = heroSection.offsetWidth;
+        hH = hackerCanvas.height = heroSection.offsetHeight;
+      };
+      window.addEventListener('resize', resizeHacker);
+      resizeHacker();
 
+      // Generate random hacker-style content lines
+      const hexChars = '0123456789abcdef';
+      const randHex = (n) => { let s = ''; for (let i = 0; i < n; i++) s += hexChars[Math.floor(Math.random() * 16)]; return s; };
+      const randIP = () => [1, 2, 3, 4].map(() => Math.floor(Math.random() * 256)).join('.');
+      const randPort = () => Math.floor(Math.random() * 65535);
+      const protocols = ['TCP', 'UDP', 'SSH', 'HTTP', 'DNS', 'TLS'];
+      const statuses = ['SYN_SENT', 'ESTABLISHED', 'ACK', 'FIN_WAIT', 'RST', 'CONNECTED'];
+      const actions = ['SCAN', 'PROBE', 'EXFIL', 'RECON', 'INJECT', 'INTERCEPT'];
+
+      const generateLine = () => {
+        const r = Math.random();
+        if (r < 0.3) {
+          const offset = randHex(8);
+          let hex = '0x' + offset + '  ';
+          for (let b = 0; b < 6 + Math.floor(Math.random() * 8); b++) hex += randHex(4) + ' ';
+          return hex + '|' + randHex(8) + '|';
+        } else if (r < 0.6) {
+          const proto = protocols[Math.floor(Math.random() * protocols.length)];
+          const status = statuses[Math.floor(Math.random() * statuses.length)];
+          return '[' + proto + '] ' + randIP() + ':' + randPort() + ' -> ' + randIP() + ':' + randPort() + ' ' + status + ' len=' + Math.floor(Math.random() * 9999) + ' ttl=' + Math.floor(Math.random() * 255) + ' seq=' + randHex(8);
+        } else if (r < 0.8) {
+          const action = actions[Math.floor(Math.random() * actions.length)];
+          return '> ' + action + ' ' + randIP() + ' [' + randHex(6) + '] flags=0x' + randHex(4) + ' payload=' + randHex(16) + ' status=OK';
+        } else {
+          const tool = ['nmap', 'tcpdump', 'wireshark', 'hashcat', 'hydra', 'john'][Math.floor(Math.random() * 6)];
+          const flag = ['--scan', '--dump', '--crack', '--brute', '--sniff', '--trace'][Math.floor(Math.random() * 6)];
+          return '$ ' + tool + ' ' + flag + ' -t ' + randIP() + ' -p ' + randPort() + ',' + randPort() + ',' + randPort() + ' --output=' + randHex(8) + '.log';
+        }
+      };
+
+      // Full-width scrolling: render lines across the entire canvas width
+      const fontSize = 13;
+      const lineHeight = 24;
+      const maxLines = Math.ceil(hH / lineHeight) + 5;
+      let lines = [];
+      for (let i = 0; i < maxLines; i++) lines.push({ text: generateLine(), alpha: 0.25 + Math.random() * 0.55 });
+
+      let scrollOffset = 0;
+      const scrollSpeed = 0.35;
+      let frameCount = 0;
+
+      const drawHacker = () => {
+        if (hackerCanvas.width !== heroSection.offsetWidth || hackerCanvas.height !== heroSection.offsetHeight) {
+          resizeHacker();
+          // Re-populate lines on resize
+          const newMax = Math.ceil(hH / lineHeight) + 5;
+          while (lines.length < newMax) lines.push({ text: generateLine(), alpha: 0.25 + Math.random() * 0.55 });
+        }
+
+        hCtx.clearRect(0, 0, hW, hH);
+        const isDark = document.documentElement.dataset.theme !== 'light';
+
+        // Subtle scanlines
+        for (let y = 0; y < hH; y += 3) {
+          hCtx.fillStyle = isDark ? 'rgba(0,0,0,0.03)' : 'rgba(0,0,0,0.012)';
+          hCtx.fillRect(0, y, hW, 1);
+        }
+
+        hCtx.font = fontSize + 'px "Share Tech Mono", monospace';
+        frameCount++;
+
+        scrollOffset += scrollSpeed;
+        if (scrollOffset >= lineHeight) {
+          scrollOffset -= lineHeight;
+          lines.shift();
+          lines.push({ text: generateLine(), alpha: 0.25 + Math.random() * 0.55 });
+        }
+
+        lines.forEach((line, i) => {
+          const y = i * lineHeight - scrollOffset + lineHeight;
+          if (y < -lineHeight || y > hH + lineHeight) return;
+
+          let fadeAlpha = line.alpha;
+          // Fade at top and bottom edges
+          if (y < 50) fadeAlpha *= y / 50;
+          if (y > hH - 50) fadeAlpha *= (hH - y) / 50;
+          fadeAlpha = Math.max(0, fadeAlpha);
+
+          // Random flicker for some lines
+          if (frameCount % 90 === 0 && Math.random() < 0.08) {
+            line.alpha = 0.6 + Math.random() * 0.35;
+          }
+
+          if (isDark) {
+            hCtx.fillStyle = 'rgba(100,240,170,' + fadeAlpha + ')';
+          } else {
+            hCtx.fillStyle = 'rgba(15,120,100,' + (fadeAlpha * 0.85) + ')';
+          }
+          hCtx.fillText(line.text, 10, y);
+        });
+
+        requestAnimationFrame(drawHacker);
+      };
+      drawHacker();
+    }
     });
-  }
+  </script>
 
-  // 3. Global Click to Close
-  document.addEventListener('click', (e) => {
-    if (nav && nav.classList.contains('open') && !nav.contains(e.target) && !toggle.contains(e.target)) {
-      nav.classList.remove('open');
-      toggle.classList.remove('is-open');
-      document.body.classList.remove('nav-open');
-    }
-  });
+  <script>
+    // Global particles background (all pages)
+    (function () {
+      const canvas = document.getElementById('global-particles');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let w, h, particles = [];
+      const COUNT = 50;
+      const resize = () => { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; };
+      window.addEventListener('resize', resize);
+      resize();
 
-  // 4. Code Copy Button
-  const copyIcon = '<svg viewBox="0 0 24 24" role="presentation"><path d="M8 4a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3h-1v3a3 3 0 0 1-3 3H4a3 3 0 0 1-3-3v-8a3 3 0 0 1 3-3h1V4Zm2 0v3h5a3 3 0 0 1 3 3v5h1a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1h-8a1 1 0 0 0-1 1Zm-6 8v8a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1Z"/></svg>';
-  document.querySelectorAll('figure.highlight, div.highlight').forEach(block => {
-    const code = block.querySelector('pre code');
-    if (!code) return;
-    const btn = document.createElement('button');
-    btn.className = 'copy-btn'; btn.innerHTML = copyIcon;
-    btn.onclick = async () => {
-      await navigator.clipboard.writeText(code.innerText);
-      btn.classList.add('copied');
-      setTimeout(() => btn.classList.remove('copied'), 1500);
-    };
-    const actions = block.querySelector('.code-actions') || document.createElement('div');
-    actions.className = 'code-actions';
-    actions.appendChild(btn);
-    if (!block.querySelector('.code-actions')) block.appendChild(actions);
-  });
-});
-</script>
-      
-  </body>
+      for (let i = 0; i < COUNT; i++) {
+        particles.push({
+          x: Math.random() * w, y: Math.random() * h,
+          r: Math.random() * 2.5 + 0.8,
+          dx: (Math.random() - 0.5) * 0.3,
+          dy: (Math.random() - 0.5) * 0.3,
+          o: Math.random() * 0.45 + 0.15
+        });
+      }
+
+      const draw = () => {
+        ctx.clearRect(0, 0, w, h);
+        const isDark = document.documentElement.dataset.theme !== 'light';
+        const col = isDark ? '125,249,194' : '37,99,235';
+
+        particles.forEach((p, i) => {
+          p.x += p.dx; p.y += p.dy;
+          if (p.x < 0 || p.x > w) p.dx *= -1;
+          if (p.y < 0 || p.y > h) p.dy *= -1;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(' + col + ',' + p.o + ')';
+          ctx.fill();
+
+          for (let j = i + 1; j < particles.length; j++) {
+            const q = particles[j];
+            const dist = Math.hypot(p.x - q.x, p.y - q.y);
+            if (dist < 140) {
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(q.x, q.y);
+              ctx.strokeStyle = 'rgba(' + col + ',' + ((1 - dist / 140) * 0.18) + ')';
+              ctx.lineWidth = 0.7;
+              ctx.stroke();
+            }
+          }
+        });
+        requestAnimationFrame(draw);
+      };
+      draw();
+    })();
+  </script>
+
+</body>
+
 </html>
-

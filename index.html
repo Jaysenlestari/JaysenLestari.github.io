@@ -4,24 +4,32 @@ title: Home
 ---
 
 <section class="hero">
-  <div class="hero-grid">
-    <div class="hero-copy">
+  <canvas id="hacker-canvas" class="hacker-bg-canvas" aria-hidden="true"></canvas>
+  <div class="hero-single">
+    <div class="hero-copy anim-fade-up" style="--delay: 0">
       <p class="eyebrow">Cybersecurity / DFIR / CTFs</p>
       <h1>Hi, I'm Jaysen</h1>
-      <p class="lede">
-        I'm a Computer Science student who enjoys participating in Capture The Flag (CTF) competitions.
-        This blog is where I share CTF write-ups and what I learn along the way.
-      </p>
-      <div class="hero-actions">
-        <a class="btn primary" href="#posts">View posts</a>
-        <a class="btn ghost" href="{{ '/about/' | relative_url }}">About</a>
-      </div>
-    </div>
 
-    <div class="hero-avatar card">
-      <div class="avatar-frame">
-        <img src="{{ site.avatar | default: '/assets/img/avatar.png' | relative_url }}"
-             alt="Jaysen profile picture">
+      <div class="terminal-card terminal-wide">
+        <div class="terminal-header">
+          <span class="term-dot red"></span>
+          <span class="term-dot yellow"></span>
+          <span class="term-dot green"></span>
+          <span class="term-title">jaysen@blog:~</span>
+        </div>
+        <div id="terminal-body" class="terminal-body" aria-live="polite"></div>
+      </div>
+
+      <div class="hero-actions">
+        <a class="btn primary" href="#posts">
+          <span>View posts</span>
+          <svg class="btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 17L17 7" />
+            <path d="M7 7h10v10" />
+          </svg>
+        </a>
+        <a class="btn ghost" href="{{ '/about/' | relative_url }}">About</a>
       </div>
     </div>
   </div>
@@ -29,40 +37,56 @@ title: Home
 
 <section class="posts" id="posts">
   <div class="section-header">
-    <h2>All Posts</h2>
+    <div>
+      <p class="eyebrow">Signal log</p>
+      <h2>All Posts</h2>
+    </div>
+    <p class="muted section-note">Fresh drops, clean notes, reproducible steps.</p>
   </div>
 
   {% if site.posts and site.posts.size > 0 %}
-    <div class="post-grid">
-      {% for post in site.posts %}
-        <article class="post-card">
-          <div class="post-meta">
-            {{ post.date | date: "%b %-d, %Y" }}
-          </div>
+  <div class="post-grid">
+    {% for post in site.posts %}
+    <article class="post-card anim-fade-up" style="--delay: {{ forloop.index | plus: 1 }}">
+      <div class="post-card-body">
+        <div class="post-meta">
+          {{ post.date | date: "%b %-d, %Y" }}
+        </div>
 
-          <h3 class="post-title">
-            <a class="post-link" href="{{ post.url | relative_url }}">
-              {{ post.title }}
-            </a>
-          </h3>
+        <h3 class="post-title">
+          <a class="post-link" href="{{ post.url | relative_url }}">
+            {{ post.title }}
+          </a>
+        </h3>
 
-          {% if post.excerpt %}
-            <p class="post-excerpt">
-              {{ post.excerpt }}
-            </p>
-          {% endif %}
+        {% if post.excerpt %}
+        <p class="post-excerpt">
+          {{ post.excerpt | strip_html | truncatewords: 30 }}
+        </p>
+        {% endif %}
 
+        <div class="post-card-footer">
           {% if post.categories %}
-            <div class="post-tags">
-              {% for cat in post.categories %}
-                <span class="tag">{{ cat }}</span>
-              {% endfor %}
-            </div>
+          <div class="post-tags">
+            {% for cat in post.categories %}
+            <span class="tag">{{ cat }}</span>
+            {% endfor %}
+          </div>
           {% endif %}
-        </article>
-      {% endfor %}
-    </div>
+          <a class="read-more" href="{{ post.url | relative_url }}">
+            Read
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14" />
+              <path d="M12 5l7 7-7 7" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
   {% else %}
-    <p class="muted">No posts yet.</p>
+  <p class="muted">No posts yet.</p>
   {% endif %}
 </section>

