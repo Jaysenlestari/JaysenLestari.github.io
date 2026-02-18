@@ -74,37 +74,37 @@
       <p class="post-meta-line">
         <span>Feb 17, 2026</span>
         
-          <span class="dot" aria-hidden="true">&bull;</span>
-          <span class="caps">CTF | Forensics | DFIR</span>
+        <span class="dot" aria-hidden="true">&bull;</span>
+        <span class="caps">CTF | Forensics | DFIR</span>
         
       </p>
 
       <h1 class="post-title">Breached - C2C 2026 Qualification</h1>
 
       
-        <div class="tag-row">
-          
-            <span class="tag-chip">DigitalForensics</span>
-          
-            <span class="tag-chip">DFIR</span>
-          
-            <span class="tag-chip">Linux</span>
-          
-            <span class="tag-chip">WordPress</span>
-          
-            <span class="tag-chip">WebShell</span>
-          
-            <span class="tag-chip">MalwareAnalysis</span>
-          
-            <span class="tag-chip">ReverseEngineering</span>
-          
-            <span class="tag-chip">PrivilegeEscalation</span>
-          
-            <span class="tag-chip">Persistence</span>
-          
-            <span class="tag-chip">Ransomware</span>
-          
-        </div>
+      <div class="tag-row">
+        
+        <span class="tag-chip">DigitalForensics</span>
+        
+        <span class="tag-chip">DFIR</span>
+        
+        <span class="tag-chip">Linux</span>
+        
+        <span class="tag-chip">WordPress</span>
+        
+        <span class="tag-chip">WebShell</span>
+        
+        <span class="tag-chip">MalwareAnalysis</span>
+        
+        <span class="tag-chip">ReverseEngineering</span>
+        
+        <span class="tag-chip">PrivilegeEscalation</span>
+        
+        <span class="tag-chip">Persistence</span>
+        
+        <span class="tag-chip">Ransomware</span>
+        
+      </div>
       
 
       <div class="post-body">
@@ -680,93 +680,94 @@ Answer : <code class="language-plaintext highlighter-rouge">D3cRyptEd1337!!</cod
 
     <aside id="post-toc" class="toc-card" aria-label="Table of contents"></aside>
   </div>
-  <button id="toc-toggle" class="toc-toggle" type="button" aria-expanded="false" aria-controls="post-toc" aria-label="Toggle table of contents">
+  <button id="toc-toggle" class="toc-toggle" type="button" aria-expanded="false" aria-controls="post-toc"
+    aria-label="Toggle table of contents">
     <svg viewBox="0 0 24 24" role="presentation">
-      <path d="M4 5.5c0-.55.45-1 1-1h14a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1Zm0 6c0-.55.45-1 1-1h8a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1Zm0 6c0-.55.45-1 1-1h14a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1Z"/>
+      <path
+        d="M4 5.5c0-.55.45-1 1-1h14a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1Zm0 6c0-.55.45-1 1-1h8a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1Zm0 6c0-.55.45-1 1-1h14a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1Z" />
     </svg>
   </button>
 </article>
 <script>
-(function () {
-  const tocRoot = document.getElementById('post-toc');
-  const postBody = document.querySelector('.post-body');
-  if (!tocRoot || !postBody) return;
+  (function () {
+    const tocRoot = document.getElementById('post-toc');
+    const postBody = document.querySelector('.post-body');
+    if (!tocRoot || !postBody) return;
 
-  const headings = Array.from(postBody.querySelectorAll('h2, h3, h4'));
-  if (headings.length === 0) { tocRoot.remove(); document.getElementById('toc-toggle')?.remove(); return; }
+    const headings = Array.from(postBody.querySelectorAll('h2, h3, h4'));
+    if (headings.length === 0) { tocRoot.remove(); document.getElementById('toc-toggle')?.remove(); return; }
 
-  const rootList = document.createElement('ul');
-  rootList.className = 'toc-list';
-  const headingMap = new Map();
-  let currentH2Li = null;
-  let currentH3Li = null;
+    const rootList = document.createElement('ul');
+    rootList.className = 'toc-list';
+    const headingMap = new Map();
+    let currentH2Li = null;
+    let currentH3Li = null;
 
-  headings.forEach((h, i) => {
-    if (!h.id) h.id = `section-${i + 1}`;
-    const li = document.createElement('li');
-    const a = document.createElement('a');
-    a.href = `#${h.id}`; a.textContent = h.textContent;
+    headings.forEach((h, i) => {
+      if (!h.id) h.id = `section-${i + 1}`;
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = `#${h.id}`; a.textContent = h.textContent;
 
-    if (h.tagName === 'H2') {
-      li.className = 'toc-item';
-      li.appendChild(a);
-      rootList.appendChild(li);
-      currentH2Li = li;
-      currentH3Li = null;
-    } else if (h.tagName === 'H3' && currentH2Li) {
-      let sub = currentH2Li.querySelector('ul') || document.createElement('ul');
-      sub.className = 'toc-list depth-2';
-      const subLi = document.createElement('li');
-      subLi.className = 'toc-item depth-2';
-      subLi.appendChild(a);
-      sub.appendChild(subLi);
-      if (!currentH2Li.contains(sub)) currentH2Li.appendChild(sub);
-      currentH3Li = subLi;
-    } else if (h.tagName === 'H4' && currentH3Li) {
-      let sub2 = currentH3Li.querySelector('ul') || document.createElement('ul');
-      sub2.className = 'toc-list depth-3';
-      const subLi2 = document.createElement('li');
-      subLi2.className = 'toc-item depth-3';
-      subLi2.appendChild(a);
-      sub2.appendChild(subLi2);
-      if (!currentH3Li.contains(sub2)) currentH3Li.appendChild(sub2);
-    }
-    headingMap.set(h.id, li);
-  });
-
-  tocRoot.innerHTML = '<div class="toc-title">Contents</div>';
-  tocRoot.appendChild(rootList);
-
-  const tocToggle = document.getElementById('toc-toggle');
-  if (tocToggle) {
-    tocToggle.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      const isOpened = tocRoot.classList.toggle('open');
-      document.body.classList.toggle('toc-open', isOpened);
+      if (h.tagName === 'H2') {
+        li.className = 'toc-item';
+        li.appendChild(a);
+        rootList.appendChild(li);
+        currentH2Li = li;
+        currentH3Li = null;
+      } else if (h.tagName === 'H3' && currentH2Li) {
+        let sub = currentH2Li.querySelector('ul') || document.createElement('ul');
+        sub.className = 'toc-list depth-2';
+        const subLi = document.createElement('li');
+        subLi.className = 'toc-item depth-2';
+        subLi.appendChild(a);
+        sub.appendChild(subLi);
+        if (!currentH2Li.contains(sub)) currentH2Li.appendChild(sub);
+        currentH3Li = subLi;
+      } else if (h.tagName === 'H4' && currentH3Li) {
+        let sub2 = currentH3Li.querySelector('ul') || document.createElement('ul');
+        sub2.className = 'toc-list depth-3';
+        const subLi2 = document.createElement('li');
+        subLi2.className = 'toc-item depth-3';
+        subLi2.appendChild(a);
+        sub2.appendChild(subLi2);
+        if (!currentH3Li.contains(sub2)) currentH3Li.appendChild(sub2);
+      }
+      headingMap.set(h.id, li);
     });
-  }
 
-  // Scroll Spy
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        document.querySelectorAll('.toc-item.active').forEach(el => el.classList.remove('active'));
-        headingMap.get(entry.target.id)?.classList.add('active');
+    tocRoot.innerHTML = '<div class="toc-title">Contents</div>';
+    tocRoot.appendChild(rootList);
+
+    const tocToggle = document.getElementById('toc-toggle');
+    if (tocToggle) {
+      tocToggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        const isOpened = tocRoot.classList.toggle('open');
+        document.body.classList.toggle('toc-open', isOpened);
+      });
+    }
+
+    // Scroll Spy
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          document.querySelectorAll('.toc-item.active').forEach(el => el.classList.remove('active'));
+          headingMap.get(entry.target.id)?.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-10% 0px -70% 0px' });
+    headings.forEach(h => observer.observe(h));
+
+    document.addEventListener('click', (e) => {
+      if (tocRoot.classList.contains('open') && !tocRoot.contains(e.target) && !tocToggle?.contains(e.target)) {
+        tocRoot.classList.remove('open');
+        document.body.classList.remove('toc-open');
       }
     });
-  }, { rootMargin: '-10% 0px -70% 0px' });
-  headings.forEach(h => observer.observe(h));
-
-  document.addEventListener('click', (e) => {
-    if (tocRoot.classList.contains('open') && !tocRoot.contains(e.target) && !tocToggle?.contains(e.target)) {
-      tocRoot.classList.remove('open');
-      document.body.classList.remove('toc-open');
-    }
-  });
-})();
+  })();
 </script>
-
     </div>
   </main>
 
