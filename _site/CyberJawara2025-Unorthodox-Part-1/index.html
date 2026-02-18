@@ -329,13 +329,14 @@ Answer : <code class="language-plaintext highlighter-rouge">192.168.100.137_c2gg
   const postBody = document.querySelector('.post-body');
   if (!tocRoot || !postBody) return;
 
-  const headings = Array.from(postBody.querySelectorAll('h2, h3'));
+  const headings = Array.from(postBody.querySelectorAll('h2, h3, h4'));
   if (headings.length === 0) { tocRoot.remove(); document.getElementById('toc-toggle')?.remove(); return; }
 
   const rootList = document.createElement('ul');
   rootList.className = 'toc-list';
   const headingMap = new Map();
   let currentH2Li = null;
+  let currentH3Li = null;
 
   headings.forEach((h, i) => {
     if (!h.id) h.id = `section-${i + 1}`;
@@ -348,6 +349,7 @@ Answer : <code class="language-plaintext highlighter-rouge">192.168.100.137_c2gg
       li.appendChild(a);
       rootList.appendChild(li);
       currentH2Li = li;
+      currentH3Li = null;
     } else if (h.tagName === 'H3' && currentH2Li) {
       let sub = currentH2Li.querySelector('ul') || document.createElement('ul');
       sub.className = 'toc-list depth-2';
@@ -356,6 +358,15 @@ Answer : <code class="language-plaintext highlighter-rouge">192.168.100.137_c2gg
       subLi.appendChild(a);
       sub.appendChild(subLi);
       if (!currentH2Li.contains(sub)) currentH2Li.appendChild(sub);
+      currentH3Li = subLi;
+    } else if (h.tagName === 'H4' && currentH3Li) {
+      let sub2 = currentH3Li.querySelector('ul') || document.createElement('ul');
+      sub2.className = 'toc-list depth-3';
+      const subLi2 = document.createElement('li');
+      subLi2.className = 'toc-item depth-3';
+      subLi2.appendChild(a);
+      sub2.appendChild(subLi2);
+      if (!currentH3Li.contains(sub2)) currentH3Li.appendChild(sub2);
     }
     headingMap.set(h.id, li);
   });

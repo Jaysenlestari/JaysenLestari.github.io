@@ -457,6 +457,12 @@ html[data-theme='light'] .site-header {
 .hero h1 {
   font-size: 2.8rem;
   margin: 0 0 0.75rem;
+  color: var(--accent);
+}
+
+/* Home title color tweak for light mode */
+html[data-theme='light'] .hero h1 {
+  color: var(--accent-2);
 }
 
 .hero-actions {
@@ -712,6 +718,13 @@ html[data-theme='light'] .site-header {
   margin-top: 0.2rem;
 }
 
+.toc-list.depth-3 {
+  border-left: 1px dashed var(--border);
+  margin-left: 1.6rem;
+  padding-left: 0.6rem;
+  margin-top: 0.2rem;
+}
+
 .toc-item a {
   display: block;
   padding: 0.25rem 0.4rem;
@@ -744,6 +757,16 @@ html[data-theme='light'] .site-header {
 }
 
 .toc-item.depth-2.active > a {
+  font-weight: 600;
+}
+
+.toc-item.depth-3 a {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.toc-item.depth-3.active > a {
+  color: var(--accent);
   font-weight: 600;
 }
 
@@ -786,6 +809,15 @@ html[data-theme='light'] .site-header {
   margin-top: 1.6rem;
   margin-bottom: 0.6rem;
   font-weight: 700;
+  color: var(--accent);
+}
+
+/* Keep headings neutral in light mode */
+html[data-theme='light'] .post-body h2,
+html[data-theme='light'] .post-body h3,
+html[data-theme='light'] .post-body h4 {
+  color: var(--text);
+  font-weight: 800;
 }
 
 .post-body p {
@@ -811,12 +843,37 @@ html[data-theme='light'] .site-header {
   margin: 1rem 0;
   display: block;
   overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
 }
 
 .post-body th,
 .post-body td {
   border: 1px solid var(--border);
   padding: 0.5rem 0.6rem;
+  text-align: left;
+}
+
+.post-body th {
+  background: var(--bg-soft);
+  color: var(--text);
+  font-weight: 700;
+}
+
+/* Make the first column look like a clear index/number column */
+.post-body td:first-child,
+.post-body th:first-child {
+  width: 4.5rem;
+  text-align: center;
+  font-weight: 700;
+}
+
+.post-body tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.02);
+}
+html[data-theme='light'] .post-body tr:nth-child(even) td {
+  background: rgba(0, 0, 0, 0.03);
 }
 
 
@@ -887,6 +944,21 @@ html[data-theme='light'] .site-header {
 
 img {
   max-width: 100%;
+}
+
+/* Blog images: moderate width, left-aligned */
+.post-main img {
+  display: block;
+  margin: 1.25rem 0;
+  width: 90%;
+  max-width: 360px;
+  height: auto;
+}
+
+@media (max-width: 720px) {
+  .post-main img {
+    width: 100%;
+  }
 }
 
 hr {
