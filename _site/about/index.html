@@ -94,7 +94,7 @@
             <li>Play CTFs and build CTF challenges</li>
             <li>CTF problem setter for COMPFEST 17</li>
             <li>CTF problem setter for Pekan RISTEK 2025</li>
-            <li>CTF problem setter candidate for RISTEK Oprec 2026</li>
+            <li>CTF problem setter candidate for RISTEK Open Recruitment 2026</li>
         </ul>
     </div>
 
@@ -104,6 +104,7 @@
             <li>Hack The Box University CTF 2025 — International 4th Place & Indonesia 1st Place</li>
             <li>Finalist of Netcomp 4.0</li>
             <li>Finalist of Cyber Jawara 2025</li>
+            <li>Finalist of Arkavidia 10.0</li>
         </ul>
     </div>
 </div>
@@ -302,33 +303,146 @@
       window.addEventListener('resize', resizeHacker);
       resizeHacker();
 
-      // Generate random hacker-style content lines
+      // Generate realistic hacker-style content lines
       const hexChars = '0123456789abcdef';
       const randHex = (n) => { let s = ''; for (let i = 0; i < n; i++) s += hexChars[Math.floor(Math.random() * 16)]; return s; };
       const randIP = () => [1, 2, 3, 4].map(() => Math.floor(Math.random() * 256)).join('.');
       const randPort = () => Math.floor(Math.random() * 65535);
-      const protocols = ['TCP', 'UDP', 'SSH', 'HTTP', 'DNS', 'TLS'];
-      const statuses = ['SYN_SENT', 'ESTABLISHED', 'ACK', 'FIN_WAIT', 'RST', 'CONNECTED'];
-      const actions = ['SCAN', 'PROBE', 'EXFIL', 'RECON', 'INJECT', 'INTERCEPT'];
+      const randHash = (n) => randHex(n);
+      const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
       const generateLine = () => {
         const r = Math.random();
-        if (r < 0.3) {
-          const offset = randHex(8);
-          let hex = '0x' + offset + '  ';
-          for (let b = 0; b < 6 + Math.floor(Math.random() * 8); b++) hex += randHex(4) + ' ';
-          return hex + '|' + randHex(8) + '|';
-        } else if (r < 0.6) {
-          const proto = protocols[Math.floor(Math.random() * protocols.length)];
-          const status = statuses[Math.floor(Math.random() * statuses.length)];
-          return '[' + proto + '] ' + randIP() + ':' + randPort() + ' -> ' + randIP() + ':' + randPort() + ' ' + status + ' len=' + Math.floor(Math.random() * 9999) + ' ttl=' + Math.floor(Math.random() * 255) + ' seq=' + randHex(8);
-        } else if (r < 0.8) {
-          const action = actions[Math.floor(Math.random() * actions.length)];
-          return '> ' + action + ' ' + randIP() + ' [' + randHex(6) + '] flags=0x' + randHex(4) + ' payload=' + randHex(16) + ' status=OK';
-        } else {
-          const tool = ['nmap', 'tcpdump', 'wireshark', 'hashcat', 'hydra', 'john'][Math.floor(Math.random() * 6)];
-          const flag = ['--scan', '--dump', '--crack', '--brute', '--sniff', '--trace'][Math.floor(Math.random() * 6)];
-          return '$ ' + tool + ' ' + flag + ' -t ' + randIP() + ' -p ' + randPort() + ',' + randPort() + ',' + randPort() + ' --output=' + randHex(8) + '.log';
+
+        if (r < 0.18) {
+          // Memory hex dump
+          const addr = randHex(8);
+          let hex = '0x' + addr + ':  ';
+          for (let b = 0; b < 4 + Math.floor(Math.random() * 6); b++) hex += randHex(4) + ' ';
+          const ascii = Array.from({ length: 8 + Math.floor(Math.random() * 8) }, () =>
+            String.fromCharCode(33 + Math.floor(Math.random() * 93))
+          ).join('');
+          return hex + ' |' + ascii + '|';
+        }
+
+        else if (r < 0.36) {
+          // Realistic network packet capture
+          const proto = pick(['TCP', 'UDP', 'TLS', 'HTTP', 'DNS']);
+          const srcIP = randIP(); const dstIP = randIP();
+          const srcPort = randPort(); const dstPort = pick([80, 443, 22, 53, 8080, 3306, 8443, 445, 139, 21]);
+          if (proto === 'TCP') {
+            const flags = pick(['[SYN]', '[SYN, ACK]', '[ACK]', '[PSH, ACK]', '[FIN, ACK]', '[RST]', '[RST, ACK]']);
+            return '[' + proto + '] ' + srcIP + ':' + srcPort + ' -> ' + dstIP + ':' + dstPort + ' ' + flags + ' seq=' + randHex(8) + ' ack=' + randHex(8) + ' win=' + (Math.floor(Math.random() * 64240) + 1024) + ' len=' + Math.floor(Math.random() * 1460);
+          } else if (proto === 'DNS') {
+            const domains = ['ns1.evil.corp', 'c2.darknet.io', 'exfil.shadow.net', 'api.target.local', 'vpn.corp.internal'];
+            const types = ['A', 'AAAA', 'CNAME', 'TXT', 'MX', 'NS'];
+            return '[DNS] ' + srcIP + ' -> ' + dstIP + ' ' + pick(types) + '? ' + pick(domains) + ' txid=0x' + randHex(4);
+          } else if (proto === 'TLS') {
+            const versions = ['TLSv1.2', 'TLSv1.3'];
+            const handshakes = ['Client Hello', 'Server Hello', 'Certificate', 'Change Cipher Spec', 'Application Data'];
+            return '[' + pick(versions) + '] ' + srcIP + ':' + srcPort + ' -> ' + dstIP + ':' + dstPort + ' ' + pick(handshakes) + ' len=' + Math.floor(Math.random() * 4096);
+          } else {
+            return '[' + proto + '] ' + srcIP + ':' + srcPort + ' -> ' + dstIP + ':' + dstPort + ' len=' + Math.floor(Math.random() * 9999) + ' ttl=' + pick([64, 128, 255]);
+          }
+        }
+
+        else if (r < 0.50) {
+          // Realistic IDS/IPS alert or log line
+          const severities = ['INFO', 'WARN', 'ALERT', 'CRIT'];
+          const alerts = [
+            'Possible port scan detected from ' + randIP(),
+            'Brute-force attempt on SSH from ' + randIP() + ' (' + (Math.floor(Math.random() * 500) + 10) + ' attempts)',
+            'Suspicious outbound connection to ' + randIP() + ':' + pick([4444, 1337, 9001, 8888, 31337]),
+            'Malicious payload detected: signature=0x' + randHex(8),
+            'SQL injection attempt: param=id value=\' OR 1=1--',
+            'Reverse shell callback to ' + randIP() + ':' + pick([4444, 9001, 1234, 31337]),
+            'Unauthorized access to /etc/shadow from pid=' + Math.floor(Math.random() * 65535),
+            'ARP spoofing detected: ' + randIP() + ' claiming MAC ' + randHex(2) + ':' + randHex(2) + ':' + randHex(2) + ':' + randHex(2) + ':' + randHex(2) + ':' + randHex(2),
+            'Encrypted C2 beacon interval=' + (Math.floor(Math.random() * 60) + 5) + 's dest=' + randIP(),
+          ];
+          return '[' + pick(severities) + '] ' + pick(alerts);
+        }
+
+        else if (r < 0.68) {
+          // Realistic tool commands
+          const toolType = Math.random();
+
+          if (toolType < 0.17) {
+            // nmap
+            const scanTypes = ['-sS', '-sV', '-sC', '-A', '-sU', '-sT', '-sn'];
+            const portSpecs = ['-p 1-1000', '-p 22,80,443,8080', '-p-', '--top-ports 100', '-p 21,22,25,80,110,443,445,3389'];
+            return '$ nmap ' + pick(scanTypes) + ' ' + pick(portSpecs) + ' ' + randIP() + ' -oN scan_' + randHex(6) + '.txt';
+          } else if (toolType < 0.34) {
+            // hashcat
+            const modes = ['0', '100', '1000', '1400', '1700', '1800', '3200', '5600', '13100'];
+            const attacks = ['-a 0', '-a 3', '-a 6'];
+            const hash = randHash(32);
+            return '$ hashcat -m ' + pick(modes) + ' ' + pick(attacks) + ' ' + hash + ' /usr/share/wordlists/rockyou.txt --force';
+          } else if (toolType < 0.51) {
+            // hydra
+            const services = ['ssh', 'ftp', 'mysql', 'rdp', 'smb', 'http-post-form', 'vnc'];
+            return '$ hydra -l admin -P /usr/share/wordlists/rockyou.txt ' + pick(services) + '://' + randIP() + ' -t 16 -V';
+          } else if (toolType < 0.68) {
+            // john
+            const formats = ['--format=raw-md5', '--format=raw-sha256', '--format=bcrypt', '--format=ntlm', '--format=sha512crypt'];
+            return '$ john ' + pick(formats) + ' --wordlist=/usr/share/wordlists/rockyou.txt hashes_' + randHex(4) + '.txt';
+          } else if (toolType < 0.84) {
+            // tcpdump
+            const interfaces = ['eth0', 'wlan0', 'tun0', 'docker0'];
+            const filters = [
+              'port 80 or port 443',
+              'host ' + randIP(),
+              'tcp and port 22',
+              'not arp and not icmp',
+              'src net 10.0.0.0/8',
+              'dst port 53',
+            ];
+            return '$ tcpdump -i ' + pick(interfaces) + ' -w capture_' + randHex(6) + '.pcap "' + pick(filters) + '"';
+          } else {
+            // wireshark tshark
+            const filters = [
+              'http.request.method == "POST"',
+              'tcp.flags.syn == 1 && tcp.flags.ack == 0',
+              'dns.qry.name contains "evil"',
+              'ip.src == ' + randIP(),
+              'frame.len > 1000',
+              'tls.handshake.type == 1',
+            ];
+            return '$ tshark -r capture.pcap -Y \'' + pick(filters) + '\' -T fields -e ip.src -e ip.dst';
+          }
+        }
+
+        else if (r < 0.82) {
+          // File system / forensics output
+          const forensics = [
+            '$ volatility -f memory.dmp --profile=Win7SP1x64 pslist | grep -i suspicious',
+            '$ strings -a firmware.bin | grep -i "password\\|secret\\|key\\|token"',
+            '$ binwalk -e suspicious_file.bin --directory=extracted_' + randHex(4),
+            '$ foremost -t all -i disk.img -o recovered_' + randHex(4),
+            '$ file artifact_' + randHex(6) + '.bin',
+            'ELF 64-bit LSB executable, x86-64, dynamically linked, stripped',
+            '$ sha256sum malware_sample.exe',
+            randHash(64) + '  malware_sample.exe',
+            '$ exiftool document_' + randHex(4) + '.pdf | grep -i "author\\|create"',
+            '$ yara -r /opt/rules/malware_index.yar /tmp/samples/',
+            'rule_' + pick(['emotet', 'cobalt_strike', 'mimikatz', 'metasploit', 'lazarus']) + ' matched: /tmp/samples/artifact_' + randHex(6),
+          ];
+          return pick(forensics);
+        }
+
+        else {
+          // Exploit / payload / session lines
+          const exploits = [
+            '[*] Trying target ' + randIP() + ':' + pick([80, 443, 8080, 445, 139]) + '...',
+            '[+] Shell obtained! Session ' + Math.floor(Math.random() * 20 + 1) + ' opened (' + randIP() + ':' + randPort() + ' -> ' + randIP() + ':' + pick([4444, 9001, 1337]) + ')',
+            '[*] Sending payload (' + Math.floor(Math.random() * 2000 + 200) + ' bytes)...',
+            '[+] Meterpreter session ' + Math.floor(Math.random() * 10 + 1) + ' opened at ' + randIP() + ':' + pick([4444, 5555]) + ' -> ' + randIP() + ':' + randPort(),
+            'meterpreter > ' + pick(['sysinfo', 'getuid', 'hashdump', 'getsystem', 'migrate ' + Math.floor(Math.random() * 9999), 'upload /tmp/shell.elf', 'download C:\\\\Windows\\\\System32\\\\config\\\\SAM']),
+            '[*] Post module running: ' + pick(['post/multi/gather/firefox_creds', 'post/windows/gather/hashdump', 'post/linux/gather/enum_configs', 'post/multi/recon/local_exploit_suggester']),
+            '$ python3 exploit_' + pick(['rce', 'sqli', 'ssrf', 'lfi', 'xxe']) + '.py --target ' + randIP() + ' --lhost ' + randIP() + ' --lport ' + pick([4444, 9001]),
+            '[+] Flag: JAY{' + randHex(16) + '}',
+          ];
+          return pick(exploits);
         }
       };
 
