@@ -2143,3 +2143,37 @@ html[data-theme='light'] .post-card:hover {
     display: none;
   }
 }
+/* ===== VISITED LINK FIX - OVERRIDE ALL ===== */
+a:visited {
+  color: var(--accent) !important;
+}
+
+.tag-tile:visited,
+.tag-tile:visited .tag-name {
+  color: var(--text) !important;
+}
+
+.tag-post-list a,
+.tag-post-list a:visited {
+  color: var(--accent) !important;
+}
+
+.tag-post-list a:hover {
+  color: var(--accent-2) !important;
+}
+
+.toc-item a:visited {
+  color: var(--muted) !important;
+}
+
+.toc-item.active > a,
+.toc-item.active > a:visited,
+.toc-item.depth-2.active > a,
+.toc-item.depth-2.active > a:visited,
+.toc-item.depth-3.active > a,
+.toc-item.depth-3.active > a:visited {
+  color: var(--accent) !important;
+  background: rgba(125, 249, 194, 0.15) !important;
+  border-radius: 4px;
+}
+

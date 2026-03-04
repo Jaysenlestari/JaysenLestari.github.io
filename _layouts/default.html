@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en" data-theme="dark">
 
 <head>
@@ -7,7 +7,7 @@
   <title>{% if page.title %}{{ page.title }} | {% endif %}{{ site.title }}</title>
   <link rel="icon" type="image/png" href="{{ site.avatar | default: '/assets/img/avatar.png' | relative_url }}">
   <link rel="stylesheet" href="{{ '/assets/main.css' | relative_url }}">
-  <link rel="stylesheet" href="{{ '/assets/css/custom.css' | relative_url }}">
+  <link rel="stylesheet" href="{{ '/assets/css/custom.css' | relative_url }}?v=20260304c">
 </head>
 
 <body>
@@ -25,9 +25,9 @@
         {{ site.title }}
       </a>
       <nav id="primary-nav" class="nav-links" aria-label="Primary">
-        <a href="{{ '/' | relative_url }}">Home</a>
-        <a href="{{ '/tags/' | relative_url }}">Tags</a>
-        <a href="{{ '/about/' | relative_url }}">About</a>
+        <a href="{{ '/' | relative_url }}" {% if page.url == '/' %}class="active"{% endif %}>Home</a>
+        <a href="{{ '/tags/' | relative_url }}" {% if page.url contains '/tags' %}class="active"{% endif %}>Tags</a>
+        <a href="{{ '/about/' | relative_url }}" {% if page.url contains '/about' %}class="active"{% endif %}>About</a>
         <div class="nav-icons">
           <a class="icon-btn" href="https://github.com/Jaysenlestari" target="_blank" rel="noopener"
             aria-label="GitHub: Jaysenlestari">

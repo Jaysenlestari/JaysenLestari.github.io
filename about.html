@@ -4,37 +4,241 @@ title: About
 permalink: /about/
 ---
 
-<section class="hero" style="padding: 1rem 0 2.5rem; position: relative; overflow: hidden;">
-    <canvas id="hacker-canvas" class="hacker-bg-canvas" aria-hidden="true"></canvas>
+<div class="card" style="margin-bottom: 2rem;">
+    <h3>Who I Am</h3>
+    <p class="lede">
+        Hi, I'm Jaysen — a second-year Computer Science student at the <strong>University of Indonesia</strong>
+        and a member of <strong>NetSOS</strong> (Network, Security & Operating System SIG) at <strong>Ristek CSUI</strong>.
+    </p>
+</div>
 
-    <div class="about-header" style="position: relative; z-index: 1;">
-        <p class="lede">
-            Hi, I'm Jaysen — a second-year Computer Science student at the <strong>University of Indonesia</strong>
-            and a member of <strong>NetSOS</strong> (Network, Security & Operating System SIG) at <strong>Ristek
-                CSUI</strong>.
-        </p>
-    </div>
-</section>
+<div class="card" style="margin-bottom: 2rem;">
+    <h3>What I Do</h3>
+    <ul>
+        <li>Play CTFs and build CTF challenges</li>
+        <li>CTF problem setter for COMPFEST 17</li>
+        <li>CTF problem setter for Pekan RISTEK 2025</li>
+        <li>CTF problem setter candidate for RISTEK Open Recruitment 2026</li>
+    </ul>
+</div>
 
-<div class="highlights">
-    <div class="card">
-        <h3>What I Do</h3>
-        <ul>
-            <li>Play CTFs and build CTF challenges</li>
-            <li>CTF problem setter for COMPFEST 17</li>
-            <li>CTF problem setter for Pekan RISTEK 2025</li>
-            <li>CTF problem setter candidate for RISTEK Open Recruitment 2026</li>
-        </ul>
-    </div>
+<!-- Achievements Carousel -->
+<style>
+.achievements-section {
+    margin: 2.5rem 0;
+}
 
-    <div class="card">
-        <h3>Achievements</h3>
-        <ul>
-            <li>Hack The Box University CTF 2025 — International 4th Place & Indonesia 1st Place</li>
-            <li>Finalist of Netcomp 4.0</li>
-            <li>Finalist of Cyber Jawara 2025</li>
-            <li>Finalist of Arkavidia 10.0</li>
-        </ul>
+.achievements-section h3 {
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.carousel-container {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    mask-image: linear-gradient(90deg, transparent, black 5%, black 95%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, black 5%, black 95%, transparent);
+}
+
+.carousel-track {
+    display: flex;
+    gap: 1.5rem;
+    animation: slide-carousel 25s linear infinite;
+    width: max-content;
+}
+
+.carousel-container:hover .carousel-track {
+    animation-play-state: paused;
+}
+
+@keyframes slide-carousel {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+.achievement-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    width: 380px;
+    flex-shrink: 0;
+    box-shadow: var(--shadow);
+    transition: transform 200ms ease, box-shadow 200ms ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.achievement-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    opacity: 0;
+    transition: opacity 200ms ease;
+}
+
+.achievement-item:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+}
+
+.achievement-item:hover::before {
+    opacity: 1;
+}
+
+.achievement-item.featured {
+    background: linear-gradient(135deg, var(--card) 0%, rgba(110, 231, 255, 0.05) 100%);
+    border-color: rgba(110, 231, 255, 0.2);
+}
+
+.achievement-item.featured::before {
+    opacity: 1;
+}
+
+.achievement-header {
+    margin-bottom: 1rem;
+}
+
+.achievement-header h4 {
+    margin: 0 0 0.5rem;
+    font-size: 1.1rem;
+    color: var(--text);
+}
+
+.achievement-rank {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.achievement-image {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    margin-top: 1rem;
+}
+
+.achievement-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .achievement-item {
+        width: 300px;
+        padding: 1.25rem;
+    }
+    
+    .carousel-track {
+        animation-duration: 20s;
+    }
+}
+</style>
+
+<div class="achievements-section">
+    <h3>Achievements</h3>
+    <div class="carousel-container">
+        <div class="carousel-track">
+            <!-- HTB University CTF 2025 -->
+            <div class="achievement-item featured">
+                <div class="achievement-header">
+                    <h4>Hack The Box University CTF 2025</h4>
+                    <p class="achievement-rank">International 4th Place & Indonesia 1st Place</p>
+                </div>
+                <div class="achievement-image">
+                    <img src="{{ '/assets/img/certificates/htb-uni-2025.png' | relative_url }}" alt="HTB University CTF Certificate">
+                </div>
+            </div>
+
+            <!-- Arkavidia 10.0 -->
+            <div class="achievement-item">
+                <div class="achievement-header">
+                    <h4>Arkavidia 10.0</h4>
+                    <p class="achievement-rank">3rd Place</p>
+                </div>
+                <div class="achievement-image">
+                    <img src="{{ '/assets/img/certificates/arkavidia-10.svg' | relative_url }}" alt="Arkavidia Certificate">
+                </div>
+            </div>
+
+            <!-- Cyber Jawara 2025 -->
+            <div class="achievement-item">
+                <div class="achievement-header">
+                    <h4>Cyber Jawara 2025</h4>
+                    <p class="achievement-rank">Finalist</p>
+                </div>
+                <div class="achievement-image">
+                    <img src="{{ '/assets/img/certificates/cyber-jawara-2025.svg' | relative_url }}" alt="Cyber Jawara Certificate">
+                </div>
+            </div>
+
+            <!-- Netcomp 4.0 -->
+            <div class="achievement-item">
+                <div class="achievement-header">
+                    <h4>Netcomp 4.0</h4>
+                    <p class="achievement-rank">Finalist</p>
+                </div>
+                <div class="achievement-image">
+                    <img src="{{ '/assets/img/certificates/netcomp-4.svg' | relative_url }}" alt="Netcomp Certificate">
+                </div>
+            </div>
+
+            <!-- Duplicate for seamless loop -->
+            <div class="achievement-item featured">
+                <div class="achievement-header">
+                    <h4>Hack The Box University CTF 2025</h4>
+                    <p class="achievement-rank">International 4th Place & Indonesia 1st Place</p>
+                </div>
+                <div class="achievement-image">
+                    <img src="{{ '/assets/img/certificates/htb-uni-2025.png' | relative_url }}" alt="HTB University CTF Certificate">
+                </div>
+            </div>
+
+            <div class="achievement-item">
+                <div class="achievement-header">
+                    <h4>Arkavidia 10.0</h4>
+                    <p class="achievement-rank">3rd Place</p>
+                </div>
+                <div class="achievement-image">
+                    <img src="{{ '/assets/img/certificates/arkavidia-10.svg' | relative_url }}" alt="Arkavidia Certificate">
+                </div>
+            </div>
+
+            <div class="achievement-item">
+                <div class="achievement-header">
+                    <h4>Cyber Jawara 2025</h4>
+                    <p class="achievement-rank">Finalist</p>
+                </div>
+                <div class="achievement-image">
+                    <img src="{{ '/assets/img/certificates/cyber-jawara-2025.svg' | relative_url }}" alt="Cyber Jawara Certificate">
+                </div>
+            </div>
+
+            <div class="achievement-item">
+                <div class="achievement-header">
+                    <h4>Netcomp 4.0</h4>
+                    <p class="achievement-rank">Finalist</p>
+                </div>
+                <div class="achievement-image">
+                    <img src="{{ '/assets/img/certificates/netcomp-4.svg' | relative_url }}" alt="Netcomp Certificate">
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -54,5 +258,11 @@ permalink: /about/
         <span class="tag-chip">Eric Zimmerman Tools</span>
         <span class="tag-chip">Autopsy</span>
         <span class="tag-chip">FTK Imager</span>
+        <span class="tag-chip">Nmap</span>
+        <span class="tag-chip">Hayabusa</span>
+        <span class="tag-chip">Bulkextractor</span>
+        <span class="tag-chip">memprocfs</span>
+        <span class="tag-chip">procmon</span>
+        <span class="tag-chip">WinDbg</span>
     </div>
 </div>
