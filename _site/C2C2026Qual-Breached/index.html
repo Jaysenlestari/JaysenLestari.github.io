@@ -708,6 +708,7 @@ Answer : <code class="language-plaintext highlighter-rouge">D3cRyptEd1337!!</cod
       const li = document.createElement('li');
       const a = document.createElement('a');
       a.href = `#${h.id}`; a.textContent = h.textContent;
+      let tocItem = null;
 
       if (h.tagName === 'H2') {
         li.className = 'toc-item';
@@ -715,6 +716,7 @@ Answer : <code class="language-plaintext highlighter-rouge">D3cRyptEd1337!!</cod
         rootList.appendChild(li);
         currentH2Li = li;
         currentH3Li = null;
+        tocItem = li;
       } else if (h.tagName === 'H3' && currentH2Li) {
         let sub = currentH2Li.querySelector('ul') || document.createElement('ul');
         sub.className = 'toc-list depth-2';
@@ -724,6 +726,7 @@ Answer : <code class="language-plaintext highlighter-rouge">D3cRyptEd1337!!</cod
         sub.appendChild(subLi);
         if (!currentH2Li.contains(sub)) currentH2Li.appendChild(sub);
         currentH3Li = subLi;
+        tocItem = subLi;
       } else if (h.tagName === 'H4' && currentH3Li) {
         let sub2 = currentH3Li.querySelector('ul') || document.createElement('ul');
         sub2.className = 'toc-list depth-3';
@@ -732,8 +735,10 @@ Answer : <code class="language-plaintext highlighter-rouge">D3cRyptEd1337!!</cod
         subLi2.appendChild(a);
         sub2.appendChild(subLi2);
         if (!currentH3Li.contains(sub2)) currentH3Li.appendChild(sub2);
+        tocItem = subLi2;
       }
-      headingMap.set(h.id, li);
+
+      if (tocItem) headingMap.set(h.id, tocItem);
     });
 
     tocRoot.innerHTML = '<div class="toc-title">Contents</div>';
@@ -749,16 +754,47 @@ Answer : <code class="language-plaintext highlighter-rouge">D3cRyptEd1337!!</cod
       });
     }
 
-    // Scroll Spy
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          document.querySelectorAll('.toc-item.active').forEach(el => el.classList.remove('active'));
-          headingMap.get(entry.target.id)?.classList.add('active');
-        }
-      });
-    }, { rootMargin: '-10% 0px -70% 0px' });
-    headings.forEach(h => observer.observe(h));
+    // Scroll spy that stays stable when scrolling up/down.
+    let activeId = null;
+    const clearActive = () => {
+      document.querySelectorAll('.toc-item.active').forEach(el => el.classList.remove('active'));
+    };
+
+    const setActive = (id) => {
+      if (!id || id === activeId) return;
+      clearActive();
+      headingMap.get(id)?.classList.add('active');
+      activeId = id;
+    };
+
+    const getCurrentHeadingId = () => {
+      const offset = Math.max(120, window.innerHeight * 0.22);
+      let current = headings[0];
+
+      for (const h of headings) {
+        if ((h.getBoundingClientRect().top - offset) <= 0) current = h;
+        else break;
+      }
+
+      return current?.id || null;
+    };
+
+    let ticking = false;
+    const updateActive = () => {
+      ticking = false;
+      setActive(getCurrentHeadingId());
+    };
+
+    const requestUpdate = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(updateActive);
+    };
+
+    window.addEventListener('scroll', requestUpdate, { passive: true });
+    window.addEventListener('resize', requestUpdate, { passive: true });
+    window.addEventListener('hashchange', requestUpdate);
+    requestUpdate();
 
     document.addEventListener('click', (e) => {
       if (tocRoot.classList.contains('open') && !tocRoot.contains(e.target) && !tocToggle?.contains(e.target)) {
@@ -768,6 +804,7 @@ Answer : <code class="language-plaintext highlighter-rouge">D3cRyptEd1337!!</cod
     });
   })();
 </script>
+
     </div>
   </main>
 
@@ -843,8 +880,8 @@ Answer : <code class="language-plaintext highlighter-rouge">D3cRyptEd1337!!</cod
       // 5. Hero terminal typewriter loop (colored HTML output)
       const terminalEl = document.getElementById('terminal-body');
       if (terminalEl) {
-        const postCount = '3';
-        const recentTitles = [ 'Breached - C2C 2026 Qualification',   'Unorthodox Part 1 – Cyber Jawara Qual 2025',   'Operation Pensieve Breach - heroCTF v7' ];
+        const postCount = '4';
+        const recentTitles = [ 'Lovely Malware - HTB Sherlocks',   'Breached - C2C 2026 Qualification',   'Unorthodox Part 1 – Cyber Jawara Qual 2025' ];
 
       // Each line: { kind, text, html }
       // 'html' is what gets rendered (with color spans); 'text' is what gets typed char-by-char
@@ -857,7 +894,7 @@ Answer : <code class="language-plaintext highlighter-rouge">D3cRyptEd1337!!</cod
         { kind: 'out', text: 'I break things, build challenges, and write about it.', html: '<span class="t-out">I break things, build challenges, and write about it.</span>' },
         { kind: 'cmd', text: 'cat stats.json | jq', html: prompt + '<span class="t-cmd">cat stats.json</span> <span class="t-muted">|</span> <span class="t-cmd">jq</span>' },
         { kind: 'out', text: '  writeups : ' + postCount, html: '  <span class="t-label">writeups</span> <span class="t-muted">:</span> <span class="t-val">' + postCount + '</span>' },
-        { kind: 'out', text: '  focus    : Forensics . DFIR . CyberSecurity', html: '  <span class="t-label">focus</span>    <span class="t-muted">:</span> <span class="t-hi">Forensics</span> <span class="t-muted">.</span> <span class="t-hi">DFIR</span> <span class="t-muted">.</span> <span class="t-hi">CyberSecurity</span>' },
+        { kind: 'out', text: '  focus    : Forensics . DFIR . Malware Analysis. CyberSecurity', html: '  <span class="t-label">focus</span>    <span class="t-muted">:</span> <span class="t-hi">Forensics</span> <span class="t-muted">.</span> <span class="t-hi">DFIR</span> <span class="t-muted">.</span> <span class="t-hi">CyberSecurity</span>' },
         { kind: 'out', text: '  role     : CTF Player & Challenge Author', html: '  <span class="t-label">role</span>     <span class="t-muted">:</span> <span class="t-val">CTF Player & Challenge Author</span>' },
         { kind: 'out', text: '  tools    : Volatility . Wireshark . Eric Zimmerman Tools . Autopsy . FTK Imager', html: '  <span class="t-label">tools</span>    <span class="t-muted">:</span> <span class="t-val">Volatility</span> <span class="t-muted">.</span> <span class="t-val">Wireshark</span> <span class="t-muted">.</span> <span class="t-val">Eric Zimmerman Tools</span> <span class="t-muted">.</span> <span class="t-val">Autopsy</span> <span class="t-muted">.</span> <span class="t-val">FTK Imager</span>' },
         { kind: 'cmd', text: 'tail -1 ctf.log', html: prompt + '<span class="t-cmd">tail -1 ctf.log</span>' },

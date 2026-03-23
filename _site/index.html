@@ -115,6 +115,48 @@
     <article class="post-card anim-fade-up" style="--delay: 2">
       <div class="post-card-body">
         <div class="post-meta">
+          Mar 18, 2026
+        </div>
+
+        <h3 class="post-title">
+          <a class="post-link" href="/Sherlock-LovelyMalware/">
+            Lovely Malware - HTB Sherlocks
+          </a>
+        </h3>
+
+        
+        <p class="post-excerpt">
+          In this post I want to share how I solved my first Insane Sherlock challenge. Lately, I’ve been diving deeper into malware reversing, and especially during CTFs I usually rely...
+        </p>
+        
+
+        <div class="post-card-footer">
+          
+          <div class="post-tags">
+            
+            <span class="tag">Forensics</span>
+            
+            <span class="tag">Malware Analysis</span>
+            
+            <span class="tag">Sherlocks</span>
+            
+          </div>
+          
+          <a class="read-more" href="/Sherlock-LovelyMalware/">
+            Read
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14" />
+              <path d="M12 5l7 7-7 7" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </article>
+    
+    <article class="post-card anim-fade-up" style="--delay: 3">
+      <div class="post-card-body">
+        <div class="post-meta">
           Feb 17, 2026
         </div>
 
@@ -154,7 +196,7 @@
       </div>
     </article>
     
-    <article class="post-card anim-fade-up" style="--delay: 3">
+    <article class="post-card anim-fade-up" style="--delay: 4">
       <div class="post-card-body">
         <div class="post-meta">
           Jan 17, 2026
@@ -196,7 +238,7 @@
       </div>
     </article>
     
-    <article class="post-card anim-fade-up" style="--delay: 4">
+    <article class="post-card anim-fade-up" style="--delay: 5">
       <div class="post-card-body">
         <div class="post-meta">
           Dec 23, 2025
@@ -316,8 +358,8 @@
       // 5. Hero terminal typewriter loop (colored HTML output)
       const terminalEl = document.getElementById('terminal-body');
       if (terminalEl) {
-        const postCount = '3';
-        const recentTitles = [ 'Breached - C2C 2026 Qualification',   'Unorthodox Part 1 – Cyber Jawara Qual 2025',   'Operation Pensieve Breach - heroCTF v7' ];
+        const postCount = '4';
+        const recentTitles = [ 'Lovely Malware - HTB Sherlocks',   'Breached - C2C 2026 Qualification',   'Unorthodox Part 1 – Cyber Jawara Qual 2025' ];
 
       // Each line: { kind, text, html }
       // 'html' is what gets rendered (with color spans); 'text' is what gets typed char-by-char
@@ -330,7 +372,7 @@
         { kind: 'out', text: 'I break things, build challenges, and write about it.', html: '<span class="t-out">I break things, build challenges, and write about it.</span>' },
         { kind: 'cmd', text: 'cat stats.json | jq', html: prompt + '<span class="t-cmd">cat stats.json</span> <span class="t-muted">|</span> <span class="t-cmd">jq</span>' },
         { kind: 'out', text: '  writeups : ' + postCount, html: '  <span class="t-label">writeups</span> <span class="t-muted">:</span> <span class="t-val">' + postCount + '</span>' },
-        { kind: 'out', text: '  focus    : Forensics . DFIR . CyberSecurity', html: '  <span class="t-label">focus</span>    <span class="t-muted">:</span> <span class="t-hi">Forensics</span> <span class="t-muted">.</span> <span class="t-hi">DFIR</span> <span class="t-muted">.</span> <span class="t-hi">CyberSecurity</span>' },
+        { kind: 'out', text: '  focus    : Forensics . DFIR . Malware Analysis. CyberSecurity', html: '  <span class="t-label">focus</span>    <span class="t-muted">:</span> <span class="t-hi">Forensics</span> <span class="t-muted">.</span> <span class="t-hi">DFIR</span> <span class="t-muted">.</span> <span class="t-hi">CyberSecurity</span>' },
         { kind: 'out', text: '  role     : CTF Player & Challenge Author', html: '  <span class="t-label">role</span>     <span class="t-muted">:</span> <span class="t-val">CTF Player & Challenge Author</span>' },
         { kind: 'out', text: '  tools    : Volatility . Wireshark . Eric Zimmerman Tools . Autopsy . FTK Imager', html: '  <span class="t-label">tools</span>    <span class="t-muted">:</span> <span class="t-val">Volatility</span> <span class="t-muted">.</span> <span class="t-val">Wireshark</span> <span class="t-muted">.</span> <span class="t-val">Eric Zimmerman Tools</span> <span class="t-muted">.</span> <span class="t-val">Autopsy</span> <span class="t-muted">.</span> <span class="t-val">FTK Imager</span>' },
         { kind: 'cmd', text: 'tail -1 ctf.log', html: prompt + '<span class="t-cmd">tail -1 ctf.log</span>' },

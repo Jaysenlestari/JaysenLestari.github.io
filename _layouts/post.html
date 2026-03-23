@@ -58,6 +58,7 @@ layout: default
       const li = document.createElement('li');
       const a = document.createElement('a');
       a.href = `#${h.id}`; a.textContent = h.textContent;
+      let tocItem = null;
 
       if (h.tagName === 'H2') {
         li.className = 'toc-item';
@@ -65,6 +66,7 @@ layout: default
         rootList.appendChild(li);
         currentH2Li = li;
         currentH3Li = null;
+        tocItem = li;
       } else if (h.tagName === 'H3' && currentH2Li) {
         let sub = currentH2Li.querySelector('ul') || document.createElement('ul');
         sub.className = 'toc-list depth-2';
@@ -74,6 +76,7 @@ layout: default
         sub.appendChild(subLi);
         if (!currentH2Li.contains(sub)) currentH2Li.appendChild(sub);
         currentH3Li = subLi;
+        tocItem = subLi;
       } else if (h.tagName === 'H4' && currentH3Li) {
         let sub2 = currentH3Li.querySelector('ul') || document.createElement('ul');
         sub2.className = 'toc-list depth-3';
@@ -82,8 +85,10 @@ layout: default
         subLi2.appendChild(a);
         sub2.appendChild(subLi2);
         if (!currentH3Li.contains(sub2)) currentH3Li.appendChild(sub2);
+        tocItem = subLi2;
       }
-      headingMap.set(h.id, li);
+
+      if (tocItem) headingMap.set(h.id, tocItem);
     });
 
     tocRoot.innerHTML = '<div class="toc-title">Contents</div>';
@@ -99,16 +104,47 @@ layout: default
       });
     }
 
-    // Scroll Spy
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          document.querySelectorAll('.toc-item.active').forEach(el => el.classList.remove('active'));
-          headingMap.get(entry.target.id)?.classList.add('active');
-        }
-      });
-    }, { rootMargin: '-10% 0px -70% 0px' });
-    headings.forEach(h => observer.observe(h));
+    // Scroll spy that stays stable when scrolling up/down.
+    let activeId = null;
+    const clearActive = () => {
+      document.querySelectorAll('.toc-item.active').forEach(el => el.classList.remove('active'));
+    };
+
+    const setActive = (id) => {
+      if (!id || id === activeId) return;
+      clearActive();
+      headingMap.get(id)?.classList.add('active');
+      activeId = id;
+    };
+
+    const getCurrentHeadingId = () => {
+      const offset = Math.max(120, window.innerHeight * 0.22);
+      let current = headings[0];
+
+      for (const h of headings) {
+        if ((h.getBoundingClientRect().top - offset) <= 0) current = h;
+        else break;
+      }
+
+      return current?.id || null;
+    };
+
+    let ticking = false;
+    const updateActive = () => {
+      ticking = false;
+      setActive(getCurrentHeadingId());
+    };
+
+    const requestUpdate = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(updateActive);
+    };
+
+    window.addEventListener('scroll', requestUpdate, { passive: true });
+    window.addEventListener('resize', requestUpdate, { passive: true });
+    window.addEventListener('hashchange', requestUpdate);
+    requestUpdate();
 
     document.addEventListener('click', (e) => {
       if (tocRoot.classList.contains('open') && !tocRoot.contains(e.target) && !tocToggle?.contains(e.target)) {

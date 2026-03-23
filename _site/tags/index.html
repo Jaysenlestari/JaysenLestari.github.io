@@ -109,7 +109,7 @@
       
       <a class="tag-tile" href="#digitalforensics">
         <span class="tag-name">DigitalForensics</span>
-        <span class="tag-count">| 3</span>
+        <span class="tag-count">| 4</span>
       </a>
     
       
@@ -137,7 +137,7 @@
       
       <a class="tag-tile" href="#malwareanalysis">
         <span class="tag-name">MalwareAnalysis</span>
-        <span class="tag-count">| 1</span>
+        <span class="tag-count">| 2</span>
       </a>
     
       
@@ -172,14 +172,14 @@
       
       <a class="tag-tile" href="#ransomware">
         <span class="tag-name">Ransomware</span>
-        <span class="tag-count">| 1</span>
+        <span class="tag-count">| 2</span>
       </a>
     
       
       
       <a class="tag-tile" href="#reverseengineering">
         <span class="tag-name">ReverseEngineering</span>
-        <span class="tag-count">| 1</span>
+        <span class="tag-count">| 2</span>
       </a>
     
       
@@ -266,8 +266,13 @@
       
       
       <section id="digitalforensics" class="tag-section">
-        <h2>DigitalForensics <span class="tag-count">| 3</span></h2>
+        <h2>DigitalForensics <span class="tag-count">| 4</span></h2>
         <ul class="tag-post-list">
+          
+            <li>
+              <a href="/Sherlock-LovelyMalware/">Lovely Malware - HTB Sherlocks</a>
+              <span class="muted">Mar 18, 2026</span>
+            </li>
           
             <li>
               <a href="/C2C2026Qual-Breached/">Breached - C2C 2026 Qualification</a>
@@ -342,8 +347,13 @@
       
       
       <section id="malwareanalysis" class="tag-section">
-        <h2>MalwareAnalysis <span class="tag-count">| 1</span></h2>
+        <h2>MalwareAnalysis <span class="tag-count">| 2</span></h2>
         <ul class="tag-post-list">
+          
+            <li>
+              <a href="/Sherlock-LovelyMalware/">Lovely Malware - HTB Sherlocks</a>
+              <span class="muted">Mar 18, 2026</span>
+            </li>
           
             <li>
               <a href="/C2C2026Qual-Breached/">Breached - C2C 2026 Qualification</a>
@@ -417,8 +427,13 @@
       
       
       <section id="ransomware" class="tag-section">
-        <h2>Ransomware <span class="tag-count">| 1</span></h2>
+        <h2>Ransomware <span class="tag-count">| 2</span></h2>
         <ul class="tag-post-list">
+          
+            <li>
+              <a href="/Sherlock-LovelyMalware/">Lovely Malware - HTB Sherlocks</a>
+              <span class="muted">Mar 18, 2026</span>
+            </li>
           
             <li>
               <a href="/C2C2026Qual-Breached/">Breached - C2C 2026 Qualification</a>
@@ -431,8 +446,13 @@
       
       
       <section id="reverseengineering" class="tag-section">
-        <h2>ReverseEngineering <span class="tag-count">| 1</span></h2>
+        <h2>ReverseEngineering <span class="tag-count">| 2</span></h2>
         <ul class="tag-post-list">
+          
+            <li>
+              <a href="/Sherlock-LovelyMalware/">Lovely Malware - HTB Sherlocks</a>
+              <span class="muted">Mar 18, 2026</span>
+            </li>
           
             <li>
               <a href="/C2C2026Qual-Breached/">Breached - C2C 2026 Qualification</a>
@@ -562,8 +582,8 @@
       // 5. Hero terminal typewriter loop (colored HTML output)
       const terminalEl = document.getElementById('terminal-body');
       if (terminalEl) {
-        const postCount = '3';
-        const recentTitles = [ 'Breached - C2C 2026 Qualification',   'Unorthodox Part 1 – Cyber Jawara Qual 2025',   'Operation Pensieve Breach - heroCTF v7' ];
+        const postCount = '4';
+        const recentTitles = [ 'Lovely Malware - HTB Sherlocks',   'Breached - C2C 2026 Qualification',   'Unorthodox Part 1 – Cyber Jawara Qual 2025' ];
 
       // Each line: { kind, text, html }
       // 'html' is what gets rendered (with color spans); 'text' is what gets typed char-by-char
@@ -576,7 +596,7 @@
         { kind: 'out', text: 'I break things, build challenges, and write about it.', html: '<span class="t-out">I break things, build challenges, and write about it.</span>' },
         { kind: 'cmd', text: 'cat stats.json | jq', html: prompt + '<span class="t-cmd">cat stats.json</span> <span class="t-muted">|</span> <span class="t-cmd">jq</span>' },
         { kind: 'out', text: '  writeups : ' + postCount, html: '  <span class="t-label">writeups</span> <span class="t-muted">:</span> <span class="t-val">' + postCount + '</span>' },
-        { kind: 'out', text: '  focus    : Forensics . DFIR . CyberSecurity', html: '  <span class="t-label">focus</span>    <span class="t-muted">:</span> <span class="t-hi">Forensics</span> <span class="t-muted">.</span> <span class="t-hi">DFIR</span> <span class="t-muted">.</span> <span class="t-hi">CyberSecurity</span>' },
+        { kind: 'out', text: '  focus    : Forensics . DFIR . Malware Analysis. CyberSecurity', html: '  <span class="t-label">focus</span>    <span class="t-muted">:</span> <span class="t-hi">Forensics</span> <span class="t-muted">.</span> <span class="t-hi">DFIR</span> <span class="t-muted">.</span> <span class="t-hi">CyberSecurity</span>' },
         { kind: 'out', text: '  role     : CTF Player & Challenge Author', html: '  <span class="t-label">role</span>     <span class="t-muted">:</span> <span class="t-val">CTF Player & Challenge Author</span>' },
         { kind: 'out', text: '  tools    : Volatility . Wireshark . Eric Zimmerman Tools . Autopsy . FTK Imager', html: '  <span class="t-label">tools</span>    <span class="t-muted">:</span> <span class="t-val">Volatility</span> <span class="t-muted">.</span> <span class="t-val">Wireshark</span> <span class="t-muted">.</span> <span class="t-val">Eric Zimmerman Tools</span> <span class="t-muted">.</span> <span class="t-val">Autopsy</span> <span class="t-muted">.</span> <span class="t-val">FTK Imager</span>' },
         { kind: 'cmd', text: 'tail -1 ctf.log', html: prompt + '<span class="t-cmd">tail -1 ctf.log</span>' },
