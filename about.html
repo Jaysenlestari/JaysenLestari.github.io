@@ -4,35 +4,18 @@ title: About
 permalink: /about/
 ---
 
-<div class="card" style="margin-bottom: 2rem;">
+<div class="card" style="margin-bottom: 2rem; width: 100%;">
     <h3>Who I Am</h3>
     <p class="lede">
-        Hi, I'm Jaysen — a second-year Computer Science student at the <strong>University of Indonesia</strong>
-        and a member of <strong>NetSOS</strong> (Network, Security & Operating System SIG) at <strong>Ristek CSUI</strong>.
+        Hi, I'm Jaysen — a third-year Computer Science student at the <strong>University of Indonesia</strong>
+        and a lead of <strong>NetSOS</strong> (Network, Security & Operating System SIG) at <strong>Ristek CSUI</strong>.
     </p>
 </div>
 
-<div class="card" style="margin-bottom: 2rem;">
-    <h3>What I Do</h3>
-    <ul>
-        <li>Play CTFs and build CTF challenges</li>
-        <li>CTF problem setter for COMPFEST 17</li>
-        <li>CTF problem setter for Pekan RISTEK 2025</li>
-        <li>CTF problem setter candidate for RISTEK Open Recruitment 2026</li>
-    </ul>
-</div>
-
-<!-- Achievements Carousel -->
+<!-- ─── Achievements Carousel ─── -->
 <style>
-.achievements-section {
-    margin: 2.5rem 0;
-}
-
-.achievements-section h3 {
-    margin-bottom: 1.5rem;
-    font-size: 1.5rem;
-}
-
+.achievements-section { margin: 2.5rem 0; }
+.achievements-section h3 { margin-bottom: 1.5rem; font-size: 1.5rem; }
 .carousel-container {
     position: relative;
     overflow: hidden;
@@ -40,27 +23,17 @@ permalink: /about/
     mask-image: linear-gradient(90deg, transparent, black 5%, black 95%, transparent);
     -webkit-mask-image: linear-gradient(90deg, transparent, black 5%, black 95%, transparent);
 }
-
 .carousel-track {
     display: flex;
     gap: 1.5rem;
     animation: slide-carousel 25s linear infinite;
     width: max-content;
 }
-
-.carousel-container:hover .carousel-track {
-    animation-play-state: paused;
-}
-
+.carousel-container:hover .carousel-track { animation-play-state: paused; }
 @keyframes slide-carousel {
-    0% {
-        transform: translateX(0);
-    }
-    100% {
-        transform: translateX(-50%);
-    }
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
 }
-
 .achievement-item {
     background: var(--card);
     border: 1px solid var(--border);
@@ -73,54 +46,25 @@ permalink: /about/
     position: relative;
     overflow: hidden;
 }
-
 .achievement-item::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
+    top: 0; left: 0; right: 0;
     height: 3px;
     background: linear-gradient(90deg, var(--accent), var(--accent-2));
     opacity: 0;
     transition: opacity 200ms ease;
 }
-
-.achievement-item:hover {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
-}
-
-.achievement-item:hover::before {
-    opacity: 1;
-}
-
+.achievement-item:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 16px 40px rgba(0,0,0,0.35); }
+.achievement-item:hover::before { opacity: 1; }
 .achievement-item.featured {
-    background: linear-gradient(135deg, var(--card) 0%, rgba(110, 231, 255, 0.05) 100%);
-    border-color: rgba(110, 231, 255, 0.2);
+    background: linear-gradient(135deg, var(--card) 0%, rgba(110,231,255,0.05) 100%);
+    border-color: rgba(110,231,255,0.2);
 }
-
-.achievement-item.featured::before {
-    opacity: 1;
-}
-
-.achievement-header {
-    margin-bottom: 1rem;
-}
-
-.achievement-header h4 {
-    margin: 0 0 0.5rem;
-    font-size: 1.1rem;
-    color: var(--text);
-}
-
-.achievement-rank {
-    color: var(--accent);
-    font-weight: 600;
-    font-size: 0.9rem;
-    margin: 0;
-}
-
+.achievement-item.featured::before { opacity: 1; }
+.achievement-header { margin-bottom: 1rem; }
+.achievement-header h4 { margin: 0 0 0.5rem; font-size: 1.1rem; color: var(--text); }
+.achievement-rank { color: var(--accent); font-weight: 600; font-size: 0.9rem; margin: 0; }
 .achievement-image {
     width: 100%;
     aspect-ratio: 16 / 10;
@@ -130,23 +74,10 @@ permalink: /about/
     border: 1px solid var(--border);
     margin-top: 1rem;
 }
-
-.achievement-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
+.achievement-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
 @media (max-width: 768px) {
-    .achievement-item {
-        width: 300px;
-        padding: 1.25rem;
-    }
-    
-    .carousel-track {
-        animation-duration: 20s;
-    }
+    .achievement-item { width: 300px; padding: 1.25rem; }
+    .carousel-track { animation-duration: 20s; }
 }
 </style>
 
@@ -154,18 +85,15 @@ permalink: /about/
     <h3>Achievements</h3>
     <div class="carousel-container">
         <div class="carousel-track">
-            <!-- HTB University CTF 2025 -->
             <div class="achievement-item featured">
                 <div class="achievement-header">
                     <h4>Hack The Box University CTF 2025</h4>
-                    <p class="achievement-rank">International 4th Place & Indonesia 1st Place</p>
+                    <p class="achievement-rank">International 4th Place &amp; Indonesia 1st Place</p>
                 </div>
                 <div class="achievement-image">
                     <img src="{{ '/assets/img/certificates/htb-uni-2025.png' | relative_url }}" alt="HTB University CTF Certificate">
                 </div>
             </div>
-
-            <!-- Arkavidia 10.0 -->
             <div class="achievement-item">
                 <div class="achievement-header">
                     <h4>Arkavidia 10.0</h4>
@@ -175,8 +103,6 @@ permalink: /about/
                     <img src="{{ '/assets/img/certificates/arkav10.jpg' | relative_url }}" alt="Arkavidia Certificate">
                 </div>
             </div>
-
-            <!-- Cyber Jawara 2025 -->
             <div class="achievement-item">
                 <div class="achievement-header">
                     <h4>Cyber Jawara 2025</h4>
@@ -186,8 +112,6 @@ permalink: /about/
                     <img src="{{ '/assets/img/certificates/cyber-jawara-2025.jpg' | relative_url }}" alt="Cyber Jawara Certificate">
                 </div>
             </div>
-
-            <!-- Netcomp 4.0 -->
             <div class="achievement-item">
                 <div class="achievement-header">
                     <h4>Netcomp 4.0</h4>
@@ -197,18 +121,16 @@ permalink: /about/
                     <img src="{{ '/assets/img/certificates/netcomp-4.jpg' | relative_url }}" alt="Netcomp Certificate">
                 </div>
             </div>
-
-            <!-- Duplicate for seamless loop -->
+            <!-- duplicates for seamless loop -->
             <div class="achievement-item featured">
                 <div class="achievement-header">
                     <h4>Hack The Box University CTF 2025</h4>
-                    <p class="achievement-rank">International 4th Place & Indonesia 1st Place</p>
+                    <p class="achievement-rank">International 4th Place &amp; Indonesia 1st Place</p>
                 </div>
                 <div class="achievement-image">
                     <img src="{{ '/assets/img/certificates/htb-uni-2025.png' | relative_url }}" alt="HTB University CTF Certificate">
                 </div>
             </div>
-
             <div class="achievement-item">
                 <div class="achievement-header">
                     <h4>Arkavidia 10.0</h4>
@@ -218,7 +140,6 @@ permalink: /about/
                     <img src="{{ '/assets/img/certificates/arkav10.jpg' | relative_url }}" alt="Arkavidia Certificate">
                 </div>
             </div>
-
             <div class="achievement-item">
                 <div class="achievement-header">
                     <h4>Cyber Jawara 2025</h4>
@@ -228,7 +149,6 @@ permalink: /about/
                     <img src="{{ '/assets/img/certificates/cyber-jawara-2025.jpg' | relative_url }}" alt="Cyber Jawara Certificate">
                 </div>
             </div>
-
             <div class="achievement-item">
                 <div class="achievement-header">
                     <h4>Netcomp 4.0</h4>
@@ -242,17 +162,96 @@ permalink: /about/
     </div>
 </div>
 
-<div class="card" style="margin-top: 2rem;">
-    <h3>This Blog</h3>
-    <p>
-        This is where I share CTF writeups and what I learn along the way. Most posts focus on the thought process,
-        techniques, and investigation steps rather than just the final solution.
-    </p>
+<!-- ─── Experience ─── -->
+<style>
+.exp-section { margin: 2.5rem 0; }
+.exp-section-title { font-size: 1.5rem; margin-bottom: 2rem; }
+
+/* grid: left-card | center-node | right-card */
+.xzz { position: relative; width: 100%; }
+.xrow {
+    display: grid;
+    grid-template-columns: 1fr 80px 1fr;
+    align-items: flex-start;
+    width: 100%;
+}
+
+/* card cell */
+.xcl { padding: 0 12px 20px 0; }   /* left card cell */
+.xcr { padding: 0 0 20px 12px; }   /* right card cell */
+.xce { padding-bottom: 20px; }     /* empty cell */
+
+/* card */
+.xcard {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color .2s, transform .15s;
+}
+.xcard:hover { border-color: var(--accent); transform: translateY(-2px); }
+.xcard.xopen { border-color: var(--accent); }
+.xrow.xa .xcard { border-left: 3px solid #3B6D11; }
+
+.xctop { display: flex; justify-content: space-between; align-items: flex-start; padding: .85rem 1rem; gap: 8px; }
+.xorg  { font-size: 14px; font-weight: 600; color: var(--text); }
+.xrole { font-size: 12px; color: var(--text-muted, #888); margin-top: 3px; line-height: 1.4; }
+.xtags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+.xtag  { font-size: 10.5px; font-weight: 500; padding: 2px 7px; border-radius: 5px; white-space: nowrap; }
+.ts  { background: #E6F1FB; color: #0C447C; border: 0.5px solid #85B7EB; }
+.tc  { background: #EEEDFE; color: #3C3489; border: 0.5px solid #AFA9EC; }
+.te  { background: #EAF3DE; color: #3B6D11; border: 0.5px solid #97C459; }
+.tl  { background: #FAEEDA; color: #633806; border: 0.5px solid #EF9F27; }
+
+.xchev { flex-shrink: 0; margin-top: 2px; transition: transform .25s; color: var(--text-muted, #888); }
+.xcard.xopen .xchev { transform: rotate(180deg); }
+
+.xbody { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .3s ease; }
+.xcard.xopen .xbody { grid-template-rows: 1fr; }
+.xbodyin { overflow: hidden; }
+.xdesc { font-size: 13px; line-height: 1.7; padding: .1rem 1rem 1rem; border-top: 1px solid var(--border); color: var(--text-muted, #888); }
+
+/* center column */
+.xmid { display: flex; flex-direction: column; align-items: center; padding-top: 1.1rem; }
+.xnode {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--border);
+    border: 3px solid var(--bg, #fff);
+    flex-shrink: 0;
+    transition: background .2s, transform .2s;
+    position: relative; z-index: 2;
+}
+.xrow:hover .xnode { background: var(--accent); transform: scale(1.3); }
+.xrow.xa .xnode { background: #3B6D11; border-color: #C0DD97; }
+.xdatelbl {
+    font-size: 10.5px; color: var(--text-muted, #888);
+    margin-top: 6px; text-align: center; line-height: 1.5; white-space: nowrap;
+}
+.xldot {
+    display: inline-block; width: 6px; height: 6px;
+    border-radius: 50%; background: #3B6D11;
+    animation: xpulse 2s infinite; vertical-align: middle;
+}
+@keyframes xpulse { 0%,100%{opacity:1} 50%{opacity:.25} }
+
+/* SVG connector layer */
+.xsvg { position: absolute; top: 0; left: 0; width: 100%; pointer-events: none; overflow: visible; }
+</style>
+
+<div class="exp-section">
+    <h3 class="exp-section-title">Experience</h3>
+    <div class="xzz" id="xzz"></div>
 </div>
 
+<!-- ─── Toolkit ─── -->
 <div style="margin-top: 2.5rem;">
     <h3>Toolkit</h3>
     <div class="tag-row">
+        <span class="tag-chip">Threat Intelligence</span>
+        <span class="tag-chip">IDA</span>
         <span class="tag-chip">Volatility</span>
         <span class="tag-chip">Wireshark</span>
         <span class="tag-chip">Eric Zimmerman Tools</span>
@@ -266,3 +265,124 @@ permalink: /about/
         <span class="tag-chip">WinDbg</span>
     </div>
 </div>
+
+<div class="card" style="margin-top: 2rem;">
+    <h3>This Blog</h3>
+    <p>
+        This is where I share CTF writeups and what I learn along the way. Most posts focus on the thought process,
+        techniques, and investigation steps rather than just the final solution.
+    </p>
+</div>
+
+<script>
+(function () {
+    var EXP = [
+        {org:"Superbank",role:"Cyber Threat Response & Solution Intern — Operations",date:"Jun 2026",a:true,
+         tags:[{l:"Threat Intel",c:"ts"},{l:"SIEM",c:"ts"},{l:"SOC",c:"ts"}],
+         desc:"Handling threat intelligence operations and monitoring security events across the organization. Currently assisting with onboarding new services into the SIEM platform to expand detection coverage, while also actively involved in a SIEM migration — adapting existing detection logic and pipelines to the new environment."},
+        {org:"RISTEK CSUI",role:"Lead — Network, Security & OS SIG (NetSOS)",date:"Feb 2026",a:true,
+         tags:[{l:"Leadership",c:"tl"},{l:"Cybersecurity",c:"ts"}],
+         desc:"Leading NetSOS, the cybersecurity-focused SIG at Ristek CSUI. Driving continued development of \"Bobol\", an internal CTF learning platform for UI students. Organizing study sessions on networking, OS, and security topics, and delivering workshops — including one on malware reverse engineering."},
+        {org:"COMPFEST 18",role:"Problem Setter — Capture The Flag",date:"Feb 2026",a:true,
+         tags:[{l:"CTF",c:"tc"},{l:"Web",c:"ts"},{l:"Forensics",c:"ts"}],
+         desc:"Designing and developing cybersecurity challenges for COMPFEST 18's CTF competition. Creating realistic attack and investigation scenarios covering web exploitation and digital forensics for both national and international participants."},
+        {org:"Universitas Indonesia",role:"Teaching Assistant — Computer Organization & Calculus 1",date:"Jan 2025",a:true,
+         tags:[{l:"Teaching",c:"te"}],
+         desc:"Assisted across two courses over the past year. For Computer Organization, guided students through CPU architecture, memory hierarchy, and instruction execution. Previously for Calculus 1, helped students work through foundational mathematical concepts and analytical problem solving."},
+        {org:"Open Recruitment RISTEK 2026",role:"Problem Setter — Capture The Flag",date:"Feb 2026",a:false,
+         tags:[{l:"CTF",c:"tc"},{l:"Forensics",c:"ts"}],
+         desc:"Designed 2 digital forensics challenges for RISTEK's recruitment selection process. Built realistic investigation scenarios to assess participants' analytical skills, then evaluated submissions and validated the intended solving paths."},
+        {org:"Pekan RISTEK 2025",role:"Speaker & Problem Setter — Capture The Flag",date:"Oct–Nov 2025",a:false,
+         tags:[{l:"CTF",c:"tc"},{l:"Web",c:"ts"},{l:"Speaker",c:"tl"}],
+         desc:"Delivered an open class on web exploitation, introducing common vulnerability concepts and attack techniques to a public audience. Designed CTF challenges across digital forensics, web exploitation, and cryptography for the competition."},
+        {org:"COMPFEST 17",role:"Problem Setter — Capture The Flag",date:"Apr–Sep 2025",a:false,
+         tags:[{l:"CTF",c:"tc"},{l:"Web",c:"ts"},{l:"Forensics",c:"ts"}],
+         desc:"Created 3 challenges (2 solo, 1 co-authored) for a national and international CTF with 500+ teams (CTFtime rating 96). Designed a PCAP-based forensic challenge involving Rust malware and Windows AD1 artifact analysis, plus web challenges covering SSRF + DNS rebinding, SQL injection chaining, and YAML deserialization. Positive reviews from top teams including L3AK."},
+        {org:"RISTEK CSUI",role:"Member — Network, Security & OS SIG (NetSOS)",date:"Mar 2025–Feb 2026",a:false,
+         tags:[{l:"Cybersecurity",c:"ts"},{l:"CTF",c:"tc"}],
+         desc:"Contributed to building \"Bobol\", an internal CTF platform for UI students. Participated in study sessions across digital forensics, cryptography, reverse engineering, binary exploitation, and web security. Collaborated with teammates to tackle CTF challenges across multiple security domains."}
+    ];
+
+    var zz = document.getElementById('xzz');
+    var nodes = [];
+
+    EXP.forEach(function (d, i) {
+        var isLeft = (i % 2 === 0);
+        var row = document.createElement('div');
+        row.className = 'xrow' + (d.a ? ' xa' : '');
+
+        /* card HTML */
+        var cardHTML =
+            '<div class="xcard" onclick="this.classList.toggle(\'xopen\')">' +
+              '<div class="xctop">' +
+                '<div style="flex:1;min-width:0">' +
+                  '<div class="xorg">' + d.org + '</div>' +
+                  '<div class="xrole">' + d.role + '</div>' +
+                  '<div class="xtags">' +
+                    d.tags.map(function(t){ return '<span class="xtag ' + t.c + '">' + t.l + '</span>'; }).join('') +
+                  '</div>' +
+                '</div>' +
+                '<svg class="xchev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>' +
+              '</div>' +
+              '<div class="xbody"><div class="xbodyin"><p class="xdesc">' + d.desc + '</p></div></div>' +
+            '</div>';
+
+        /* mid node */
+        var mid = document.createElement('div');
+        mid.className = 'xmid';
+        mid.innerHTML = '<div class="xnode"></div><div class="xdatelbl">' + d.date + (d.a ? '<br><span class="xldot"></span>' : '') + '</div>';
+
+        if (isLeft) {
+            var lc = document.createElement('div'); lc.className = 'xcl'; lc.innerHTML = cardHTML;
+            var rc = document.createElement('div'); rc.className = 'xce';
+            row.appendChild(lc);
+            row.appendChild(mid);
+            row.appendChild(rc);
+        } else {
+            var lc2 = document.createElement('div'); lc2.className = 'xce';
+            var rc2 = document.createElement('div'); rc2.className = 'xcr'; rc2.innerHTML = cardHTML;
+            row.appendChild(lc2);
+            row.appendChild(mid);
+            row.appendChild(rc2);
+        }
+
+        zz.appendChild(row);
+        nodes.push(mid.querySelector('.xnode'));
+    });
+
+    function drawSVG() {
+        var old = zz.querySelector('.xsvg');
+        if (old) old.remove();
+        var zzR = zz.getBoundingClientRect();
+        if (!zzR.height) return;
+        var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('class', 'xsvg');
+        svg.setAttribute('height', zz.offsetHeight);
+        svg.style.height = zz.offsetHeight + 'px';
+        for (var i = 0; i < nodes.length - 1; i++) {
+            var rA = nodes[i].getBoundingClientRect();
+            var rB = nodes[i+1].getBoundingClientRect();
+            var x1 = rA.left + rA.width/2 - zzR.left;
+            var y1 = rA.top  + rA.height/2 - zzR.top;
+            var x2 = rB.left + rB.width/2 - zzR.left;
+            var y2 = rB.top  + rB.height/2 - zzR.top;
+            var p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            p.setAttribute('d',
+                'M'+x1+' '+y1+
+                ' C'+x1+' '+(y1+(y2-y1)*.5)+
+                ' '+x2+' '+(y1+(y2-y1)*.5)+
+                ' '+x2+' '+y2);
+            p.setAttribute('fill','none');
+            p.setAttribute('stroke', 'var(--border)');
+            p.setAttribute('stroke-width','1.5');
+            p.setAttribute('stroke-dasharray','4 3');
+            svg.appendChild(p);
+        }
+        zz.style.position = 'relative';
+        zz.insertBefore(svg, zz.firstChild);
+    }
+
+    requestAnimationFrame(function(){ requestAnimationFrame(drawSVG); });
+    window.addEventListener('resize', drawSVG);
+})();
+</script>
