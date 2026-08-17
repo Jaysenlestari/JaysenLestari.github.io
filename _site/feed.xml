@@ -1,6 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2026-03-23T18:01:13+07:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Jay’s Cybersecurity Notes</title><subtitle>A personal technical blog documenting my journey as a Computer Science student, covering cybersecurity, CTF write-ups, digital forensics, reverse engineering, and hands-on security research.
-</subtitle><author><name>Jaysen</name></author><entry><title type="html">Lovely Malware - HTB Sherlocks</title><link href="http://localhost:4000/Sherlock-LovelyMalware/" rel="alternate" type="text/html" title="Lovely Malware - HTB Sherlocks" /><published>2026-03-18T00:00:00+07:00</published><updated>2026-03-18T00:00:00+07:00</updated><id>http://localhost:4000/Sherlock-LovelyMalware</id><content type="html" xml:base="http://localhost:4000/Sherlock-LovelyMalware/"><![CDATA[<p>In this post I want to share how I solved my first <em>Insane</em> Sherlock challenge. Lately, I’ve been diving deeper into malware reversing, and especially during CTFs I usually rely on AI agents or MCP to speed things up. But this time, I decided to take a different approach: solving everything without those tools so I could truly understand each step of the process. It took me around two days to fully solve this challenge.<br />
-<a href="/assets/LovelyMalware/solve.png">!alt text</a></p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2026-06-28T13:58:26+07:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Jay’s Cybersecurity Notes</title><subtitle>A personal technical blog documenting my journey as a Computer Science student, covering cybersecurity, CTF write-ups, digital forensics, reverse engineering, and hands-on security research.
+</subtitle><author><name>Jaysen</name></author><entry><title type="html">Analyzing a Discord Hijack Malware Behind the MrBeast Giveaway Scam Wave</title><link href="http://localhost:4000/Analyzing-a-Discord-Hijack-Malware-Behind-the-MrBeast-Giveaway-Scam-Wave/" rel="alternate" type="text/html" title="Analyzing a Discord Hijack Malware Behind the MrBeast Giveaway Scam Wave" /><published>2026-03-18T00:00:00+07:00</published><updated>2026-03-18T00:00:00+07:00</updated><id>http://localhost:4000/Analyzing-a-Discord-Hijack-Malware-Behind-the-MrBeast-Giveaway-Scam-Wave</id><content type="html" xml:base="http://localhost:4000/Analyzing-a-Discord-Hijack-Malware-Behind-the-MrBeast-Giveaway-Scam-Wave/"><![CDATA[<p>Initially, one of my friends became infected with a malware that hijacked their Discord account. The compromised account was then used to automatically send spam messages promoting a fake “MrBeast giveaway.” In this post, I will present a detailed analysis of the malware behind this incident.
+<img src="/assets/mrbeast/message.png" alt="alt text" /></p>
+
+<p>After that, my friend attempted to install a pirated application from a <a href="https://www.kuyhaa.me/sketchup-pro-2026-full.html">website</a>, However, the installation never completed successfully, and shortly afterward his discord account was compromised and began sending spam messages.</p>
+
+<p>The initial step I took was to analyze the download link using VirusTotal. The URL was flagged by 6 out of 92 security vendors, including Kaspersky, which identified it as malware. However, there was an unusual behavior observed. Each time the download button was clicked, it redirected to a dynamically generated download page using an endpoint in the format: <code class="language-plaintext highlighter-rouge">https://dropfluxy.com/&lt;DYNAMIC_HASH&gt;</code>. This suggests that the distribution infrastructure is using dynamic URL generation, likely to evade detection and make static URL-based blocking less effective.</p>
+
+<p>Further inspection of the <a href="https://dropfluxy.com/">domain</a> revealed significantly more alarming results. At the time of analysis, 21 out of 92 security vendors flagged the domain as malicious or suspicious. Multiple reputable engines, including BitDefender, Fortinet, and Kaspersky, classified the domain under categories such as malware, phishing, and trojan-related activity. This level of consensus across different security vendors strongly suggests that the domain is actively involved in malicious distribution or phishing infrastructure.</p>
+
+<p>After the download was initiated from the previously mentioned redirect chain, the victim eventually obtained a ZIP archive containing the supposed installer. The file was named <code class="language-plaintext highlighter-rouge">SketchUp_Pro_2026_Full_v26.2.243_WinMac__Archive_x86_7251.zip</code>. Next, extracted the zip file and the archive revealed a single executable file named <code class="language-plaintext highlighter-rouge">SetupFull_34123.exe</code> with a size of 63.8 MB.</p>
+
+<p>Using its SHA256 hash (74877ea7d1112b1f7e6949815c81c5083b739adf3d5322dd480abe93c0657656), the file was analyzed on VirusTotal. The results showed that 18 out of 68 security vendors flagged the binary as malicious or potentially unwanted software.</p>
+
+<p>Langkah selanjutnya adalah saya melakuakn scanning file exe tersebut memakai DIE (Detect it Easy), dan dari hasil scan menunjukkan binary tersebut merupakan SFX 7-zip. Sehingga kita tinggal melakukan extract pada file exe tersebut.
+<img src="/assets/mrbeast/DIE-1.png" alt="alt text" /></p>]]></content><author><name>Jaysen</name></author><category term="Malware Analysis" /><category term="Reverse Engineering" /><category term="MalwareAnalysis" /><category term="ReverseEngineering" /><category term="Information Stealer" /><category term="Crypto Wallet" /><summary type="html"><![CDATA[Initially, one of my friends became infected with a malware that hijacked their Discord account. The compromised account was then used to automatically send spam messages promoting a fake “MrBeast giveaway.” In this post, I will present a detailed analysis of the malware behind this incident.]]></summary></entry><entry><title type="html">Lovely Malware - HTB Sherlocks</title><link href="http://localhost:4000/Sherlock-LovelyMalware/" rel="alternate" type="text/html" title="Lovely Malware - HTB Sherlocks" /><published>2026-03-18T00:00:00+07:00</published><updated>2026-03-18T00:00:00+07:00</updated><id>http://localhost:4000/Sherlock-LovelyMalware</id><content type="html" xml:base="http://localhost:4000/Sherlock-LovelyMalware/"><![CDATA[<p>In this post I want to share how I solved my first <em>Insane</em> Sherlock challenge. Lately, I’ve been diving deeper into malware reversing, and especially during CTFs I usually rely on AI agents or MCP to speed things up. But this time, I decided to take a different approach: solving everything without those tools so I could truly understand each step of the process. It took me around two days to fully solve this challenge.<br />
+<img src="/assets/LovelyMalware/solve.png" alt="alt text" /></p>
 <h2 id="initial-triage--recon">Initial Triage &amp; Recon</h2>
 
 <p>So first, before diving into reversing the binary, we need to understand its basic properties. I started by using Detect It Easy (DIE) to gather initial information.
@@ -584,45 +598,45 @@ This function appears quite simple. It acts as a wrapper that sets up a small lo
   <li><code class="language-plaintext highlighter-rouge">sub_140006400</code>(<code class="language-plaintext highlighter-rouge">4096</code>, 0, <code class="language-plaintext highlighter-rouge">v7</code>[8]): Resolves to <code class="language-plaintext highlighter-rouge">kernel32.dll</code>!<code class="language-plaintext highlighter-rouge">OpenProcess</code>. It uses the PPID found in the previous step to open a handle to its parent process. We rename this to <code class="language-plaintext highlighter-rouge">Call_OpenProcess</code>.</li>
   <li><code class="language-plaintext highlighter-rouge">sub_140006350</code>(<code class="language-plaintext highlighter-rouge">v6</code>, 0, <code class="language-plaintext highlighter-rouge">v8</code>, <code class="language-plaintext highlighter-rouge">260</code>): Resolves to <code class="language-plaintext highlighter-rouge">kernel32.dll</code>!<code class="language-plaintext highlighter-rouge">K32GetModuleFileNameExA</code>. It retrieves the full executable path of that parent process. We rename this to <code class="language-plaintext highlighter-rouge">Call_K32GetModuleFileNameExA</code>.</li>
   <li>The String Comparison (<code class="language-plaintext highlighter-rouge">sub_140003C60</code>): The malware decrypts a 13-byte string at <code class="language-plaintext highlighter-rouge">byte_14000F0F8</code> using our familiar <code class="language-plaintext highlighter-rouge">DecryptString</code> routine. The decrypted string is <code class="language-plaintext highlighter-rouge">explorer.exe</code>. (Note: If we recall our previous analysis, the data in this buffer was actually copied from <code class="language-plaintext highlighter-rouge">byte_14000BA70</code> during the TLS Callback phase). The malware then compares the parent process path to see if it contains <code class="language-plaintext highlighter-rouge">explorer.exe</code>.</li>
-  <li>Back in our <code class="language-plaintext highlighter-rouge">main</code> enumeration block (<code class="language-plaintext highlighter-rouge">sub_140007EA0</code>), immediately after the decryption of <code class="language-plaintext highlighter-rouge">explorer.exe</code>, we see a call to <code class="language-plaintext highlighter-rouge">v4</code> = <code class="language-plaintext highlighter-rouge">sub_140007B00</code>();. Let’s take a quick look at this subroutine:
-```c
-__int64 sub_140007B00()
-{
-  unsigned int v1; // [rsp+20h] [rbp-18h]
-  __int64 v2; // [rsp+28h] [rbp-10h]</li>
+  <li>Back in our <code class="language-plaintext highlighter-rouge">main</code> enumeration block (<code class="language-plaintext highlighter-rouge">sub_140007EA0</code>), immediately after the decryption of <code class="language-plaintext highlighter-rouge">explorer.exe</code>, we see a call to <code class="language-plaintext highlighter-rouge">v4</code> = <code class="language-plaintext highlighter-rouge">sub_140007B00</code>();. Let’s take a quick look at this subroutine:</li>
 </ol>
 
-<p>v1 = sub_140004220(0, 0);
-  if ( !v1 )
-    return 0;
-  v2 = sub_1400036F0(v1 + 1);
-  if ( !(unsigned int)sub_140004220(v2, v1) )
-    return 0;
-  *(_BYTE *)(v2 + v1 - 1) = 92;
-  return v2;
-}</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>By resolving the hashes inside this function, we quickly identify that `sub_140004220` is `kernel32.dll`!`GetWindowsDirectoryA`.
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">__int64</span> <span class="nf">sub_140007B00</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">v1</span><span class="p">;</span> <span class="c1">// [rsp+20h] [rbp-18h]</span>
+  <span class="n">__int64</span> <span class="n">v2</span><span class="p">;</span> <span class="c1">// [rsp+28h] [rbp-10h]</span>
 
-The function `sub_1400036F0` is simply a custom wrapper for memory allocation (using APIs like HeapCreate and HeapAlloc). I renamed this to Heap_Alloc_Private for clarity.
+  <span class="n">v1</span> <span class="o">=</span> <span class="n">sub_140004220</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="n">v1</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="n">v2</span> <span class="o">=</span> <span class="n">sub_1400036F0</span><span class="p">(</span><span class="n">v1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span><span class="p">)</span><span class="n">sub_140004220</span><span class="p">(</span><span class="n">v2</span><span class="p">,</span> <span class="n">v1</span><span class="p">)</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="o">*</span><span class="p">(</span><span class="n">_BYTE</span> <span class="o">*</span><span class="p">)(</span><span class="n">v2</span> <span class="o">+</span> <span class="n">v1</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="mi">92</span><span class="p">;</span>
+  <span class="k">return</span> <span class="n">v2</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>By resolving the hashes inside this function, we quickly identify that <code class="language-plaintext highlighter-rouge">sub_140004220</code> is <code class="language-plaintext highlighter-rouge">kernel32.dll</code>!<code class="language-plaintext highlighter-rouge">GetWindowsDirectoryA</code>.</p>
 
-With the functions properly renamed, the underlying logic is incredibly straightforward. It gets the length of the Windows directory, allocates the necessary memory, retrieves the actual path (e.g., `C:\Windows`), and finally appends the ASCII character 92 (which is the backslash \) to the end of the string.
+<p>The function <code class="language-plaintext highlighter-rouge">sub_1400036F0</code> is simply a custom wrapper for memory allocation (using APIs like HeapCreate and HeapAlloc). I renamed this to Heap_Alloc_Private for clarity.</p>
 
-Here is the fully cleaned-up and renamed version of the function, which I called GetWinDir:
-```c
-__int64 GetWinDir()
-{
-  unsigned int v1; // [rsp+20h] [rbp-18h]
-  __int64 v2; // [rsp+28h] [rbp-10h]
+<p>With the functions properly renamed, the underlying logic is incredibly straightforward. It gets the length of the Windows directory, allocates the necessary memory, retrieves the actual path (e.g., <code class="language-plaintext highlighter-rouge">C:\Windows</code>), and finally appends the ASCII character 92 (which is the backslash ) to the end of the string.</p>
 
-  v1 = Call_GetWindowsDirectoryA(0, 0);
-  if ( !v1 )
-    return 0;
-  v2 = Heap_Alloc_Private(v1 + 1);
-  if ( !(unsigned int)Call_GetWindowsDirectoryA(v2, v1) )
-    return 0;
-  *(_BYTE *)(v2 + v1 - 1) = 92;
-  return v2;
-}
+<p>Here is the fully cleaned-up and renamed version of the function, which I called GetWinDir:</p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">__int64</span> <span class="nf">GetWinDir</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">v1</span><span class="p">;</span> <span class="c1">// [rsp+20h] [rbp-18h]</span>
+  <span class="n">__int64</span> <span class="n">v2</span><span class="p">;</span> <span class="c1">// [rsp+28h] [rbp-10h]</span>
+
+  <span class="n">v1</span> <span class="o">=</span> <span class="n">Call_GetWindowsDirectoryA</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="n">v1</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="n">v2</span> <span class="o">=</span> <span class="n">Heap_Alloc_Private</span><span class="p">(</span><span class="n">v1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span><span class="p">)</span><span class="n">Call_GetWindowsDirectoryA</span><span class="p">(</span><span class="n">v2</span><span class="p">,</span> <span class="n">v1</span><span class="p">)</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="o">*</span><span class="p">(</span><span class="n">_BYTE</span> <span class="o">*</span><span class="p">)(</span><span class="n">v2</span> <span class="o">+</span> <span class="n">v1</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="mi">92</span><span class="p">;</span>
+  <span class="k">return</span> <span class="n">v2</span><span class="p">;</span>
+<span class="p">}</span>
 </code></pre></div></div>
 <p>Now that we have the Windows directory path (<code class="language-plaintext highlighter-rouge">v4</code>) and our decrypted “<code class="language-plaintext highlighter-rouge">explorer.exe</code>” string (<code class="language-plaintext highlighter-rouge">byte_14000F0F8</code>), the malware simply concat them together.</p>
 
@@ -631,44 +645,44 @@ __int64 GetWinDir()
 <p>Finally, the malware compares the actual parent process path we retrieved earlier (<code class="language-plaintext highlighter-rouge">v8</code>) with this newly constructed string (<code class="language-plaintext highlighter-rouge">v2</code>). It uses <code class="language-plaintext highlighter-rouge">sub_140003C60</code> to compare the first 24 bytes, which is a custom implementation of Strncmp.</p>
 
 <p>Let’s put all the pieces together. What started as an intimidating, obfuscated mess now looks like a understandable C function. I renamed the <code class="language-plaintext highlighter-rouge">main</code> subroutine to <code class="language-plaintext highlighter-rouge">Check_Parent_Is_Explorer</code>:</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>char Check_Parent_Is_Explorer()
-{
-  int v1; // [rsp+20h] [rbp-398h]
-  __int64 v2; // [rsp+28h] [rbp-390h]
-  __int64 v3; // [rsp+30h] [rbp-388h]
-  __int64 v4; // [rsp+38h] [rbp-380h]
-  __int64 v5; // [rsp+40h] [rbp-378h]
-  __int64 v6; // [rsp+48h] [rbp-370h]
-  _DWORD v7[144]; // [rsp+50h] [rbp-368h] BYREF
-  _BYTE v8[272]; // [rsp+290h] [rbp-128h] BYREF
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">char</span> <span class="nf">Check_Parent_Is_Explorer</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="kt">int</span> <span class="n">v1</span><span class="p">;</span> <span class="c1">// [rsp+20h] [rbp-398h]</span>
+  <span class="n">__int64</span> <span class="n">v2</span><span class="p">;</span> <span class="c1">// [rsp+28h] [rbp-390h]</span>
+  <span class="n">__int64</span> <span class="n">v3</span><span class="p">;</span> <span class="c1">// [rsp+30h] [rbp-388h]</span>
+  <span class="n">__int64</span> <span class="n">v4</span><span class="p">;</span> <span class="c1">// [rsp+38h] [rbp-380h]</span>
+  <span class="n">__int64</span> <span class="n">v5</span><span class="p">;</span> <span class="c1">// [rsp+40h] [rbp-378h]</span>
+  <span class="n">__int64</span> <span class="n">v6</span><span class="p">;</span> <span class="c1">// [rsp+48h] [rbp-370h]</span>
+  <span class="n">_DWORD</span> <span class="n">v7</span><span class="p">[</span><span class="mi">144</span><span class="p">];</span> <span class="c1">// [rsp+50h] [rbp-368h] BYREF</span>
+  <span class="n">_BYTE</span> <span class="n">v8</span><span class="p">[</span><span class="mi">272</span><span class="p">];</span> <span class="c1">// [rsp+290h] [rbp-128h] BYREF</span>
 
-  JunkFunc1(21562, 1);
-  JunkFunc2(57767, 3);
-  v5 = Call_GetCurrentProcess();
-  v1 = Call_GetProcessId(v5);
-  v3 = Call_CreateToolhelp32Snapshot(2, 0);
-  v7[0] = 568;
-  if ( !(unsigned int)Call_Process32FirstW(v3, v7) )
-    return 0;
-  while ( v7[2] != v1 &amp;&amp; (unsigned int)Call_Process32NextW(v3, v7) )
-    ;
-  v6 = Call_OpenProcess(4096, 0, v7[8]);
-  Call_K32GetModuleFileNameExA(v6, 0, v8, 260);
-  DecryptString((__int64)&amp;byte_14000F0F8, 0xDu);
-  v4 = GetWinDir();
-  v2 = ConcatString(v4, &amp;byte_14000F0F8);
-  Free(v4);
-  if ( (unsigned __int8)Strncmp(v8, v2, 24) )
-  {
-    Free(v2);
-    return 1;
-  }
-  else
-  {
-    Free(v2);
-    return 0;
-  }
-}
+  <span class="n">JunkFunc1</span><span class="p">(</span><span class="mi">21562</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="n">JunkFunc2</span><span class="p">(</span><span class="mi">57767</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+  <span class="n">v5</span> <span class="o">=</span> <span class="n">Call_GetCurrentProcess</span><span class="p">();</span>
+  <span class="n">v1</span> <span class="o">=</span> <span class="n">Call_GetProcessId</span><span class="p">(</span><span class="n">v5</span><span class="p">);</span>
+  <span class="n">v3</span> <span class="o">=</span> <span class="n">Call_CreateToolhelp32Snapshot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">v7</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">568</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span><span class="p">)</span><span class="n">Call_Process32FirstW</span><span class="p">(</span><span class="n">v3</span><span class="p">,</span> <span class="n">v7</span><span class="p">)</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="k">while</span> <span class="p">(</span> <span class="n">v7</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="n">v1</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span><span class="p">)</span><span class="n">Call_Process32NextW</span><span class="p">(</span><span class="n">v3</span><span class="p">,</span> <span class="n">v7</span><span class="p">)</span> <span class="p">)</span>
+    <span class="p">;</span>
+  <span class="n">v6</span> <span class="o">=</span> <span class="n">Call_OpenProcess</span><span class="p">(</span><span class="mi">4096</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">v7</span><span class="p">[</span><span class="mi">8</span><span class="p">]);</span>
+  <span class="n">Call_K32GetModuleFileNameExA</span><span class="p">(</span><span class="n">v6</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">v8</span><span class="p">,</span> <span class="mi">260</span><span class="p">);</span>
+  <span class="n">DecryptString</span><span class="p">((</span><span class="n">__int64</span><span class="p">)</span><span class="o">&amp;</span><span class="n">byte_14000F0F8</span><span class="p">,</span> <span class="mh">0xDu</span><span class="p">);</span>
+  <span class="n">v4</span> <span class="o">=</span> <span class="n">GetWinDir</span><span class="p">();</span>
+  <span class="n">v2</span> <span class="o">=</span> <span class="n">ConcatString</span><span class="p">(</span><span class="n">v4</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">byte_14000F0F8</span><span class="p">);</span>
+  <span class="n">Free</span><span class="p">(</span><span class="n">v4</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kr">__int8</span><span class="p">)</span><span class="n">Strncmp</span><span class="p">(</span><span class="n">v8</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="mi">24</span><span class="p">)</span> <span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">Free</span><span class="p">(</span><span class="n">v2</span><span class="p">);</span>
+    <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">else</span>
+  <span class="p">{</span>
+    <span class="n">Free</span><span class="p">(</span><span class="n">v2</span><span class="p">);</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
 </code></pre></div></div>
 <p>This is a Anti-Analysis/Anti-Debugging evasion technique. If a normal victim double-clicks the malware payload, its parent process will naturally be <code class="language-plaintext highlighter-rouge">explorer.exe</code> (returning 1). However, if an analyst runs it through a debugger (like x64dbg), via the Command Prompt, or inside a sandboxed environment, the parent process will not match, and the function will return 0.</p>
 
@@ -713,79 +727,75 @@ This confirms our earlier theory: the malware only executes its evasive actions 
 <span class="p">}</span>
 </code></pre></div></div>
 <p>Inside <code class="language-plaintext highlighter-rouge">sub_140007DA0</code>, the very first thing it does is check if <code class="language-plaintext highlighter-rouge">qword_14000F398</code> is initialized. If not, it calls <code class="language-plaintext highlighter-rouge">sub_140002A10</code>. This pattern strongly suggests another module initialization routine. Let’s dig into <code class="language-plaintext highlighter-rouge">sub_140002A10</code>:</p>
-<ol>
-  <li><code class="language-plaintext highlighter-rouge">sub_140002A10</code>
-```c
-__int64 sub_140002A10()
-{
-  __int64 result; // rax</li>
-</ol>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">__int64</span> <span class="nf">sub_140002A10</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="n">__int64</span> <span class="n">result</span><span class="p">;</span> <span class="c1">// rax</span>
 
-<p>DecryptString((__int64)Destination, 9u);
-  qword_14000EAC8 = sub_1400045D0(Destination);
-  result = sub_140003D50(-1288590482);
-  qword_14000F398 = result;
-  if ( !result )
-  {
-    result = sub_140003D50(-169485708);
-    qword_14000F398 = result;
-  }
-  if ( !qword_14000F398 )
-  {
-    result = sub_140003D50(-1338924274);
-    qword_14000F398 = result;
-  }
-  if ( !qword_14000F398 )
-  {
-    result = sub_140003D50(-119151916);
-    qword_14000F398 = result;
-  }
-  return result;
-}</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>First, it decrypts a 9-byte string at Destination. By mimicking the decryption algorithm from earlier, we know this decrypts to "advapi32". It passes this string into `sub_1400045D0`, which handles standard API resolution. Given the context of loading a module name, this is easily identified as `kernel32.dll`!`LoadLibraryA`. So, the malware dynamically loads `advapi32.dll` and I renamed the function to `Call_LoadLibraryA`.
+  <span class="n">DecryptString</span><span class="p">((</span><span class="n">__int64</span><span class="p">)</span><span class="n">Destination</span><span class="p">,</span> <span class="mi">9u</span><span class="p">);</span>
+  <span class="n">qword_14000EAC8</span> <span class="o">=</span> <span class="n">sub_1400045D0</span><span class="p">(</span><span class="n">Destination</span><span class="p">);</span>
+  <span class="n">result</span> <span class="o">=</span> <span class="n">sub_140003D50</span><span class="p">(</span><span class="o">-</span><span class="mi">1288590482</span><span class="p">);</span>
+  <span class="n">qword_14000F398</span> <span class="o">=</span> <span class="n">result</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="n">result</span> <span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">sub_140003D50</span><span class="p">(</span><span class="o">-</span><span class="mi">169485708</span><span class="p">);</span>
+    <span class="n">qword_14000F398</span> <span class="o">=</span> <span class="n">result</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="n">qword_14000F398</span> <span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">sub_140003D50</span><span class="p">(</span><span class="o">-</span><span class="mi">1338924274</span><span class="p">);</span>
+    <span class="n">qword_14000F398</span> <span class="o">=</span> <span class="n">result</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="n">qword_14000F398</span> <span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">sub_140003D50</span><span class="p">(</span><span class="o">-</span><span class="mi">119151916</span><span class="p">);</span>
+    <span class="n">qword_14000F398</span> <span class="o">=</span> <span class="n">result</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>First, it decrypts a 9-byte string at Destination. By mimicking the decryption algorithm from earlier, we know this decrypts to “advapi32”. It passes this string into <code class="language-plaintext highlighter-rouge">sub_1400045D0</code>, which handles standard API resolution. Given the context of loading a module name, this is easily identified as <code class="language-plaintext highlighter-rouge">kernel32.dll</code>!<code class="language-plaintext highlighter-rouge">LoadLibraryA</code>. So, the malware dynamically loads <code class="language-plaintext highlighter-rouge">advapi32.dll</code> and I renamed the function to <code class="language-plaintext highlighter-rouge">Call_LoadLibraryA</code>.</p>
 
-Next, it attempts to resolve the base address of this newly loaded module using a custom function, `sub_140003D50`:
-```c
-__int64 __fastcall sub_140003D50(int a1)
-{
-  int i; // [rsp+20h] [rbp-88h]
-  _BYTE *v3; // [rsp+28h] [rbp-80h]
-  _QWORD *v4; // [rsp+30h] [rbp-78h]
-  __int64 v5; // [rsp+40h] [rbp-68h]
-  _QWORD v6[2]; // [rsp+48h] [rbp-60h] BYREF
-  __int64 v7; // [rsp+58h] [rbp-50h]
-  __int64 v8; // [rsp+60h] [rbp-48h]
-  _BYTE *v9; // [rsp+68h] [rbp-40h]
-  void *Block; // [rsp+70h] [rbp-38h]
-  void *v11; // [rsp+78h] [rbp-30h]
-  _QWORD v12[5]; // [rsp+80h] [rbp-28h] BYREF
+<p>Next, it attempts to resolve the base address of this newly loaded module using a custom function, <code class="language-plaintext highlighter-rouge">sub_140003D50</code>:</p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">__int64</span> <span class="kr">__fastcall</span> <span class="nf">sub_140003D50</span><span class="p">(</span><span class="kt">int</span> <span class="n">a1</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="kt">int</span> <span class="n">i</span><span class="p">;</span> <span class="c1">// [rsp+20h] [rbp-88h]</span>
+  <span class="n">_BYTE</span> <span class="o">*</span><span class="n">v3</span><span class="p">;</span> <span class="c1">// [rsp+28h] [rbp-80h]</span>
+  <span class="n">_QWORD</span> <span class="o">*</span><span class="n">v4</span><span class="p">;</span> <span class="c1">// [rsp+30h] [rbp-78h]</span>
+  <span class="n">__int64</span> <span class="n">v5</span><span class="p">;</span> <span class="c1">// [rsp+40h] [rbp-68h]</span>
+  <span class="n">_QWORD</span> <span class="n">v6</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span> <span class="c1">// [rsp+48h] [rbp-60h] BYREF</span>
+  <span class="n">__int64</span> <span class="n">v7</span><span class="p">;</span> <span class="c1">// [rsp+58h] [rbp-50h]</span>
+  <span class="n">__int64</span> <span class="n">v8</span><span class="p">;</span> <span class="c1">// [rsp+60h] [rbp-48h]</span>
+  <span class="n">_BYTE</span> <span class="o">*</span><span class="n">v9</span><span class="p">;</span> <span class="c1">// [rsp+68h] [rbp-40h]</span>
+  <span class="kt">void</span> <span class="o">*</span><span class="n">Block</span><span class="p">;</span> <span class="c1">// [rsp+70h] [rbp-38h]</span>
+  <span class="kt">void</span> <span class="o">*</span><span class="n">v11</span><span class="p">;</span> <span class="c1">// [rsp+78h] [rbp-30h]</span>
+  <span class="n">_QWORD</span> <span class="n">v12</span><span class="p">[</span><span class="mi">5</span><span class="p">];</span> <span class="c1">// [rsp+80h] [rbp-28h] BYREF</span>
 
-  v7 = sub_140003D40();
-  v8 = *(_QWORD *)(v7 + 24);
-  qmemcpy(v12, (const void *)(v8 + 32), 0x10u);
-  v4 = v12;
-  do
-  {
-    v5 = *v4;
-    qmemcpy(v6, (const void *)(*v4 + 72LL), sizeof(v6));
-    v9 = operator new(((int)LOWORD(v6[0]) &gt;&gt; 1) + 1);
-    v3 = v9;
-    for ( i = 0; i &lt; (int)LOWORD(v6[0]) &gt;&gt; 1; ++i )
-      v3[i] = *(_BYTE *)(v6[1] + 2 * i);
-    v3[(int)LOWORD(v6[0]) &gt;&gt; 1] = 0;
-    if ( (unsigned int)CalculateMalwareHash(v3) == a1 )
-    {
-      Block = v3;
-      j_j_free(v3);
-      return *(_QWORD *)(v5 + 32);
-    }
-    v4 = (_QWORD *)*v4;
-    v11 = v3;
-    j_j_free(v3);
-  }
-  while ( *v4 != v12[0] );
-  return 0;
-}
+  <span class="n">v7</span> <span class="o">=</span> <span class="n">sub_140003D40</span><span class="p">();</span>
+  <span class="n">v8</span> <span class="o">=</span> <span class="o">*</span><span class="p">(</span><span class="n">_QWORD</span> <span class="o">*</span><span class="p">)(</span><span class="n">v7</span> <span class="o">+</span> <span class="mi">24</span><span class="p">);</span>
+  <span class="n">qmemcpy</span><span class="p">(</span><span class="n">v12</span><span class="p">,</span> <span class="p">(</span><span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="p">)(</span><span class="n">v8</span> <span class="o">+</span> <span class="mi">32</span><span class="p">),</span> <span class="mh">0x10u</span><span class="p">);</span>
+  <span class="n">v4</span> <span class="o">=</span> <span class="n">v12</span><span class="p">;</span>
+  <span class="k">do</span>
+  <span class="p">{</span>
+    <span class="n">v5</span> <span class="o">=</span> <span class="o">*</span><span class="n">v4</span><span class="p">;</span>
+    <span class="n">qmemcpy</span><span class="p">(</span><span class="n">v6</span><span class="p">,</span> <span class="p">(</span><span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="p">)(</span><span class="o">*</span><span class="n">v4</span> <span class="o">+</span> <span class="mi">72LL</span><span class="p">),</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">v6</span><span class="p">));</span>
+    <span class="n">v9</span> <span class="o">=</span> <span class="n">operator</span> <span class="n">new</span><span class="p">(((</span><span class="kt">int</span><span class="p">)</span><span class="n">LOWORD</span><span class="p">(</span><span class="n">v6</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="n">v3</span> <span class="o">=</span> <span class="n">v9</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">LOWORD</span><span class="p">(</span><span class="n">v6</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span> <span class="p">)</span>
+      <span class="n">v3</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">*</span><span class="p">(</span><span class="n">_BYTE</span> <span class="o">*</span><span class="p">)(</span><span class="n">v6</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">i</span><span class="p">);</span>
+    <span class="n">v3</span><span class="p">[(</span><span class="kt">int</span><span class="p">)</span><span class="n">LOWORD</span><span class="p">(</span><span class="n">v6</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span><span class="p">)</span><span class="n">CalculateMalwareHash</span><span class="p">(</span><span class="n">v3</span><span class="p">)</span> <span class="o">==</span> <span class="n">a1</span> <span class="p">)</span>
+    <span class="p">{</span>
+      <span class="n">Block</span> <span class="o">=</span> <span class="n">v3</span><span class="p">;</span>
+      <span class="n">j_j_free</span><span class="p">(</span><span class="n">v3</span><span class="p">);</span>
+      <span class="k">return</span> <span class="o">*</span><span class="p">(</span><span class="n">_QWORD</span> <span class="o">*</span><span class="p">)(</span><span class="n">v5</span> <span class="o">+</span> <span class="mi">32</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">v4</span> <span class="o">=</span> <span class="p">(</span><span class="n">_QWORD</span> <span class="o">*</span><span class="p">)</span><span class="o">*</span><span class="n">v4</span><span class="p">;</span>
+    <span class="n">v11</span> <span class="o">=</span> <span class="n">v3</span><span class="p">;</span>
+    <span class="n">j_j_free</span><span class="p">(</span><span class="n">v3</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">while</span> <span class="p">(</span> <span class="o">*</span><span class="n">v4</span> <span class="o">!=</span> <span class="n">v12</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">);</span>
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
 </code></pre></div></div>
 <p>This function traverses the PEB (Process Environment Block) to list all loaded modules, extracts their names, hashes them using our <code class="language-plaintext highlighter-rouge">CalculateMalwareHash</code> algorithm, and compares them against the target hash (<code class="language-plaintext highlighter-rouge">a1</code>). If it finds a match, it returns the module’s base address. I renamed this extremely useful function to GetModuleHandleByHash.</p>
 
@@ -812,16 +822,7 @@ __int64 __fastcall sub_140003D50(int a1)
 </code></pre></div></div>
 <p>Using our <code class="language-plaintext highlighter-rouge">api.py</code> script against the <code class="language-plaintext highlighter-rouge">advapi32.dll</code> module, we can quickly resolve the next set of hashed API calls:</p>
 <ol>
-  <li>
-    <table>
-      <tbody>
-        <tr>
-          <td><code class="language-plaintext highlighter-rouge">sub_1400057A0</code> (Hash: <code class="language-plaintext highlighter-rouge">0xF668CB82</code>): This resolves to <code class="language-plaintext highlighter-rouge">OpenProcessToken</code>. It takes the process handle (<code class="language-plaintext highlighter-rouge">a1</code>), requests access rights of 40 (<code class="language-plaintext highlighter-rouge">TOKEN_ADJUST_PRIVILEGES</code></td>
-          <td><code class="language-plaintext highlighter-rouge">TOKEN_QUERY</code>), and stores the token handle in <code class="language-plaintext highlighter-rouge">v2</code>. We rename this to <code class="language-plaintext highlighter-rouge">Call_OpenProcessToken</code>.</td>
-        </tr>
-      </tbody>
-    </table>
-  </li>
+  <li><code class="language-plaintext highlighter-rouge">sub_1400057A0</code> (Hash: <code class="language-plaintext highlighter-rouge">0xF668CB82</code>): This resolves to <code class="language-plaintext highlighter-rouge">OpenProcessToken</code>. It takes the process handle (<code class="language-plaintext highlighter-rouge">a1</code>), requests access rights of 40, and stores the token handle in <code class="language-plaintext highlighter-rouge">v2</code>. We rename this to <code class="language-plaintext highlighter-rouge">Call_OpenProcessToken</code>.</li>
   <li><code class="language-plaintext highlighter-rouge">DecryptString</code>: It decrypts a 20-byte string at <code class="language-plaintext highlighter-rouge">byte_14000F0E0</code>. Running this through our Python decryption script reveals the string: SeShutdownPrivilege. We rename it to <code class="language-plaintext highlighter-rouge">qw_SeShutdownPrivilege</code></li>
   <li><code class="language-plaintext highlighter-rouge">sub_140007CD0</code>: This function takes the token handle, the “SeShutdownPrivilege” string, and a boolean flag (1 for True). This is a custom wrapper used to adjust the privileges of the token. Let’s look inside.
 Inside <code class="language-plaintext highlighter-rouge">sub_140007CD0</code> (which we will rename to SetProcessPrivilege), we find the core privilege escalation logic:
@@ -2524,7 +2525,7 @@ Now that the static analysis is complete and the exfiltration mechanism is fully
 <ul>
   <li><strong>Attacker Email:</strong> <code class="language-plaintext highlighter-rouge">nebilij251@rencr.com</code></li>
   <li><strong>Bitcoin Wallet Address:</strong> <code class="language-plaintext highlighter-rouge">bc1qntgwduujdjnfv6txwxugdsx6nw5mfhgqa4nn82</code></li>
-</ul>]]></content><author><name>Jaysen</name></author><category term="Forensics" /><category term="Malware Analysis" /><category term="Sherlocks" /><category term="DigitalForensics" /><category term="MalwareAnalysis" /><category term="ReverseEngineering" /><category term="Ransomware" /><summary type="html"><![CDATA[In this post I want to share how I solved my first Insane Sherlock challenge. Lately, I’ve been diving deeper into malware reversing, and especially during CTFs I usually rely on AI agents or MCP to speed things up. But this time, I decided to take a different approach: solving everything without those tools so I could truly understand each step of the process. It took me around two days to fully solve this challenge. !alt text Initial Triage &amp; Recon]]></summary></entry><entry><title type="html">Breached - C2C 2026 Qualification</title><link href="http://localhost:4000/C2C2026Qual-Breached/" rel="alternate" type="text/html" title="Breached - C2C 2026 Qualification" /><published>2026-02-17T00:00:00+07:00</published><updated>2026-02-17T00:00:00+07:00</updated><id>http://localhost:4000/C2C2026Qual-Breached</id><content type="html" xml:base="http://localhost:4000/C2C2026Qual-Breached/"><![CDATA[<p>This challenge is a very interesting and fun forensic scenario. We are placed in the role of the blue team, tasked with investigating a compromised virtual machine and reconstructing the entire attack purely from artifacts.</p>
+</ul>]]></content><author><name>Jaysen</name></author><category term="Forensics" /><category term="Malware Analysis" /><category term="Sherlocks" /><category term="DigitalForensics" /><category term="MalwareAnalysis" /><category term="ReverseEngineering" /><category term="Ransomware" /><summary type="html"><![CDATA[In this post I want to share how I solved my first Insane Sherlock challenge. Lately, I’ve been diving deeper into malware reversing, and especially during CTFs I usually rely on AI agents or MCP to speed things up. But this time, I decided to take a different approach: solving everything without those tools so I could truly understand each step of the process. It took me around two days to fully solve this challenge. Initial Triage &amp; Recon]]></summary></entry><entry><title type="html">Breached - C2C 2026 Qualification</title><link href="http://localhost:4000/C2C2026Qual-Breached/" rel="alternate" type="text/html" title="Breached - C2C 2026 Qualification" /><published>2026-02-17T00:00:00+07:00</published><updated>2026-02-17T00:00:00+07:00</updated><id>http://localhost:4000/C2C2026Qual-Breached</id><content type="html" xml:base="http://localhost:4000/C2C2026Qual-Breached/"><![CDATA[<p>This challenge is a very interesting and fun forensic scenario. We are placed in the role of the blue team, tasked with investigating a compromised virtual machine and reconstructing the entire attack purely from artifacts.</p>
 
 <p>The scenario feels similar to a boot2root-style machine, but from the defensive perspective: rather than exploiting the system, we must analyze logs and disk artifactsto understand how the attacker gained access, escalated privileges, established persistence, and finally encrypted sensitive data.</p>
 
