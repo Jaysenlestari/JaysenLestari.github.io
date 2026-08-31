@@ -23,7 +23,7 @@ tags:
 
 So, in this post I will explain the forensic challenge I created for COMPFEST 18. The challenge focuses on how an attacker abuses LOTS (Living Off Trusted Sites) as a command-and-control channel. The idea was inspired by the Spotify as C2 [research](https://john-woodman.com/research/spotifyc2/), which led me to explore how Google Calendar could be abused in a similar way.  
 
-![alt text](/assets/apex-affair/attack_graf.png)
+<img class="attack-graph" src="/assets/apex-affair/attack_graf.png" alt="Complete attack chain diagram">
 The graph above summarizes the complete two-day attack chain. Throughout this writeup, I will follow the same flow from the initial phishing email, through payload execution and Google Calendar-based C2, to the attacker's activity on the second day and the final ransomware execution.
 
 ## Initial Access and Phishing Recovery

@@ -1387,6 +1387,13 @@ img {
   height: auto;
 }
 
+/* The Compfest attack-chain diagram benefits from the full post width. */
+.post-main img.attack-graph {
+  width: 100%;
+  max-width: 1100px;
+  margin: 1.5rem auto 1.75rem;
+}
+
 @media (max-width: 720px) {
   .post-main img {
     width: 100%;
