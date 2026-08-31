@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2026-08-31T11:24:12+07:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Jay’s Cybersecurity Notes</title><subtitle>A personal technical blog documenting my journey as a Computer Science student, covering cybersecurity, CTF write-ups, digital forensics, reverse engineering, and hands-on security research.
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2026-08-31T11:38:52+07:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Jay’s Cybersecurity Notes</title><subtitle>A personal technical blog documenting my journey as a Computer Science student, covering cybersecurity, CTF write-ups, digital forensics, reverse engineering, and hands-on security research.
 </subtitle><author><name>Jaysen</name></author><entry><title type="html">The Apex Affair - Compfest18 Qualification</title><link href="http://localhost:4000/Compfest18Qual-TheApexAffair/" rel="alternate" type="text/html" title="The Apex Affair - Compfest18 Qualification" /><published>2026-08-29T00:00:00+07:00</published><updated>2026-08-29T00:00:00+07:00</updated><id>http://localhost:4000/Compfest18Qual-TheApexAffair</id><content type="html" xml:base="http://localhost:4000/Compfest18Qual-TheApexAffair/"><![CDATA[<p>So, in this post I will explain the forensic challenge I created for COMPFEST 18. The challenge focuses on how an attacker abuses LOTS (Living Off Trusted Sites) as a command-and-control channel. The idea was inspired by the Spotify as C2 <a href="https://john-woodman.com/research/spotifyc2/">research</a>, which led me to explore how Google Calendar could be abused in a similar way.</p>
 
 <p><img src="/assets/apex-affair/attack_graf.png" alt="alt text" />
@@ -136,19 +136,19 @@ The graph above summarizes the complete two-day attack chain. Throughout this wr
   <tbody>
     <tr>
       <td>Sender</td>
-      <td><code class="language-plaintext highlighter-rouge">tech.cloudaxls@gmail.com</code></td>
+      <td>tech.cloudaxls@gmail.com</td>
     </tr>
     <tr>
       <td>Reply-To Domain</td>
-      <td><code class="language-plaintext highlighter-rouge">cloudaxls-tech.com</code></td>
+      <td>cloudaxls-tech.com</td>
     </tr>
     <tr>
       <td>Malicious URL</td>
-      <td><code class="language-plaintext highlighter-rouge">http://192.168.56.1/googlechromestandaloneenterprise64.msi</code></td>
+      <td>http://192.168.56.1/googlechromestandaloneenterprise64.msi</td>
     </tr>
     <tr>
       <td>MSI SHA-256</td>
-      <td><code class="language-plaintext highlighter-rouge">3c1e30040500f4bb55fbd669544949863557b8f7b25bdbce4a9d4ba6cb3264e4</code></td>
+      <td>3c1e30040500f4bb55fbd669544949863557b8f7b25bdbce4a9d4ba6cb3264e4</td>
     </tr>
   </tbody>
 </table>
@@ -165,31 +165,31 @@ The graph above summarizes the complete two-day attack chain. Throughout this wr
   <tbody>
     <tr>
       <td>Dropped DLL</td>
-      <td><code class="language-plaintext highlighter-rouge">C:\Users\Public\chrome_update.dll</code></td>
+      <td>C:\Users\Public\chrome_update.dll</td>
     </tr>
     <tr>
       <td>Defender Tool</td>
-      <td><code class="language-plaintext highlighter-rouge">C:\Program Files\Google\Chrome\GoogleUpdater.exe</code></td>
+      <td>C:\Program Files\Google\Chrome\GoogleUpdater.exe</td>
     </tr>
     <tr>
       <td>GoogleUpdater.exe SHA-256</td>
-      <td><code class="language-plaintext highlighter-rouge">192f65c45f72d1221c9c95158fa97093348c620428f2a22b53d4a7f6b67dcb17</code></td>
+      <td>192f65c45f72d1221c9c95158fa97093348c620428f2a22b53d4a7f6b67dcb17</td>
     </tr>
     <tr>
       <td>RAT</td>
-      <td><code class="language-plaintext highlighter-rouge">C:\Program Files\Google\Chrome\software_reporter_tool.exe</code></td>
+      <td>C:\Program Files\Google\Chrome\software_reporter_tool.exe</td>
     </tr>
     <tr>
       <td>RAT SHA-256</td>
-      <td><code class="language-plaintext highlighter-rouge">520a4c0a8d1349ab9e5c8bc98832198dac2680345ad6e038e172102138a1f79c</code></td>
+      <td>520a4c0a8d1349ab9e5c8bc98832198dac2680345ad6e038e172102138a1f79c</td>
     </tr>
     <tr>
       <td>Injected Shellcode SHA-256</td>
-      <td><code class="language-plaintext highlighter-rouge">9e2413e4d0469a25c7840872f5fa98d93c4bb1c2f9a0d184f47eadaf808fefcf</code></td>
+      <td>9e2413e4d0469a25c7840872f5fa98d93c4bb1c2f9a0d184f47eadaf808fefcf</td>
     </tr>
     <tr>
       <td>Ransomware SHA-256</td>
-      <td><code class="language-plaintext highlighter-rouge">7651bb07c5cc826c04f70ded7f20460710bddeb23aa24963d637284cb924394c</code></td>
+      <td>7651bb07c5cc826c04f70ded7f20460710bddeb23aa24963d637284cb924394c</td>
     </tr>
   </tbody>
 </table>
@@ -206,23 +206,23 @@ The graph above summarizes the complete two-day attack chain. Throughout this wr
   <tbody>
     <tr>
       <td>Run Key</td>
-      <td><code class="language-plaintext highlighter-rouge">HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\software_reporter_tool</code></td>
+      <td>HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\software_reporter_tool</td>
     </tr>
     <tr>
       <td>C2 Service</td>
-      <td><code class="language-plaintext highlighter-rouge">Google Calendar</code></td>
+      <td>Google Calendar</td>
     </tr>
     <tr>
       <td>Google API Host</td>
-      <td><code class="language-plaintext highlighter-rouge">www.googleapis.com</code></td>
+      <td>www.googleapis.com</td>
     </tr>
     <tr>
       <td>Payload Source</td>
-      <td><code class="language-plaintext highlighter-rouge">192.168.56.1:80</code></td>
+      <td>192.168.56.1:80</td>
     </tr>
     <tr>
       <td>Payload Path</td>
-      <td><code class="language-plaintext highlighter-rouge">/patch.bin</code></td>
+      <td>/patch.bin</td>
     </tr>
   </tbody>
 </table>
@@ -239,23 +239,23 @@ The graph above summarizes the complete two-day attack chain. Throughout this wr
   <tbody>
     <tr>
       <td>Sepolia RPC</td>
-      <td><code class="language-plaintext highlighter-rouge">ethereum-sepolia-rpc.publicnode.com</code></td>
+      <td>ethereum-sepolia-rpc.publicnode.com</td>
     </tr>
     <tr>
       <td>Smart Contract</td>
-      <td><code class="language-plaintext highlighter-rouge">0x08FE9fc8288Cf5D5EE5f4F69c0e4f774FFA275d4</code></td>
+      <td>0x08FE9fc8288Cf5D5EE5f4F69c0e4f774FFA275d4</td>
     </tr>
     <tr>
       <td>Ransomware Extension</td>
-      <td><code class="language-plaintext highlighter-rouge">.jay</code></td>
+      <td>.jay</td>
     </tr>
     <tr>
       <td>Ransom Note</td>
-      <td><code class="language-plaintext highlighter-rouge">README.txt</code></td>
+      <td>README.txt</td>
     </tr>
     <tr>
       <td>Ransom Wallet</td>
-      <td><code class="language-plaintext highlighter-rouge">0xcd02c89DeF2A9Aa64598CbA248c37D833AFE92D8</code></td>
+      <td>0xcd02c89DeF2A9Aa64598CbA248c37D833AFE92D8</td>
     </tr>
   </tbody>
 </table>]]></content><author><name>Jaysen</name></author><category term="Forensics" /><category term="Malware Analysis" /><category term="Disk Forensics" /><category term="Memory Forensics" /><category term="LOTS" /><category term="DFIR" /><category term="MalwareAnalysis" /><category term="MemoryForensics" /><category term="DiskForensics" /><category term="ReverseEngineering" /><category term="LOTS" /><category term="GoogleCalendar" /><category term="DPAPI" /><category term="MemProcFS" /><category term="ProcessInjection" /><category term="Ransomware" /><category term="Ethereum" /><category term="SmartContract" /><summary type="html"><![CDATA[So, in this post I will explain the forensic challenge I created for COMPFEST 18. The challenge focuses on how an attacker abuses LOTS (Living Off Trusted Sites) as a command-and-control channel. The idea was inspired by the Spotify as C2 research, which led me to explore how Google Calendar could be abused in a similar way.]]></summary></entry><entry><title type="html">Lovely Malware - HTB Sherlocks</title><link href="http://localhost:4000/Sherlock-LovelyMalware-copy/" rel="alternate" type="text/html" title="Lovely Malware - HTB Sherlocks" /><published>2026-03-18T00:00:00+07:00</published><updated>2026-03-18T00:00:00+07:00</updated><id>http://localhost:4000/Sherlock-LovelyMalware%20copy</id><content type="html" xml:base="http://localhost:4000/Sherlock-LovelyMalware-copy/"><![CDATA[<p>In this post I want to share how I solved my first <em>Insane</em> Sherlock challenge. Lately, I’ve been diving deeper into malware reversing, and especially during CTFs I usually rely on AI agents or MCP to speed things up. But this time, I decided to take a different approach: solving everything without those tools so I could truly understand each step of the process. It took me around two days to fully solve this challenge.<br />

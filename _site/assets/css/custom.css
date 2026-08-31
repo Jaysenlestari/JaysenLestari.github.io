@@ -1254,6 +1254,7 @@ html[data-theme='light'] .post-body h4 {
   border: 1px solid var(--border);
   border-radius: 10px;
   box-shadow: var(--shadow);
+  table-layout: auto;
 }
 
 .post-body th,
@@ -1261,6 +1262,11 @@ html[data-theme='light'] .post-body h4 {
   border: 1px solid var(--border);
   padding: 0.5rem 0.6rem;
   text-align: left;
+  color: var(--text);
+  vertical-align: middle;
+  overflow-wrap: normal;
+  word-break: normal;
+  white-space: normal;
 }
 
 .post-body th {
@@ -1269,10 +1275,27 @@ html[data-theme='light'] .post-body h4 {
   font-weight: 700;
 }
 
+/* Override Minima's light table colors so dark mode keeps readable contrast. */
+html[data-theme='dark'] .post-body tr:nth-child(even) td {
+  background-color: #0e1527 !important;
+  color: var(--text);
+}
+
+html[data-theme='dark'] .post-body tr:nth-child(odd) td {
+  background-color: #09111f !important;
+  color: var(--text);
+}
+
+html[data-theme='dark'] .post-body table tr:nth-child(even),
+html[data-theme='dark'] .post-body table tr:nth-child(odd) {
+  background-color: transparent !important;
+}
+
 /* Make the first column look like a clear index/number column */
 .post-body td:first-child,
 .post-body th:first-child {
-  width: 4.5rem;
+  width: 8rem;
+  min-width: 8rem;
   text-align: center;
   font-weight: 700;
 }

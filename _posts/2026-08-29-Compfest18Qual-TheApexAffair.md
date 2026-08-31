@@ -150,39 +150,39 @@ And with that, the full incident comes together: what started as a phishing emai
 
 | Type | Indicator |
 |---|---|
-| Sender | `tech.cloudaxls@gmail.com` |
-| Reply-To Domain | `cloudaxls-tech.com` |
-| Malicious URL | `http://192.168.56.1/googlechromestandaloneenterprise64.msi` |
-| MSI SHA-256 | `3c1e30040500f4bb55fbd669544949863557b8f7b25bdbce4a9d4ba6cb3264e4` |
+| Sender | tech.cloudaxls@gmail.com |
+| Reply-To Domain | cloudaxls-tech.com |
+| Malicious URL | http://192.168.56.1/googlechromestandaloneenterprise64.msi |
+| MSI SHA-256 | 3c1e30040500f4bb55fbd669544949863557b8f7b25bdbce4a9d4ba6cb3264e4 |
 
 ### Malicious Files
 
 | Type | Indicator |
 |---|---|
-| Dropped DLL | `C:\Users\Public\chrome_update.dll` |
-| Defender Tool | `C:\Program Files\Google\Chrome\GoogleUpdater.exe` |
-| GoogleUpdater.exe SHA-256 | `192f65c45f72d1221c9c95158fa97093348c620428f2a22b53d4a7f6b67dcb17` |
-| RAT | `C:\Program Files\Google\Chrome\software_reporter_tool.exe` |
-| RAT SHA-256 | `520a4c0a8d1349ab9e5c8bc98832198dac2680345ad6e038e172102138a1f79c` |
-| Injected Shellcode SHA-256 | `9e2413e4d0469a25c7840872f5fa98d93c4bb1c2f9a0d184f47eadaf808fefcf` |
-| Ransomware SHA-256 | `7651bb07c5cc826c04f70ded7f20460710bddeb23aa24963d637284cb924394c` |
+| Dropped DLL | C:\Users\Public\chrome_update.dll |
+| Defender Tool | C:\Program Files\Google\Chrome\GoogleUpdater.exe |
+| GoogleUpdater.exe SHA-256 | 192f65c45f72d1221c9c95158fa97093348c620428f2a22b53d4a7f6b67dcb17 |
+| RAT | C:\Program Files\Google\Chrome\software_reporter_tool.exe |
+| RAT SHA-256 | 520a4c0a8d1349ab9e5c8bc98832198dac2680345ad6e038e172102138a1f79c|
+| Injected Shellcode SHA-256 | 9e2413e4d0469a25c7840872f5fa98d93c4bb1c2f9a0d184f47eadaf808fefcf |
+| Ransomware SHA-256 | 7651bb07c5cc826c04f70ded7f20460710bddeb23aa24963d637284cb924394c |
 
 ### Persistence and C2
 
 | Type | Indicator |
 |---|---|
-| Run Key | `HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\software_reporter_tool` |
-| C2 Service | `Google Calendar` |
-| Google API Host | `www.googleapis.com` |
-| Payload Source | `192.168.56.1:80` |
-| Payload Path | `/patch.bin` |
+| Run Key | HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\software_reporter_tool |
+| C2 Service | Google Calendar |
+| Google API Host | www.googleapis.com |
+| Payload Source | 192.168.56.1:80 |
+| Payload Path | /patch.bin |
 
 ### Ransomware Infrastructure
 
 | Type | Indicator |
 |---|---|
-| Sepolia RPC | `ethereum-sepolia-rpc.publicnode.com` |
-| Smart Contract | `0x08FE9fc8288Cf5D5EE5f4F69c0e4f774FFA275d4` |
-| Ransomware Extension | `.jay` |
-| Ransom Note | `README.txt` |
-| Ransom Wallet | `0xcd02c89DeF2A9Aa64598CbA248c37D833AFE92D8` |
+| Sepolia RPC | ethereum-sepolia-rpc.publicnode.com |
+| Smart Contract | 0x08FE9fc8288Cf5D5EE5f4F69c0e4f774FFA275d4 |
+| Ransomware Extension | .jay |
+| Ransom Note | README.txt |
+| Ransom Wallet | 0xcd02c89DeF2A9Aa64598CbA248c37D833AFE92D8 |
