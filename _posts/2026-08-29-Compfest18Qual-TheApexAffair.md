@@ -102,7 +102,7 @@ Unfortunately, that path failed as well. The targeted Notepad process had alread
 
 Using MemProcFS, I navigated to the RAT process and used its generated MiniDump as the recovery source. The partial HTTP stream from bulk extractor was still useful here because it revealed two important pieces of information, the first bytes of the payload and the expected Content-Length. Those values could be used as a signature and size constraint to search through the MiniDump for candidate regions that matched the original download.
 
-After carving the matching region, the recovered payload could be validated with Detect It Easy, which identified it as Donut-generated shellcode. From there, the Donut layer could be unpacked to recover the embedded 64-bit Windows executable, which turned out to be the ransomware used in the final stage of the incident.
+After carving the matching region, the recovered payload could be validated with Detect It Easy, which identified it as Donut-generated shellcode. From there, the Donut layer could be unpacked to recover the embedded 64-bit Windows executable (I used this [tools](https://github.com/volexity/donut-decryptor)), which turned out to be the ransomware used in the final stage of the incident.
 
 ## Ransomware and Blockchain-Based Configuration
 
