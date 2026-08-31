@@ -405,3 +405,45 @@ permalink: /about/
     window.addEventListener('resize', drawSVG);
 })();
 </script>
+
+<div id="certificate-lightbox" class="certificate-lightbox" role="dialog" aria-modal="true"
+    aria-label="Certificate preview" hidden>
+    <button class="certificate-lightbox-close" type="button" aria-label="Close certificate preview">&times;</button>
+    <img class="certificate-lightbox-image" src="" alt="">
+</div>
+
+<script>
+    (function () {
+        const lightbox = document.getElementById('certificate-lightbox');
+        const preview = lightbox?.querySelector('.certificate-lightbox-image');
+        const closeButton = lightbox?.querySelector('.certificate-lightbox-close');
+        const certificates = document.querySelectorAll('.achievement-image img');
+        if (!lightbox || !preview || !closeButton || !certificates.length) return;
+        const close = () => {
+            lightbox.hidden = true;
+            document.body.classList.remove('certificate-lightbox-open');
+            preview.removeAttribute('src');
+        };
+        certificates.forEach((certificate) => {
+            certificate.tabIndex = 0;
+            certificate.setAttribute('role', 'button');
+            certificate.setAttribute('title', 'Click to enlarge certificate');
+            const open = () => {
+                preview.src = certificate.currentSrc || certificate.src;
+                preview.alt = certificate.alt;
+                lightbox.hidden = false;
+                document.body.classList.add('certificate-lightbox-open');
+                closeButton.focus();
+            };
+            certificate.addEventListener('click', open);
+            certificate.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); open(); }
+            });
+        });
+        closeButton.addEventListener('click', close);
+        lightbox.addEventListener('click', (event) => { if (event.target === lightbox) close(); });
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && !lightbox.hidden) close();
+        });
+    })();
+</script>

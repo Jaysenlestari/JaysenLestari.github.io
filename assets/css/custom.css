@@ -1394,6 +1394,63 @@ img {
   margin: 1.5rem auto 1.75rem;
 }
 
+/* Certificate lightbox on the About page. */
+.achievement-image img {
+  cursor: zoom-in;
+}
+
+.certificate-lightbox[hidden] {
+  display: none;
+}
+
+.certificate-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  background: rgba(2, 6, 15, 0.9);
+  backdrop-filter: blur(8px);
+  cursor: zoom-out;
+}
+
+.certificate-lightbox-image {
+  width: auto !important;
+  max-width: min(94vw, 1400px) !important;
+  max-height: 90vh;
+  height: auto;
+  object-fit: contain;
+  border: 1px solid rgba(125, 249, 194, 0.35);
+  border-radius: 12px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.65);
+  cursor: default;
+}
+
+.certificate-lightbox-close {
+  position: absolute;
+  top: 1rem;
+  right: 1.25rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--card);
+  color: var(--text);
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.certificate-lightbox-close:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+body.certificate-lightbox-open {
+  overflow: hidden;
+}
+
 @media (max-width: 720px) {
   .post-main img {
     width: 100%;
